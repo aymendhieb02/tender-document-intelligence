@@ -104,6 +104,14 @@
 .analysis-tab { position: relative; flex: none; padding: 12px 9px 11px; color: #718188; background: transparent; border: 0; cursor: pointer; font-size: 10px; }
 .analysis-tab.active { color: var(--accent-strong); font-weight: 680; }
 .analysis-tab.active::after { position: absolute; right: 8px; bottom: -1px; left: 8px; height: 2px; content: ""; background: var(--accent); }
+.ask-form { display: grid; gap: 10px; padding: 16px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); }
+.ask-form label { color: var(--ink-secondary); font-size: 12px; font-weight: 650; }
+.ask-form textarea { width: 100%; resize: vertical; padding: 10px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); font: inherit; }
+.ask-form .button { justify-self: start; }
+.ask-answer { margin-top: 12px; padding: 16px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); }
+.ask-answer h3 { margin: 0 0 8px; font-size: 14px; }
+.ask-answer p { white-space: pre-wrap; }
+.ask-evidence { color: var(--muted); font-size: 12px; }
 .analysis-view { min-height: 0; flex: 1; overflow: auto; padding: 18px 16px 22px; }
 .view-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 17px; }
 .view-heading h2 { margin: 0; font-size: 16px; font-weight: 650; }
