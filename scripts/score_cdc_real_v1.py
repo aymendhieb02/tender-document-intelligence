@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import Counter
+import argparse
 import json
 from pathlib import Path
 import re
@@ -53,6 +54,17 @@ ALIASES = {
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--prediction-dir", default="predictions")
+    parser.add_argument("--metrics-file", default="metrics.json")
+    parser.add_argument("--results-file", default="results.json")
+    args = parser.parse_args()
+    prediction_dir = Path(args.prediction_dir)
+    metrics_file = Path(args.metrics_file)
+    results_file = Path(args.results_file)
+    for relative in (prediction_dir, metrics_file, results_file):
+        if relative.is_absolute() or ".." in relative.parts:
+            raise ValueError("Artifact paths must remain relative to the benchmark directory")
     gt_paths = sorted((OUT / "ground_truth").glob("CDC-DEV-*.json"))
     verified = []
     predictions = {}
@@ -61,7 +73,7 @@ def main() -> None:
         if gt.get("status") != "VERIFIED":
             continue
         verified.append(gt)
-        prediction_path = OUT / "predictions" / f"{gt['corpus_document_id']}.prediction.json"
+        prediction_path = OUT / prediction_dir / f"{gt['corpus_document_id']}.prediction.json"
         if prediction_path.exists():
             predictions[gt["corpus_document_id"]] = TenderDocument.model_validate_json(
                 prediction_path.read_text(encoding="utf-8"))
@@ -201,8 +213,8 @@ def main() -> None:
         "native_performance": "reported via per-document source profile; no aggregate modality accuracy claim",
         "scanned_performance": "1 full 37-page exploratory run; ground truth remains draft, so accuracy is not measurable",
     }
-    (OUT / "metrics.json").write_text(json.dumps(metrics, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    old = json.loads((OUT / "results.json").read_text(encoding="utf-8"))
+    (OUT / metrics_file).write_text(json.dumps(metrics, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    old = json.loads((OUT / results_file).read_text(encoding="utf-8"))
     old["ground_truth"] = {"verified_documents": len(verified),
                            "draft_documents": sum(json.loads(p.read_text(encoding="utf-8")).get("status") == "DRAFT" for p in gt_paths),
                            "section_documents_scored": section_documents,
@@ -217,7 +229,7 @@ def main() -> None:
             row["ground_truth_status"] = label.get("status", "DRAFT")
             row["scored"] = label.get("status") == "VERIFIED"
     old["gate_result"] = "PARTIALLY MEASURABLE: section, annex and targeted fact-sample scores only; full article/requirement accuracy not claimed."
-    (OUT / "results.json").write_text(json.dumps(old, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (OUT / results_file).write_text(json.dumps(old, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(metrics, ensure_ascii=False, indent=2))
 
 

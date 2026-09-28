@@ -6,7 +6,7 @@ from typing import Any
 from .contract import DocumentInput, DocumentResultAdapter
 from .adapter import IntelligenceDocumentAdapter
 from .headings import HeadingDetector, LanguagePack, classify, normalize
-from .schema import (Annex, Article, Diagnostic, Evidence, Paragraph, Requirement,
+from .schema import (Annex, Article, Diagnostic, Evidence, Lot, Paragraph, Requirement,
                      Section, SpecialDocument, TableReference, TenderDocument)
 from .requirements import enrich_requirements
 
@@ -35,6 +35,7 @@ class CDCAnalyzer:
         stack: list[tuple[int, Section]] = []
         article = None
         annex = None
+        lot = None
         toc_candidates = []
         observed = []
         counters = defaultdict(int)
@@ -63,6 +64,8 @@ class CDCAnalyzer:
                 article.page_end = page
             if annex is not None:
                 annex.page_end = page
+            if lot is not None:
+                lot.page_end = page
 
         # Only repeated text in the same margin is furniture. Repetition alone is insufficient.
         margins = defaultdict(set)
@@ -108,7 +111,7 @@ class CDCAnalyzer:
                 continue
             if not page.elements:
                 extend(page.page_number)
-            for element in page.elements:
+            for element in self.detector.compose_structural_lines(page.elements):
                 ev = evidence(page, element)
                 if element.kind in ("header", "footer") or margin_key(page, element) in repeated:
                     result.furniture_evidence.append(ev)
@@ -190,6 +193,18 @@ class CDCAnalyzer:
                         toc_annex_pending = heading if not heading.title else None
                         continue
                     pending = article or annex or (stack[-1][1] if stack else None)
+                    pending_part_title = (isinstance(pending, Section)
+                                          and pending.structural_type == "part"
+                                          and pending.title is None
+                                          and len(pending.source_evidence) == 1
+                                          and not pending.paragraphs and not pending.articles
+                                          and not pending.subsections and not pending.table_refs)
+                    if pending_part_title and normalize(text).startswith("cahier des clauses"):
+                        pending.title = text
+                        pending.normalized_title = normalize(text)
+                        pending.source_evidence.append(ev)
+                        extend(page.page_number)
+                        continue
                     pending_empty = (pending is not None and pending.title is None
                             and len(pending.source_evidence) == 1
                             and not getattr(pending, "paragraphs", [])
@@ -227,8 +242,11 @@ class CDCAnalyzer:
                             heading = None
                     if heading:
                         observed.append((heading, page.page_number, ev))
-                        if heading.kind in ("section", "subsection"):
+                        if heading.kind in ("section", "part", "subsection"):
                             article = None
+                            if lot is not None:
+                                lot.page_end = max(lot.page_start, page.page_number - int(page.page_number > lot.page_start))
+                                lot = None
                             if heading.kind == "subsection" and annex is not None:
                                 while stack and stack[-1][0] >= heading.level:
                                     stack.pop()
@@ -248,6 +266,7 @@ class CDCAnalyzer:
                                 stack.pop()
                             section = Section(id=new_id("section"), number=heading.number, title=heading.title,
                                               normalized_title=normalize(heading.title) if heading.title else None,
+                                              structural_type="part" if heading.kind == "part" else "section",
                                               start_page=page.page_number, end_page=page.page_number,
                                               source_evidence=[ev], evidence_status="detected" if heading.patterned else "probable",
                                               signals={"numbering_pattern": heading.patterned,
@@ -264,8 +283,16 @@ class CDCAnalyzer:
                             if any(a.number == article.number for a in owner_articles):
                                 result.diagnostics.append(Diagnostic(code="duplicate_article_number", message="Repeated article number in the same parent", source_evidence=[ev]))
                             owner_articles.append(article)
+                        elif heading.kind == "lot":
+                            article = None
+                            lot = Lot(id=new_id("lot"), number=heading.number, title=heading.title,
+                                      page_start=page.page_number, page_end=page.page_number,
+                                      source_section=stack[-1][1].id if stack else None,
+                                      source_evidence=[ev])
+                            result.lots.append(lot)
                         else:
                             article = None
+                            lot = None
                             annex = Annex(id=new_id("annex"), number=heading.number, title=heading.title,
                                           page_start=page.page_number, page_end=page.page_number,
                                           annex_type=classify(heading.title or "", self.pack),
