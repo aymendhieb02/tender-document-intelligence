@@ -14,6 +14,8 @@ class ElementInput(BaseModel):
     font_size: float | None = None
     bold: bool | None = None
     table_id: str | None = None
+    source_type: str | None = None
+    confidence: float | None = None
     parts: list["ElementPart"] = Field(default_factory=list)
 
 
@@ -21,6 +23,8 @@ class ElementPart(BaseModel):
     id: str
     text: str
     bbox: tuple[float, float, float, float] | None = None
+    source_type: str | None = None
+    confidence: float | None = None
 
 
 class PageInput(BaseModel):

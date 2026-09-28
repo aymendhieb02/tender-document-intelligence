@@ -18,6 +18,8 @@ class Evidence(BaseModel):
     line_index: int | None = None
     source_element_ids: list[str] = Field(default_factory=list)
     source_text_parts: list[str] = Field(default_factory=list)
+    source_element_types: list[str | None] = Field(default_factory=list)
+    source_element_confidences: list[float | None] = Field(default_factory=list)
 
 
 class Review(BaseModel):

@@ -23,8 +23,7 @@ class CDCAnalyzer:
             document = self.adapter.adapt(document_result)
         elif isinstance(document_result, DocumentInput):
             document = document_result
-        elif (type(document_result).__name__ == "DocumentResult"
-              and type(document_result).__module__ == "app.document_intelligence.schemas"):
+        elif callable(getattr(document_result, "model_dump", None)):
             document = IntelligenceDocumentAdapter().adapt(document_result)
         elif isinstance(document_result, dict):
             document = (IntelligenceDocumentAdapter().adapt(document_result)
@@ -53,7 +52,9 @@ class CDCAnalyzer:
                             coordinate_space=page.coordinate_space, page_width=page.width,
                             page_height=page.height, line_index=line,
                             source_element_ids=[p.id for p in parts] or [element.id],
-                            source_text_parts=[p.text for p in parts] or [element.text])
+                            source_text_parts=[p.text for p in parts] or [element.text],
+                            source_element_types=[p.source_type for p in parts] or [element.source_type],
+                            source_element_confidences=[p.confidence for p in parts] or [element.confidence])
 
         def extend(page):
             for _, section in stack:

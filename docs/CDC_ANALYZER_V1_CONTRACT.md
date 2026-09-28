@@ -1,10 +1,10 @@
 # CDC_ANALYZER_BASELINE_V1 contract
 
-`CDC_ANALYZER_BASELINE_V1` freezes the deterministic CDC consumer behavior and its public output shape. It consumes the public Document Intelligence `DocumentResult` or a JSON serialization of that result through the CDC adapter. It does not read PDFs, invoke OCR, import PaddleOCR or invoice extraction code, or call a language model.
+`CDC_ANALYZER_BASELINE_V1` freezes the deterministic CDC consumer behavior and its public output shape. It consumes the public Document Intelligence `DocumentResult` or a JSON serialization of that result through the CDC adapter. It does not read PDFs, invoke OCR, import PaddleOCR or invoice extraction code, or call a language model. Physical pages are 1-based; public bounding boxes remain in rendered-page pixel coordinates.
 
 ## Frozen behavior
 
-- The DocumentResult consumer boundary and evidence mapping, including source page, source element IDs, raw text and available bounding boxes.
+- The DocumentResult consumer boundary and evidence mapping, including source page, opaque original source element IDs, raw text, bounding boxes, source type and confidence when available. Null native-PDF confidence is preserved as null.
 - The canonical tender structure: title, sections and nested subsections, articles and clauses, annexes, ranges, diagnostics and source evidence.
 - Deterministic structural detection and candidate requirements, with absent values left absent.
 - The CDC to BOQ handoff: classify and locate a BOQ annex, then pass its node/evidence reference to `boq_agent`.

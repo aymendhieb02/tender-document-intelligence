@@ -35,12 +35,18 @@ class IntelligenceDocumentAdapter:
                 bbox = ((min(box["x1"] for box in bboxes), min(box["y1"] for box in bboxes),
                          max(box["x2"] for box in bboxes), max(box["y2"] for box in bboxes))
                         if bboxes else None)
+                source_types = [item.get("source_type", item.get("source")) for item in items]
                 elements.append(ElementInput(
                     id=f"p{page['page_number']}-row-{row_index:04d}",
                     text=" ".join(item["text"] for item in items), bbox=bbox,
+                    source_type=source_types[0] if all(value == source_types[0] for value in source_types) else None,
+                    confidence=items[0].get("confidence")
+                    if all(item.get("confidence") == items[0].get("confidence") for item in items) else None,
                     parts=[{"id": item["id"], "text": item["text"],
                             "bbox": tuple(item["bbox"][k] for k in ("x1", "y1", "x2", "y2"))
-                            if item.get("bbox") else None} for item in items]))
+                            if item.get("bbox") else None,
+                            "source_type": item.get("source_type", item.get("source")),
+                            "confidence": item.get("confidence")} for item in items]))
             pages.append(PageInput(page_number=page["page_number"], width=page["width"], height=page["height"],
                                    coordinate_space=page["coordinate_space"], elements=elements))
             # Preserve page transforms and layout counts without retaining duplicate

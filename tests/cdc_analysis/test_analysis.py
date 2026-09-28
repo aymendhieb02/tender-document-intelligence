@@ -172,8 +172,16 @@ def test_public_document_result_contract_adapter_without_producer_imports():
     assert result.sections[0].source_evidence[0].source_element_ids == ["original-id"]
     assert result.sections[0].source_evidence[0].bbox == (20, 120, 560, 150)
     assert result.sections[0].source_evidence[0].coordinate_space == "rendered_page_pixels"
+    assert result.sections[0].source_evidence[0].source_element_types == ["native_pdf"]
+    assert result.sections[0].source_evidence[0].source_element_confidences == [None]
     assert result.tables == []
     assert CDCAnalyzer().analyze(producer) == result
+
+    class PublicDocumentResult:
+        def model_dump(self, mode="json"):
+            return producer
+
+    assert CDCAnalyzer().analyze(PublicDocumentResult()) == result
 
 
 def test_reviews_keep_machine_value_and_evidence():
