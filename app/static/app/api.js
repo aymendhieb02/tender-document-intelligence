@@ -21,6 +21,7 @@ export async function analyzeTenderDocument(file, workflow) {
       ...payload,
       document_id: payload.document.document_id,
       document_url: payload.document.document_url,
+      document_store_id: storedDocumentId(payload.document.document_url),
       source_type: payload.document.source_type,
       page_count: payload.document.page_count,
       document_result: {
@@ -45,6 +46,7 @@ export async function analyzeTenderDocument(file, workflow) {
   const firstBoq = payload.boq_results?.[0]?.result;
   return {
     ...payload,
+    document_store_id: storedDocumentId(payload.document_url),
     document_result: {
       document_id: payload.document_id,
       source_type: payload.source_type,
@@ -56,15 +58,24 @@ export async function analyzeTenderDocument(file, workflow) {
   };
 }
 
-/** Ask Tender integration boundary. Agent 16 can connect the V2 endpoint here. */
+function storedDocumentId(documentUrl) {
+  return String(documentUrl || "").match(/^\/api\/documents\/([^/?#]+)/)?.[1] || null;
+}
+
 export async function askTender(documentId, question) {
-  const response = await fetch("/api/v2/cdc/ask", {
+  if (!documentId) throw new Error("Identifiant du dossier manquant.");
+  const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/ask`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ document_id: documentId, question }),
+    body: JSON.stringify({ question }),
   });
   const payload = await response.json().catch(() => ({}));
-  if (response.status === 404 || response.status === 501) return { unavailable: true };
-  if (!response.ok) throw new Error(payload.error?.message || "La question n’a pas pu être traitée.");
+  if (!response.ok) {
+    const detail = payload.error || payload.detail || {};
+    const error = new Error(typeof detail === "string" ? detail : detail.message || "La question n’a pas pu être traitée.");
+    error.code = detail.code || "ask_tender_error";
+    error.status = response.status;
+    throw error;
+  }
   return payload;
 }

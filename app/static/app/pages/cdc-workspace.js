@@ -69,10 +69,10 @@ export function renderCdcWorkspace(outlet, payload, file, workflow) {
     button.disabled = true;
     result.innerHTML = `<p role="status">Recherche dans le dossier…</p>`;
     try {
-      const answer = await askTender(payload.document_id || cdc.document_id, question);
+      const answer = await askTender(payload.document_store_id, question);
       if (answer.unavailable) result.innerHTML = `<div class="notice notice-neutral"><strong>Ask Tender indisponible</strong><span>Le service de questions n’est pas encore connecté.</span></div>`;
-      else if (answer.no_evidence || answer.status === "not_found" || answer.status === "no_evidence") result.innerHTML = `<div class="notice notice-warning"><strong>Aucune preuve trouvée</strong><span>Le dossier ne fournit pas de source suffisante pour répondre.</span></div>`;
-      else result.innerHTML = `<article class="ask-answer"><h3>Réponse</h3><p>${escapeHtml(answer.answer || "—")}</p>${renderAskEvidence(answer.evidence || answer.sources || [])}</article>`;
+      else if (answer.status === "insufficient_evidence" || answer.no_evidence || answer.status === "not_found" || answer.status === "no_evidence") result.innerHTML = `<div class="notice notice-warning"><strong>Aucune preuve trouvée</strong><span>Le dossier ne fournit pas de source suffisante pour répondre.</span></div>`;
+      else result.innerHTML = `<article class="ask-answer">${answer.status === "generation_unavailable" ? `<div class="notice notice-neutral"><strong>Génération locale indisponible</strong><span>Des passages correspondants sont présentés ci-dessous pour vérification.</span></div>` : ""}<h3>Réponse</h3><p>${escapeHtml(answer.answer || "—")}</p>${renderAskEvidence(answer.evidence || answer.sources || [])}</article>`;
     } catch (error) {
       result.innerHTML = `<div class="notice notice-warning"><strong>Impossible d’interroger le dossier</strong><span>${escapeHtml(error.message)}</span></div>`;
     } finally { button.disabled = false; }

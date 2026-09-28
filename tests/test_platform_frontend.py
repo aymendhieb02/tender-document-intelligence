@@ -29,7 +29,8 @@ def test_frontend_adapts_backend_v2_and_does_not_claim_false_pdf_highlights():
 
     assert '"/api/v2/cdc/analyze"' in api
     assert '"/api/v2/cdc/male/analyze"' in api
-    assert '"/api/v2/cdc/ask"' in api
+    assert '${encodeURIComponent(documentId)}/ask' in api
+    assert 'document_store_id: storedDocumentId(payload.document.document_url)' in api
     assert "payload.boq_results?.[0]?.result" in api
     assert "/pages/${this.page}.png" in viewer
     assert "this.sourceUrl" in viewer and "physicalPageForEvidence(evidence)" in viewer
@@ -52,12 +53,21 @@ def test_tender_workspace_uses_real_v2_modules_and_truthful_empty_states():
     assert 'display(item.normalized)' in cdc
     assert 'item.raw ?? "—"' in cdc
     assert 'Ask Tender' in cdc and 'Finances & échéances' in cdc
+    assert 'askTender(payload.document_store_id, question)' in cdc
 
 
 def test_important_tender_and_invoice_routes_remain_available():
     for route in ("/", "/invoice", "/invoice/result/abc", "/cdc", "/cdc/result/abc",
                   "/cdc/male", "/cdc/male/result/abc"):
         assert client.get(route).status_code == 200
+
+
+def test_sidebar_uses_only_the_most_specific_tender_route():
+    shell = (ROOT / "app/static/app/components/shell.js").read_text(encoding="utf-8")
+    assert 'activePath === "/cdc" || activePath.startsWith("/cdc/result/")' in shell
+    assert 'activePath.startsWith(`${href}/`)' in shell
+    # The special handling for /cdc must avoid matching Ministry result routes.
+    assert 'href === "/cdc" ?' in shell
 
 
 def test_cdc_views_use_recursive_nodes_and_backend_handoffs_without_fixture_numbers():
