@@ -46,3 +46,7 @@ python scripts/score_cdc_real_v1.py --prediction-dir predictions_v2 --metrics-fi
 ```
 
 The source corpus and generated predictions are not committed. The metrics/report describe development results only; a held-out evaluation requires a new corpus and independently reviewed labels.
+
+### Post-V1 artifact correction
+
+The immutable `tender-intelligence-v1` tag contains a generated CDC prediction JSON inherited from the pre-release regression baseline. Current `main` removes that generated snapshot and tests the consumer contract from the committed `DocumentResult` fixture instead. The tag remains unchanged; new generated CDC prediction files under `dataset/cdc/predictions/` are ignored.
