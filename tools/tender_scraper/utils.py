@@ -1,4 +1,5 @@
 import hashlib, re, unicodedata
+from html.parser import HTMLParser
 from urllib.parse import urljoin, urlparse, urldefrag
 from pathlib import Path
 
@@ -16,3 +17,15 @@ def same_domain(a,b): return urlparse(a).hostname == urlparse(b).hostname
 def allowed_path(url, prefixes):
  path=urlparse(url).path.lower()
  return any(x in path for x in prefixes)
+
+class _LinkParser(HTMLParser):
+    def __init__(self):super().__init__(convert_charrefs=True);self.links=[];self.current=None
+    def handle_starttag(self,tag,attrs):
+        if tag.lower()=="a":self.current={"attrs":dict(attrs),"text":[]}
+    def handle_data(self,data):
+        if self.current is not None:self.current["text"].append(data)
+    def handle_endtag(self,tag):
+        if tag.lower()=="a" and self.current is not None:
+            self.links.append({**self.current["attrs"],"text":" ".join(" ".join(self.current["text"]).split())});self.current=None
+def extract_links(html):
+    parser=_LinkParser();parser.feed(html);parser.close();return parser.links

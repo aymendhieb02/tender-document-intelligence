@@ -6,7 +6,9 @@
     "organization_type": {},
     "normalized_procurement_type": {},
     "document_type": {},
+    "year_hint": {},
     "language_hint": {},
-    "quality_tier": {}
+    "text_profile": {},
+    "acquisition_quality_tier": {}
   }
 }

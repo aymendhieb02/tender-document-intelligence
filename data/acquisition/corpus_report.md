@@ -1,25 +1,23 @@
-# Tunisian tender acquisition corpus report
+# Acquired corpus diversity report
 
-Documents in manifest: 0
+Manifest documents: 0
 
-## Diversity breakdown
+## Concentration distributions
 
 ### source_id
 
-
 ### organization
-
 
 ### organization_type
 
-
 ### normalized_procurement_type
-
 
 ### document_type
 
+### year_hint
 
 ### language_hint
 
+### text_profile
 
-### quality_tier
+### acquisition_quality_tier

@@ -1,0 +1,5 @@
+from .manifest import read_csv, write_csv
+
+CANDIDATE_FIELDS="candidate_id source_id organization tender_title tender_reference publication_date deadline source_procurement_type normalized_procurement_type tender_page_url document_url document_link_text document_filename suspected_document_type discovery_method discovered_at download_status quality_status classification_reasons document_role sha256 content_simhash near_duplicate_status duplicate_of relative_path page_count file_size_bytes native_text_available likely_scanned language_hint title_hint acquisition_quality benchmark_value review_status notes".split()
+def load_candidates(path): return read_csv(path)
+def save_candidates(path, rows): write_csv(path,CANDIDATE_FIELDS,rows)
