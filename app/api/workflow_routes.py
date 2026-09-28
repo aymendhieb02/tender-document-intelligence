@@ -17,6 +17,7 @@ from app.document_intelligence import DocumentProcessor
 from app.document_intelligence.schemas import DocumentResult
 from app.boq import extract_male_municipal_from_document
 from app.invoice.document_result_adapter import DocumentResultInvoiceAdapter
+from app.ask_tender.service import AskRequest, AskResponse, answer_question
 from app.services.pipeline_runner import process_document_file
 
 logger = logging.getLogger(__name__)
@@ -205,6 +206,23 @@ async def analyze_ministry_v2(file: UploadFile = File(...)) -> TenderAnalysisRes
     payload, stored, document = await _run_ministry_upload(file)
     return build_tender_analysis_v2(payload, workflow="ministry_boq", document_result=document,
                                     filename=stored.filename)
+
+
+@router.post("/v2/cdc/{document_id}/ask", response_model=AskResponse)
+def ask_tender_v2(document_id: str, request: AskRequest) -> AskResponse:
+    """Ask a single evidence-grounded question about a previously uploaded tender."""
+    stored = document_store.get(document_id)
+    if stored is None:
+        raise WorkflowError("document_not_found", "ask_tender", "The document is unavailable or expired.",
+                            status_code=404, recoverable=True)
+    try:
+        document_result = DocumentProcessor().process(stored.path)
+        tender = CDCAnalyzer().analyze(document_result)
+    except Exception as exc:
+        logger.exception("Ask Tender source analysis failed")
+        raise WorkflowError("cdc_analysis_failed", "ask_tender", "Tender evidence could not be analyzed.",
+                            status_code=422, technical_detail=type(exc).__name__, recoverable=True) from exc
+    return answer_question(tender, request.question)
 
 
 @router.post("/invoices/analyze", response_model=ProcessInvoiceResponse)
