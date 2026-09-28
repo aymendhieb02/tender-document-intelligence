@@ -115,7 +115,16 @@ Errors use a structured envelope with code, workflow, message, optional technica
 
 Twelve committed test modules were copied unchanged to `tests/invoice_regression/` and run against the integrated code: `test_extractor.py`, `test_validator.py`, `test_line_items.py`, `test_schema.py`, `test_correction_workflow.py`, `test_ocr_engine.py`, `test_ocr_profiles.py`, `test_producer_invoice_reader_v2.py`, `test_release_blocker_invoice.py`, `test_dossier_api.py`, `test_dossier_pipeline.py`, and `test_file_loader_formats.py`. Result: **83 passed**. No assertions were reduced.
 
-No historical tests were adapted. The new `tests/test_platform_api.py` covers startup, all three workflows, errors, empty/unrecognized Ministry cases, document retrieval, and physical-page rejection. Historical browser/UI tests remain with Agent 4's frontend work. Model/benchmark tests requiring separately provisioned weights or labeled evaluation data were not imported into the V1 backend regression subset; they are not represented as passing or obsolete.
+Historical invoice-test disposition:
+
+| Classification | Disposition |
+|---|---|
+| **MIGRATED** | The 12 modules above, unchanged; 83 passed. |
+| **ADAPTED** | None. |
+| **OBSOLETE** | None declared obsolete. |
+| **BLOCKED / OUT OF BACKEND V1 SCOPE** | Ground-truth/benchmark tests requiring separately provisioned datasets or model weights were not run. Historical browser/UI tests remain with Agent 4 and were not imported into this backend branch. These are not represented as passing. |
+
+The new `tests/test_platform_api.py` covers startup, all three workflows, errors, empty/unrecognized Ministry cases, document retrieval, and physical-page rejection. The API tests add 9 cases. Model/benchmark tests excluded above are not represented as passing or obsolete.
 
 ## Known limits
 
