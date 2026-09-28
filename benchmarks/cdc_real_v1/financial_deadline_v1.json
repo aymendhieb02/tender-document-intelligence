@@ -1,0 +1,429 @@
+{
+  "artifact_version": "financial_deadline_eval_v1",
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "label_files_unchanged": true,
+  "scope": "Verified labeled raw spans for financial and temporal requirement types; excludes non-owned production quantities and draft documents.",
+  "baseline_method": "Replay of legacy V2 normalization predicates on the same raw labeled spans; this is a rule-level slice, not the published end-to-end 7/14 metric.",
+  "examples": 18,
+  "legacy_v2_exact": 5,
+  "new_exact": 17,
+  "delta_exact": 12,
+  "improvements": [
+    "submission_deadline @ CDC-DEV-006",
+    "penalty_cap @ CDC-DEV-006",
+    "annual_contract_duration @ CDC-DEV-007",
+    "penalty_rate @ CDC-DEV-007",
+    "penalty_cap @ CDC-DEV-007",
+    "payment_schedule @ CDC-DEV-007",
+    "submission_deadline @ CDC-DEV-011",
+    "provisional_guarantee @ CDC-DEV-017",
+    "penalty_rate @ CDC-DEV-017",
+    "penalty_cap @ CDC-DEV-017",
+    "payment_deadline @ CDC-DEV-017",
+    "submission_deadline @ CDC-DEV-022"
+  ],
+  "regressions": [],
+  "rows": [
+    {
+      "document_id": "CDC-DEV-001",
+      "requirement_type": "offer_validity",
+      "raw_text": "reste liée par cette offre pendant 60 jours à compter du jour suivant la date limite fixée pour la réception des offres",
+      "expected_value": 60,
+      "predicted_value": "60",
+      "correct": true,
+      "legacy_v2_correct": true,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "offer_validity",
+          "raw": "60 jours",
+          "normalized": {
+            "value": "60",
+            "unit": "DAY"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-001",
+      "requirement_type": "payment_deadline",
+      "raw_text": "Tous les paiements se feront au plus tard dans un délai de 45 jours",
+      "expected_value": 45,
+      "predicted_value": "45",
+      "correct": true,
+      "legacy_v2_correct": true,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "payment_deadline",
+          "raw": "45 jours",
+          "normalized": {
+            "value": "45",
+            "unit": "DAY"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-001",
+      "requirement_type": "penalty_cap",
+      "raw_text": "Les pénalités de retard sont plafonnées à 5 % du montant définitif des travaux augmenté du montant des avenants éventuels",
+      "expected_value": 5,
+      "predicted_value": "5",
+      "correct": true,
+      "legacy_v2_correct": true,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "penalty_cap",
+          "raw": "5 %",
+          "normalized": {
+            "value": "5",
+            "unit": "PERCENT",
+            "period": null,
+            "basis": null
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-006",
+      "requirement_type": "submission_deadline",
+      "raw_text": "05 ماي 2025 على الساعة الحاديّة عشرة صباحا",
+      "expected_value": "2025-05-05 11:00",
+      "predicted_value": "2025-05-05 11:00",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "submission_deadline",
+          "raw": "05 ماي 2025",
+          "normalized": {
+            "date": "2025-05-05",
+            "time": "11:00"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-006",
+      "requirement_type": "penalty_cap",
+      "raw_text": "لا يمكن أن تتجاوز جملة غرامات التأخير سقف (خمسة بالمائة 05 %) من المبلغ الجملي للصفقة",
+      "expected_value": 5,
+      "predicted_value": "5",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "penalty_cap",
+          "raw": "05 %",
+          "normalized": {
+            "value": "5",
+            "unit": "PERCENT",
+            "period": null,
+            "basis": "CONTRACT_AMOUNT"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-006",
+      "requirement_type": "payment_deadline",
+      "raw_text": "في أجل لا يتجاوز (30) يوما من تاريخ إيداع فاتورة",
+      "expected_value": 30,
+      "predicted_value": null,
+      "correct": false,
+      "legacy_v2_correct": false,
+      "status": "missing",
+      "facts": []
+    },
+    {
+      "document_id": "CDC-DEV-007",
+      "requirement_type": "offer_validity",
+      "raw_text": "Les offres doivent être valables pendant un délai de 120 jours à compter du jour suivant de la date limite de remise des offres fixée par l’administration",
+      "expected_value": 120,
+      "predicted_value": "120",
+      "correct": true,
+      "legacy_v2_correct": true,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "offer_validity",
+          "raw": "120 jours",
+          "normalized": {
+            "value": "120",
+            "unit": "DAY"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-007",
+      "requirement_type": "annual_contract_duration",
+      "raw_text": "pour une période d’une année renouvelable deux fois",
+      "expected_value": 1,
+      "predicted_value": "1",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "duration",
+          "raw": "une an",
+          "normalized": {
+            "value": "1",
+            "unit": "YEAR"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-007",
+      "requirement_type": "penalty_rate",
+      "raw_text": "Montant de la Pénalité = Montant annuel du contrat x Nombre de jours/heure de retard x 0.001",
+      "expected_value": 0.001,
+      "predicted_value": "0.001",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "penalty_rate",
+          "raw": "Pénalité = Montant annuel du contrat x Nombre de jours/heure de retard x 0.001",
+          "normalized": {
+            "value": "0.001",
+            "unit": "DECIMAL_RATE",
+            "period": "DAY",
+            "basis": "CONTRACT_AMOUNT"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-007",
+      "requirement_type": "penalty_cap",
+      "raw_text": "Le montant de la pénalité de retard dépasserait 5% du montant annuel total TTC du contrat de maintenance",
+      "expected_value": 5,
+      "predicted_value": "5",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "penalty_cap",
+          "raw": "5%",
+          "normalized": {
+            "value": "5",
+            "unit": "PERCENT",
+            "period": null,
+            "basis": "CONTRACT_AMOUNT"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-007",
+      "requirement_type": "payment_schedule",
+      "raw_text": "Le paiement du montant de la maintenance préventive et curative sera effectué trimestriellement et à terme échu",
+      "expected_value": null,
+      "predicted_value": {
+        "frequency": "QUARTERLY",
+        "timing": "IN_ARREARS"
+      },
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "payment_schedule",
+          "raw": "trimestriellement",
+          "normalized": {
+            "frequency": "QUARTERLY",
+            "timing": "IN_ARREARS"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-011",
+      "requirement_type": "submission_deadline",
+      "raw_text": "La date limite de réception des offres est fixée au plus tard le 17 novembre 2025 à 11h00",
+      "expected_value": "2025-11-17 11:00",
+      "predicted_value": "2025-11-17 11:00",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "submission_deadline",
+          "raw": "17 novembre 2025 à 11h00",
+          "normalized": {
+            "date": "2025-11-17",
+            "time": "11:00"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-017",
+      "requirement_type": "provisional_guarantee",
+      "raw_text": "Le cautionnement provisoire d’un montant de : 4500 Dinars",
+      "expected_value": 4500,
+      "predicted_value": "4500",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "provisional_guarantee",
+          "raw": "4500 Dinars",
+          "normalized": {
+            "amount": "4500",
+            "currency": "TND",
+            "tax_basis": null
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-017",
+      "requirement_type": "offer_validity",
+      "raw_text": "Les offres doivent être valables 120 jours à compter du jour suivant de la date limite de remise des offres",
+      "expected_value": 120,
+      "predicted_value": "120",
+      "correct": true,
+      "legacy_v2_correct": true,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "offer_validity",
+          "raw": "120 jours",
+          "normalized": {
+            "value": "120",
+            "unit": "DAY"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-017",
+      "requirement_type": "penalty_rate",
+      "raw_text": "Pénalités de retard= montant des équipements x nombre de jours de retard x 0,001",
+      "expected_value": 0.001,
+      "predicted_value": "0.001",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "penalty_rate",
+          "raw": "Pénalités de retard= montant des équipements x nombre de jours de retard x 0,001",
+          "normalized": {
+            "value": "0.001",
+            "unit": "DECIMAL_RATE",
+            "period": "DAY",
+            "basis": "CONTRACT_AMOUNT"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-017",
+      "requirement_type": "penalty_cap",
+      "raw_text": "Le montant de la pénalité de retard dépasserait 5% du montant total TTC du marché",
+      "expected_value": 5,
+      "predicted_value": "5",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "penalty_cap",
+          "raw": "5%",
+          "normalized": {
+            "value": "5",
+            "unit": "PERCENT",
+            "period": null,
+            "basis": "CONTRACT_AMOUNT"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-017",
+      "requirement_type": "payment_deadline",
+      "raw_text": "dans un délai maximum de 30 jours à compter de la date du dépôt de la facture",
+      "expected_value": 30,
+      "predicted_value": "30",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "payment_deadline",
+          "raw": "30 jours",
+          "normalized": {
+            "value": "30",
+            "unit": "DAY"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    },
+    {
+      "document_id": "CDC-DEV-022",
+      "requirement_type": "submission_deadline",
+      "raw_text": "La date limite de réception des offres est fixée au plus tard le 17 Novembre 2025 à 10h00",
+      "expected_value": "2025-11-17 10:00",
+      "predicted_value": "2025-11-17 10:00",
+      "correct": true,
+      "legacy_v2_correct": false,
+      "status": "normalized",
+      "facts": [
+        {
+          "category": "submission_deadline",
+          "raw": "17 Novembre 2025 à 10h00",
+          "normalized": {
+            "date": "2025-11-17",
+            "time": "10:00"
+          },
+          "status": "normalized",
+          "conflict_group": null
+        }
+      ]
+    }
+  ]
+}
