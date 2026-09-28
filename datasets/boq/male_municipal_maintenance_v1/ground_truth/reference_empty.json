@@ -1,0 +1,17 @@
+{
+  "document_id": "reference-template-MM-Cahier-des-charges-type-Entretien",
+  "template_family": "MALE_MUNICIPAL_MAINTENANCE_BOQ_V1",
+  "source_type": "reference",
+  "page": 25,
+  "page_size_points": [595.2, 841.92],
+  "table_bbox_points": [70.82, 213.67, 503.47, 600.17],
+  "rows": [
+    {"article": "01", "designation_raw": null, "quantity_raw": null, "unit_price_ht_raw": null, "total_ht_raw": null, "unit_price_ttc_raw": null, "total_ttc_raw": null},
+    {"article": "02", "designation_raw": null, "quantity_raw": null, "unit_price_ht_raw": null, "total_ht_raw": null, "unit_price_ttc_raw": null, "total_ttc_raw": null},
+    {"article": "03", "designation_raw": null, "quantity_raw": null, "unit_price_ht_raw": null, "total_ht_raw": null, "unit_price_ttc_raw": null, "total_ttc_raw": null},
+    {"article": "04", "designation_raw": null, "quantity_raw": null, "unit_price_ht_raw": null, "total_ht_raw": null, "unit_price_ttc_raw": null, "total_ttc_raw": null},
+    {"article": "05", "designation_raw": null, "quantity_raw": null, "unit_price_ht_raw": null, "total_ht_raw": null, "unit_price_ttc_raw": null, "total_ttc_raw": null}
+  ],
+  "totals": {"total_ht_raw": null, "vat_rate_raw": null, "vat_raw": null, "total_ttc_raw": null},
+  "notes": ["Empty template; structural reference only, never accuracy evidence.", "L'unité dotted line is inside Désignation and is retained as ancillary price-in-words evidence."]
+}

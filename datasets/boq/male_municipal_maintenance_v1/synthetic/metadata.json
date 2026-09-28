@@ -1,0 +1,14 @@
+{
+  "source_type": "synthetic",
+  "template_family": "MALE_MUNICIPAL_MAINTENANCE_BOQ_V1",
+  "source_reference": "reference/MM_Cahier-des-charges-type-Entretien.pdf, printed page 25",
+  "purpose": "Controlled development fixtures; not real-world evaluation data",
+  "fixtures": [
+    {"id": "fixture_a_clean", "file": "fixture_a_clean.pdf", "scenario": "clear cells and consistent totals"},
+    {"id": "fixture_b_french_numbers", "file": "fixture_b_french_numbers.pdf", "scenario": "space grouping and comma decimal values"},
+    {"id": "fixture_c_ocr_imperfections", "file": "fixture_c_ocr_imperfections.json", "scenario": "text-level OCR substitutions; geometry held stable"},
+    {"id": "fixture_d_missing_quantity", "file": "fixture_d_missing_quantity.pdf", "scenario": "missing quantity cell"},
+    {"id": "fixture_e_arithmetic_error", "file": "fixture_e_arithmetic_error.pdf", "scenario": "HT line arithmetic mismatch"},
+    {"id": "fixture_f_shifted_geometry", "file": "fixture_f_shifted_geometry.pdf", "scenario": "cell text shifted 2 PDF points"}
+  ]
+}
