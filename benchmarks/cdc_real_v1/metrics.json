@@ -1,0 +1,17 @@
+{
+  "status": "NOT_MEASURABLE",
+  "reason": "No source-linked ground truth has passed human visual verification; do not treat pending labels as negatives.",
+  "section_precision": null,
+  "section_recall": null,
+  "article_precision": null,
+  "article_recall": null,
+  "annex_precision": null,
+  "annex_recall": null,
+  "requirement_precision": null,
+  "requirement_recall": null,
+  "normalized_value_correctness": null,
+  "page_provenance_accuracy": null,
+  "boq_detection": null,
+  "native_performance": null,
+  "scanned_performance": null
+}

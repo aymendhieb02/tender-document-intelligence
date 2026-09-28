@@ -1,0 +1,23 @@
+{
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "baseline": "CDC_ANALYZER_REAL_BASELINE_V1",
+  "tested_commit": "a0f4e31f04540a7901ba0c956fbc5919faf4ab5e",
+  "execution_scope": "CDC Analyzer on existing DocumentResult sidecar; PDF-to-Document-Intelligence was not rerun",
+  "documents": [
+    {
+      "document_id": "CDC-DEV-001",
+      "sha256": "f3b99c74d7d1fad9cd438869be1aa8e19d2329d99e28900c444cc3f0b3b8545d",
+      "prediction_file": "predictions/MM_Cahier-des-charges-type-Entretien.prediction.json",
+      "ground_truth_status": "HUMAN_REVIEW_REQUIRED",
+      "scored": false,
+      "prediction_counts": {
+        "top_level_sections": 5,
+        "top_level_articles": 0,
+        "annexes": 6,
+        "requirements": 62,
+        "detected_special_documents": 7
+      }
+    }
+  ],
+  "gate_result": "NOT YET MEASURABLE: Human-verified source-linked labels required"
+}

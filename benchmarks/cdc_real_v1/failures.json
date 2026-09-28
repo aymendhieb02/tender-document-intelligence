@@ -1,0 +1,19 @@
+{
+  "status": "NO_VERIFIED_FAILURES_ASSERTED",
+  "reason": "The pending labels cannot establish correct or incorrect analyzer behavior.",
+  "failures": [],
+  "evaluation_blockers": [
+    {
+      "category": "MISSING_SOURCE_CORPUS",
+      "detail": "24 of 25 unique seed PDFs are unavailable in this checkout."
+    },
+    {
+      "category": "HUMAN_REVIEW_REQUIRED",
+      "detail": "Available structure annotation requires page-by-page visual verification."
+    },
+    {
+      "category": "INCOMPLETE_PIPELINE_RUN",
+      "detail": "Document Intelligence/OCR was not rerun from source PDF."
+    }
+  ]
+}
