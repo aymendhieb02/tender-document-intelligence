@@ -27,4 +27,3 @@ This adapter consumes the public DocumentResult contract and its upstream geomet
 ## Validation
 
 `python -m pytest tests/cdc_analysis -q`: **28 passed**. The real-document integration checks section/article counts and ranges, technical hierarchy, annexes and subforms, BOQ handoff, evidence, selected normalized requirements and deterministic prediction parity. The benchmark remains gated pending an authorized human label review.
-
