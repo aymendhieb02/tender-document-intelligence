@@ -1,6 +1,7 @@
 """Score the newly exhaustive, source-reviewed CDC-DEV-001 annotation subsets."""
 from __future__ import annotations
 
+import argparse
 from collections import Counter
 import json
 from pathlib import Path
@@ -30,9 +31,19 @@ def number(value):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--prediction", default="predictions_v2/CDC-DEV-001.prediction.json",
+                        help="local prediction path relative to benchmarks/cdc_real_v1; generated predictions are not committed")
+    args = parser.parse_args()
+    prediction_path = Path(args.prediction)
+    if prediction_path.is_absolute() or ".." in prediction_path.parts:
+        parser.error("--prediction must remain relative to benchmarks/cdc_real_v1")
+    prediction_path = OUT / prediction_path
+    if not prediction_path.is_file():
+        parser.error(f"prediction file is unavailable: {prediction_path}; supply a local reviewed-run prediction")
     gt = json.loads((OUT / "ground_truth" / "CDC-DEV-001.json").read_text(encoding="utf-8"))
     prediction = TenderDocument.model_validate_json(
-        (OUT / "predictions_v2" / "CDC-DEV-001.prediction.json").read_text(encoding="utf-8"))
+        prediction_path.read_text(encoding="utf-8"))
     records = structural_records(prediction)
 
     expected = gt["complete_article_inventory"]["expected_articles"]
@@ -98,7 +109,7 @@ def main():
                           "exact_normalized_fact_recall_within_scope": exact_facts / len(facts) if facts else None}
 
     result = {"schema_version": "cdc_benchmark_expansion_metrics_v1", "source_document": "CDC-DEV-001",
-              "prediction": "predictions_v2/CDC-DEV-001.prediction.json", "article_inventory": article,
+              "prediction": prediction_path.relative_to(OUT).as_posix(), "article_inventory": article,
               "negative_candidate_measurements": negative_metrics, "financial_deadline_subset": requirement_metrics,
               "boq_negative_examples": {"status": "NOT_MEASURED", "reason": "No locally available source-reviewed document without a BOQ was identified."},
               "scanned_arabic": {"document_id": "CDC-DEV-009", "ground_truth_status": "DRAFT", "scored": False}}
