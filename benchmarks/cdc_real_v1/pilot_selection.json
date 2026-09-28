@@ -1,0 +1,13 @@
+{
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "status": "SELECTED_FOR_MANUAL_ANNOTATION",
+  "documents": [
+    {"document_id": "CDC-DEV-001", "sha256": "f3b99c74d7d1fad9cd438869be1aa8e19d2329d99e28900c444cc3f0b3b8545d", "relative_path": "MM_Cahier-des-charges-type-Entretien.pdf", "selection_reason": "30-page French native-text generic works specification template; distinct format and procurement category."},
+    {"document_id": "CDC-DEV-006", "sha256": "2b0fe4062ee1ebe9da807c35fc2910d275fd49016d45f35ff2c7dcf8cb6833f1", "relative_path": "Présidence du Gouvernement — Maintenance des photocopieurs/كراس الشروط الإدارية والفنية الخاصة.pdf", "selection_reason": "51-page Arabic native-text goods tender specification; language and structure diversity."},
+    {"document_id": "CDC-DEV-007", "sha256": "2c8b7c22f3407aac5c2ada9ff17367bdd79e058d13fd5dfd3aec7b7ebc664f52", "relative_path": "Présidence du Gouvernement — Maintenance des photocopieurs/avis-fr (1).pdf", "selection_reason": "48-page French/Arabic platform maintenance tender pack with substantive clauses and annexes."},
+    {"document_id": "CDC-DEV-009", "sha256": "49c608e88db3608085b8723d8a46711ac38ed80d037f502da31b390b887d7d81", "relative_path": "C.C._Consultaion_06-2026-26022026142257.pdf", "selection_reason": "37-page scanned Arabic specification; distinct issuing organization and OCR profile."},
+    {"document_id": "CDC-DEV-011", "sha256": "80916e3dbad17bad48ea2976819a3781d2a9f1bcd5e1ea9a34b81652fb27502f", "relative_path": "Présidence du Gouvernement — Maintenance des photocopieurs/avis-fr-18102025.pdf", "selection_reason": "21-page French/Arabic substantive 2025 goods tender specification."},
+    {"document_id": "CDC-DEV-017", "sha256": "c33db281111342a6fd80b118bb7658b964c10584933cf4a51d6e8b5c3400c831", "relative_path": "Présidence du Gouvernement — Maintenance des photocopieurs/VISIOCONFERENCE.pdf", "selection_reason": "30-page French/Arabic IT procurement specification with technical equipment requirements."},
+    {"document_id": "CDC-DEV-022", "sha256": "e920382499e837baf81aca362fd3984ea1e68d5b8c9e939e0e5043c14616bf5b", "relative_path": "Présidence du Gouvernement — Maintenance des photocopieurs/cdc-fr-16102026.pdf", "selection_reason": "18-page French/Arabic service tender specification, providing a shorter structure."}
+  ]
+}

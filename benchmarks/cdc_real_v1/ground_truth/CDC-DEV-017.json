@@ -1,0 +1,44 @@
+{
+  "schema_version": "cdc_ground_truth_v1",
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "document_id": "c33db281111342a6fd80b118bb7658b964c10584933cf4a51d6e8b5c3400c831",
+  "corpus_document_id": "CDC-DEV-017",
+  "source_sha256": "c33db281111342a6fd80b118bb7658b964c10584933cf4a51d6e8b5c3400c831",
+  "filename": "VISIOCONFERENCE.pdf",
+  "status": "VERIFIED",
+  "reviewer": "Codex source-PDF curator",
+  "verified_at": "2026-09-28",
+  "verified_fields": ["document_role", "major_sections", "selected_articles", "requirements", "annexes"],
+  "document_metadata": {"page_count": 30, "organization": "Presidency of the Government", "language": "FRENCH", "text_profile": "native", "document_role": "DAO", "procurement_type": "IT", "year": 2026, "tender_reference": "01/2026", "dossier_id": null, "document_role_evidence": {"physical_page": 1, "raw_text": "Cahier des Charges Administratives et Techniques Particulières"}},
+  "expected_major_sections": [
+    {"number": "I", "title": "Cahier des Clauses Administratives Particulières", "physical_page_start": 2, "physical_page_end": 8, "evidence": {"physical_page": 2, "raw_text": "Partie I Cahier des Clauses Administratives Particulières"}},
+    {"number": "II", "title": "Cahier des Clauses Techniques Particulières", "physical_page_start": 9, "physical_page_end": 14, "evidence": {"physical_page": 9, "raw_text": "Partie II"}}
+  ],
+  "article_heading_examples": [
+    {"number": "6", "title": "Délai de validité des offres", "physical_page": 4, "evidence": {"physical_page": 4, "raw_text": "ARTICLE 6 – DELAI DE VALIDITE DES OFFRES"}},
+    {"number": "12", "title": "Délai d’exécution", "physical_page": 5, "evidence": {"physical_page": 5, "raw_text": "Article 12 : DELAI D’EXECUTION"}},
+    {"number": "13", "title": "Pénalité de retard", "physical_page": 6, "evidence": {"physical_page": 6, "raw_text": "ARTICLE 13- PENALITE DE RETARD"}},
+    {"number": "18", "title": "Garantie", "physical_page": 7, "evidence": {"physical_page": 7, "raw_text": "ARTICLE 18: GARANTIE"}},
+    {"number": "20", "title": "Modalité de paiement", "physical_page": 8, "evidence": {"physical_page": 8, "raw_text": "ARTICLE 20 – MODALITE DE PAIEMENT"}}
+  ],
+  "article_annotation_scope": "Representative source-verified headings. The complete contract also contains 14 articles within a model annex; not all article titles were transcribed here.",
+  "expected_annexes": [
+    {"number": "01", "physical_page_start": 15, "physical_page_end": 15, "evidence": {"physical_page": 15, "raw_text": "Annexe 01"}},
+    {"number": "02", "physical_page_start": 16, "physical_page_end": 16, "evidence": {"physical_page": 16, "raw_text": "ANNEXE 02"}},
+    {"number": "03", "physical_page_start": 17, "physical_page_end": 21, "evidence": {"physical_page": 17, "raw_text": "ANNEXE N°03"}},
+    {"number": "04", "physical_page_start": 22, "physical_page_end": 22, "evidence": {"physical_page": 22, "raw_text": "Annexe 04"}},
+    {"number": "05", "physical_page_start": 23, "physical_page_end": 23, "evidence": {"physical_page": 23, "raw_text": "Annexe 05"}},
+    {"number": "06", "physical_page_start": 24, "physical_page_end": 25, "evidence": {"physical_page": 24, "raw_text": "Le bordereau des prix"}},
+    {"number": "07", "physical_page_start": 26, "physical_page_end": 30, "evidence": {"physical_page": 26, "raw_text": "Annexe 07"}}
+  ],
+  "important_requirements": [
+    {"requirement_type": "provisional_guarantee", "raw_text": "Le cautionnement provisoire d’un montant de : 4500 Dinars", "normalized_value": 4500, "unit": "TND", "physical_page": 3, "section": "I", "article": "3", "mandatory": true, "notes": null},
+    {"requirement_type": "offer_validity", "raw_text": "Les offres doivent être valables 120 jours à compter du jour suivant de la date limite de remise des offres", "normalized_value": 120, "unit": "days", "physical_page": 4, "section": "I", "article": "6", "mandatory": true, "notes": null},
+    {"requirement_type": "penalty_rate", "raw_text": "Pénalités de retard= montant des équipements x nombre de jours de retard x 0,001", "normalized_value": 0.001, "unit": "per_day", "physical_page": 6, "section": "I", "article": "13", "mandatory": true, "notes": null},
+    {"requirement_type": "penalty_cap", "raw_text": "Le montant de la pénalité de retard dépasserait 5% du montant total TTC du marché", "normalized_value": 5, "unit": "percent", "physical_page": 7, "section": "I", "article": "15", "mandatory": true, "notes": null},
+    {"requirement_type": "payment_deadline", "raw_text": "dans un délai maximum de 30 jours à compter de la date du dépôt de la facture", "normalized_value": 30, "unit": "days", "physical_page": 8, "section": "I", "article": "20", "mandatory": true, "notes": null}
+  ],
+  "boq": {"boq_present": true, "pages": [24, 25], "document_role": "BOQ", "table_structure": "Bordereau des prix financial schedule", "row_count": null, "blank_or_completed": "blank_template", "evidence": {"physical_page": 24, "raw_text": "Annexe 06 Le bordereau des prix"}},
+  "document_structure_notes": "A one-page title/notice cover is followed by an administrative part, a technical specification part, and annexes.",
+  "annotator_notes": "Evidence is transcribed from the PDF's native text and visually checked on the cover and section starts."
+}

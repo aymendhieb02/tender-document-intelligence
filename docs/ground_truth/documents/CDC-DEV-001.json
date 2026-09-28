@@ -1,0 +1,47 @@
+{
+  "schema_version": "cdc_ground_truth_v1",
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "document_id": "CDC-DEV-001",
+  "source_sha256": "f3b99c74d7d1fad9cd438869be1aa8e19d2329d99e28900c444cc3f0b3b8545d",
+  "filename": "MM_Cahier-des-charges-type-Entretien.pdf",
+  "review_status": "HUMAN_REVIEW_REQUIRED",
+  "reviewer": null,
+  "verified_at": null,
+  "document_metadata": {
+    "page_count": 30,
+    "organization": null,
+    "language": "FRENCH",
+    "text_profile": "native",
+    "document_role": "CDC",
+    "document_role_evidence": [
+      {
+        "physical_page": 1,
+        "raw_text": "Cahiers de charge type",
+        "evidence_note": "Title page explicitly identifies this as a cahier de charges type; visual confirmation pending."
+      },
+      {
+        "physical_page": 1,
+        "raw_text": "Consultation ou A.O à procédure simplifiée pour travaux d’entretien de Génie Civile et Voirie et Réseaux divers",
+        "evidence_note": "Title page identifies the template's procurement subject; this is not evidence of a live tender reference."
+      }
+    ],
+    "procurement_type": "WORKS",
+    "year": null,
+    "tender_reference": null,
+    "dossier_id": null
+  },
+  "expected_major_sections": [],
+  "expected_articles": [],
+  "expected_annexes": [],
+  "important_requirements": [],
+  "boq": {
+    "boq_present": null,
+    "pages": [],
+    "document_role": null,
+    "table_structure": null,
+    "row_count": null,
+    "blank_or_completed": null
+  },
+  "document_structure_notes": "Draft source cues only. Populate structure, requirement, and BOQ labels after page-by-page visual review with physical-page and verbatim evidence.",
+  "annotator_notes": "This is one locally available generic MALE template. Role is supported by extracted title-page text; all benchmark labels remain gated on human visual verification. Do not treat the existing prediction or pending structure sidecar as ground truth."
+}

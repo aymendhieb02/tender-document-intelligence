@@ -5,6 +5,7 @@ python-multipart==0.0.32
 pydantic==2.13.4
 pydantic-settings==2.14.2
 python-dateutil==2.9.0.post0
+requests==2.34.2
 PyMuPDF==1.27.2.3
 # PaddleX requires this cv2 distribution; do not install competing cv2 wheels.
 opencv-contrib-python==4.10.0.84
