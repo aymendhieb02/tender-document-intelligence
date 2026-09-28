@@ -21,16 +21,14 @@ jobs:
       - name: Install lightweight test dependencies
         run: >-
           python -m pip install
+          fastapi==0.137.2 uvicorn==0.49.0 python-multipart==0.0.32
+          httpx==0.28.1
           pytest==9.1.1 numpy==2.3.5 opencv-contrib-python==4.10.0.84
           PyMuPDF==1.27.2.3 pillow==12.2.0 pydantic==2.13.4
           pydantic-settings==2.14.2 python-dotenv==1.2.2 pytesseract==0.3.13
           python-dateutil==2.9.0.post0 rapidfuzz==3.9.7
+          matplotlib==3.11.0 psutil==7.2.2 pillow-avif-plugin==1.6.0
       - name: Compile deterministic modules
-        run: python -m compileall -q app/document_intelligence app/cdc_analysis app/boq
-      - name: Run producer, CDC, BOQ, and cross-module tests
-        run: >-
-          python -m pytest -q
-          tests/document_intelligence
-          tests/cdc_analysis
-          tests/boq
-          tests/integration
+        run: python -m compileall -q app
+      - name: Run full deterministic and invoice regression suite
+        run: python -m pytest -q

@@ -2,7 +2,7 @@
 
 [![Deterministic CI](https://github.com/aymendhieb02/tender-document-intelligence/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/aymendhieb02/tender-document-intelligence/actions/workflows/ci.yml)
 
-This repository integrates Document Intelligence Contract 1.0, the deterministic CDC Analyzer V1, and the specialized `MALE_MUNICIPAL_MAINTENANCE_BOQ_V1` consumer. The producer returns physical-page evidence; CDC reconstructs tender structure and locates BOQ annexes; the specialized extractor parses supported BOQ evidence. The current integration checkout does not yet contain the historical FastAPI/invoice application shell.
+This repository integrates Document Intelligence Contract 1.0, the deterministic CDC Analyzer V1, the specialized `MALE_MUNICIPAL_MAINTENANCE_BOQ_V1` consumer, and the historical invoice workflow behind a FastAPI application. CDC and BOQ reuse the same physical-page `DocumentResult`.
 
 ## Install
 
@@ -19,6 +19,8 @@ $env:PADDLE_PDX_CACHE_HOME = Join-Path (Get-Location) '.cache/paddlex'
 For exactly reproduced Windows packages, install `requirements-lock-win-py311.txt`. PaddleOCR downloads its PP-OCRv4 model weights on first run unless the verified weights are provisioned locally.
 
 ## Use
+
+Start the application with `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`. Main workflows are `POST /process-invoice` (legacy route), `POST /api/invoices/analyze`, `POST /api/cdc/analyze`, and `POST /api/cdc/male/analyze`. Each accepts a multipart `file`; successful responses include an opaque document ID and a process-lifetime retrieval URL. See [integrated backend architecture and API contracts](docs/INTEGRATED_BACKEND_V1.md).
 
 ```python
 from app.document_intelligence import DocumentProcessor
@@ -37,11 +39,9 @@ python scripts/process_document.py document.pdf --output outputs/document.json
 ## Verification
 
 ```powershell
-$env:RUN_REAL_OCR = '1'
-python -m pytest tests/document_intelligence -q
 python -m pytest -q
 ```
 
-The deterministic tests include a native-PDF DocumentProcessor → CDC → BOQ handoff test over the 30-page reference tender. This document has usable embedded text, so the test exercises the shared result without loading OCR models. The real local-model test is skipped unless `RUN_REAL_OCR=1`.
+The deterministic tests cover producer/CDC/BOQ integration, API startup and responses, and selected historical invoice regressions. The real local-model test is skipped unless `RUN_REAL_OCR=1`.
 
 The implementation reuses the verified OCR inference and preprocessing behavior. Generic processing selects a full-page policy; legacy region selection stays outside the generic path. The shared OCR adapters/configuration retain their historical names for compatibility.

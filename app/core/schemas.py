@@ -374,6 +374,8 @@ class ERPFlatExport(BaseModel):
 
 
 class ProcessInvoiceResponse(BaseModel):
+    document_id: str | None = None
+    document_url: str | None = None
     extracted_text: str
     document_preview: DocumentPreview | None = None
     layout_blocks: list[LayoutBlock] = Field(default_factory=list)
