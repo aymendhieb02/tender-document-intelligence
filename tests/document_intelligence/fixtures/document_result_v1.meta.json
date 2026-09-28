@@ -1,0 +1,9 @@
+{
+  "document_intelligence_contract_version": "1.0",
+  "synthetic": true,
+  "fixture": "document_result_v1.json",
+  "purpose": "Consumer integration contract, not real OCR or ground truth",
+  "document_id_origin": "SHA-256 of synthetic specimen label, not a real document",
+  "timings": "Zero placeholders; not measurements",
+  "confidence": "Controlled values to exercise null, zero, and nonzero handling"
+}

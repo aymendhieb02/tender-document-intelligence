@@ -1,0 +1,6 @@
+# Development dependencies for the independent Document Intelligence producer.
+-r requirements.txt
+pytest>=8.2.0,<10
+httpx>=0.27.0
+matplotlib>=3.8.0
+psutil>=5.9.0
