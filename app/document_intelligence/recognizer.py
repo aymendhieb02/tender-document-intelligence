@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import hashlib
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 import json
 import logging
 from pathlib import Path
@@ -26,6 +26,14 @@ from .schemas import EvidenceElement
 
 logger = logging.getLogger(__name__)
 CACHE_VERSION = "document-evidence-1"
+
+
+def _installed_version(name: str) -> str | None:
+    """Return package metadata when installed; deterministic OCR tests may stub engines."""
+    try:
+        return version(name)
+    except PackageNotFoundError:
+        return None
 
 
 class OCRRecognizer:
@@ -52,7 +60,7 @@ class OCRRecognizer:
             "processed": hashlib.sha256(processed.tobytes()).hexdigest(),
             "config": config, "preprocessing": PREPROCESSING_VERSION,
             "recognizer_config": _paddle_fingerprint(),
-            "versions": {name: version(name) for name in ("paddleocr", "paddlepaddle", "paddlex", "opencv-contrib-python")},
+            "versions": {name: _installed_version(name) for name in ("paddleocr", "paddlepaddle", "paddlex", "opencv-contrib-python")},
         }
         key = hashlib.sha256(json.dumps(signature, sort_keys=True).encode()).hexdigest()
         cached = self._read(key) if self.use_cache else None
