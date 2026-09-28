@@ -19,9 +19,11 @@ except ModuleNotFoundError:
 
 def make_evidence(*, id, text, page_number, bbox, confidence=None, source="native_pdf", source_coordinate_space="pdf_unrotated_points", native_order=None):
     values = dict(id=id,text=text,page_number=page_number,bbox=bbox,confidence=confidence,source=source,
-        source_coordinate_space=source_coordinate_space,source_to_page=[[1,0,0],[0,1,0],[0,0,1]],native_order=native_order)
+        source_bbox=bbox,source_coordinate_space=source_coordinate_space,
+        source_to_page=[[1,0,0],[0,1,0],[0,0,1]],native_order=native_order)
     if EvidenceElement and isinstance(bbox, BoundingBox):
         values["bbox"] = bbox.model_dump()
+        values["source_bbox"] = bbox.model_dump()
     return EvidenceElement(**values) if EvidenceElement else SimpleNamespace(**values)
 
 
@@ -117,6 +119,7 @@ def test_filled_rows_decimal_validation_and_provenance():
     assert result.rows[0].quantity.raw_value == "2"
     assert result.rows[0].total_ht.normalized_value == Decimal("250.000")
     assert result.rows[0].total_ht.evidence[0].source_bbox is not None
+    assert result.rows[0].quantity.evidence[0].source_bbox == BoundingBox(x1=515,y1=492,x2=545,y2=508)
     assert result.rows[0].unit. parse_status == "MISSING"
     assert result.rows[0].quantity.evidence[0].ocr_confidence == .93
 

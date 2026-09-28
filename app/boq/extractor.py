@@ -40,6 +40,10 @@ COLUMN_MAPPING = {"Article": "article", "Désignation": "designation", "Qté": "
 
 def _bbox(e):
     box = element_value(e, "bbox")
+    return _as_bbox(box)
+
+
+def _as_bbox(box):
     if box is None:
         return None
     if isinstance(box, dict):
@@ -50,7 +54,8 @@ def _bbox(e):
 
 
 def _evidence(page, elems):
-    boxes = [_bbox(e) for e in elems]
+    # The public evidence contract keeps page geometry and original-source geometry distinct.
+    boxes = [_as_bbox(element_value(e, "source_bbox")) or _bbox(e) for e in elems]
     boxes = [b for b in boxes if b is not None]
     bbox = BoundingBox(x1=min(b.x1 for b in boxes), y1=min(b.y1 for b in boxes),
         x2=max(b.x2 for b in boxes), y2=max(b.y2 for b in boxes)) if boxes else None
