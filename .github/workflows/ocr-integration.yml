@@ -1,0 +1,24 @@
+name: paddle-ocr-integration
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-model-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install OCR and test dependencies
+        run: python -m pip install -r requirements-document-intelligence-dev.txt
+      - name: Run explicit real-model integration test
+        env:
+          RUN_REAL_OCR: "1"
+          PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK: "True"
+        run: python -m pytest tests/document_intelligence/test_real_ocr.py -q
