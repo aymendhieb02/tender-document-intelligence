@@ -1,0 +1,38 @@
+{
+  "status": "NOT YET MEASURABLE",
+  "gate_reason": "Human-verified source-linked labels required",
+  "ground_truth_verification_status": "human_review_required",
+  "interpretation": "Exact-row counts are solely an annotation-review aid, not precision, recall, accuracy, or a benchmark result until human visual verification.",
+  "exact_row_review": {
+    "sections": {
+      "prediction_records": 29,
+      "source_annotation_records": 29,
+      "equal_records_for_review": 29,
+      "mismatch_records_for_review": 0
+    },
+    "articles": {
+      "prediction_records": 36,
+      "source_annotation_records": 36,
+      "equal_records_for_review": 36,
+      "mismatch_records_for_review": 0
+    },
+    "annexes": {
+      "prediction_records": 6,
+      "source_annotation_records": 6,
+      "equal_records_for_review": 6,
+      "mismatch_records_for_review": 0
+    },
+    "annex_subsections": {
+      "prediction_records": 3,
+      "source_annotation_records": 3,
+      "equal_records_for_review": 1,
+      "mismatch_records_for_review": 4
+    },
+    "special_documents": {
+      "prediction_records": 7,
+      "source_annotation_records": 7,
+      "equal_records_for_review": 7,
+      "mismatch_records_for_review": 0
+    }
+  }
+}

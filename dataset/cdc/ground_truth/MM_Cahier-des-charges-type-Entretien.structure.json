@@ -1,0 +1,2499 @@
+{
+  "document_id": "f3b99c74d7d1fad9cd438869be1aa8e19d2329d99e28900c444cc3f0b3b8545d",
+  "source_file": "MM_Cahier-des-charges-type-Entretien.pdf",
+  "source_sha256": "f3b99c74d7d1fad9cd438869be1aa8e19d2329d99e28900c444cc3f0b3b8545d",
+  "verification_status": "human_review_required",
+  "status": "human_review_required",
+  "reviewer": null,
+  "verified_at": null,
+  "annotation_method": "Independent source-evidence pass over Document Intelligence rows from the source PDF; not copied from CDC prediction. Requires human page-by-page visual verification before scoring.",
+  "title": "Cahiers de charge type — Consultation ou A.O à procédure simplifiée pour travaux d’entretien de Génie Civil et Voirie et Réseaux divers",
+  "title_source_evidence": [
+    {
+      "page": 1,
+      "element_ids": [
+        "p1-native-000009",
+        "p1-native-000010",
+        "p1-native-000011",
+        "p1-native-000012"
+      ],
+      "raw_text": "Cahiers de charge type",
+      "bbox": [
+        333.3599853515625,
+        540.7679443359375,
+        849.6959228515625,
+        601.1519775390625
+      ],
+      "coordinate_space": "rendered_page_pixels"
+    },
+    {
+      "page": 1,
+      "element_ids": [
+        "p1-native-000013",
+        "p1-native-000014",
+        "p1-native-000015",
+        "p1-native-000016",
+        "p1-native-000017",
+        "p1-native-000018",
+        "p1-native-000019",
+        "p1-native-000020"
+      ],
+      "raw_text": "Consultation ou A.O à procédure simplifiée pour travaux",
+      "bbox": [
+        78.4800033569336,
+        609.3613891601562,
+        1104.820068359375,
+        662.0653686523438
+      ],
+      "coordinate_space": "rendered_page_pixels"
+    }
+  ],
+  "sections": [
+    {
+      "number": "A",
+      "title": "CONDITIONS DE LA CONSULTATION / A.O",
+      "page_start": 3,
+      "page_end": 9,
+      "source_evidence": [
+        {
+          "page": 3,
+          "element_ids": [
+            "p3-native-000001",
+            "p3-native-000002",
+            "p3-native-000003",
+            "p3-native-000004",
+            "p3-native-000005",
+            "p3-native-000006",
+            "p3-native-000007",
+            "p3-native-000008"
+          ],
+          "raw_text": "A – CONDITIONS DE LA CONSULTATION / A.O"
+        }
+      ]
+    },
+    {
+      "number": "B",
+      "title": "CLAUSES TECHNIQUES PARTICULIERES",
+      "page_start": 10,
+      "page_end": 11,
+      "source_evidence": [
+        {
+          "page": 10,
+          "element_ids": [
+            "p10-native-000001",
+            "p10-native-000002",
+            "p10-native-000003",
+            "p10-native-000004",
+            "p10-native-000005"
+          ],
+          "raw_text": "B – CLAUSES TECHNIQUES PARTICULIERES"
+        }
+      ]
+    },
+    {
+      "number": "C",
+      "title": "SPECIFICATIONS TECHNIQUES",
+      "page_start": 12,
+      "page_end": 19,
+      "source_evidence": [
+        {
+          "page": 12,
+          "element_ids": [
+            "p12-native-000001",
+            "p12-native-000002",
+            "p12-native-000003",
+            "p12-native-000004"
+          ],
+          "raw_text": "C – SPECIFICATIONS TECHNIQUES"
+        }
+      ]
+    },
+    {
+      "number": "D",
+      "title": "ANNEXES : Modèles à suivre",
+      "page_start": 20,
+      "page_end": 28,
+      "source_evidence": [
+        {
+          "page": 20,
+          "element_ids": [
+            "p20-native-000001",
+            "p20-native-000002",
+            "p20-native-000003",
+            "p20-native-000004",
+            "p20-native-000005",
+            "p20-native-000006"
+          ],
+          "raw_text": "D- ANNEXES : Modèles à suivre"
+        }
+      ]
+    },
+    {
+      "number": "E",
+      "title": "DESSINS ET PLANS",
+      "page_start": 29,
+      "page_end": 29,
+      "source_evidence": [
+        {
+          "page": 29,
+          "element_ids": [
+            "p29-native-000001",
+            "p29-native-000002",
+            "p29-native-000003",
+            "p29-native-000004"
+          ],
+          "raw_text": "E- DESSINS ET PLANS"
+        }
+      ]
+    }
+  ],
+  "articles": [
+    {
+      "number": "1",
+      "title": "Objet de la consultation : A.O",
+      "page_start": 3,
+      "source_evidence": [
+        {
+          "page": 3,
+          "element_ids": [
+            "p3-native-000009",
+            "p3-native-000010",
+            "p3-native-000011",
+            "p3-native-000012",
+            "p3-native-000013",
+            "p3-native-000014",
+            "p3-native-000015",
+            "p3-native-000016"
+          ],
+          "raw_text": "Article 1. Objet de la consultation : A.O"
+        }
+      ],
+      "page_end": 3,
+      "parent_section": "A"
+    },
+    {
+      "number": "2",
+      "title": "Financement",
+      "page_start": 3,
+      "source_evidence": [
+        {
+          "page": 3,
+          "element_ids": [
+            "p3-native-000123",
+            "p3-native-000124",
+            "p3-native-000125"
+          ],
+          "raw_text": "Article 2. Financement"
+        }
+      ],
+      "page_end": 3,
+      "parent_section": "A"
+    },
+    {
+      "number": "3",
+      "title": "Cahier des charges",
+      "page_start": 3,
+      "source_evidence": [
+        {
+          "page": 3,
+          "element_ids": [
+            "p3-native-000155",
+            "p3-native-000156",
+            "p3-native-000157",
+            "p3-native-000158",
+            "p3-native-000159"
+          ],
+          "raw_text": "Article 3. Cahier des charges"
+        }
+      ],
+      "page_end": 3,
+      "parent_section": "A"
+    },
+    {
+      "number": "4",
+      "title": "Obligations générales des parties contractantes",
+      "page_start": 3,
+      "source_evidence": [
+        {
+          "page": 3,
+          "element_ids": [
+            "p3-native-000204",
+            "p3-native-000205",
+            "p3-native-000206",
+            "p3-native-000207",
+            "p3-native-000208",
+            "p3-native-000209",
+            "p3-native-000210"
+          ],
+          "raw_text": "Article 4. Obligations générales des parties contractantes"
+        }
+      ],
+      "page_end": 3,
+      "parent_section": "A"
+    },
+    {
+      "number": "5",
+      "title": "Conditions de la consultation",
+      "page_start": 3,
+      "source_evidence": [
+        {
+          "page": 3,
+          "element_ids": [
+            "p3-native-000225",
+            "p3-native-000226",
+            "p3-native-000227",
+            "p3-native-000228",
+            "p3-native-000229",
+            "p3-native-000230"
+          ],
+          "raw_text": "Article 5. Conditions de la consultation"
+        }
+      ],
+      "page_end": 4,
+      "parent_section": "A"
+    },
+    {
+      "number": "6",
+      "title": "Allotissement",
+      "page_start": 4,
+      "source_evidence": [
+        {
+          "page": 4,
+          "element_ids": [
+            "p4-native-000094",
+            "p4-native-000095",
+            "p4-native-000096"
+          ],
+          "raw_text": "Article 6. Allotissement"
+        }
+      ],
+      "page_end": 4,
+      "parent_section": "A"
+    },
+    {
+      "number": "7",
+      "title": "Visite des lieux",
+      "page_start": 4,
+      "source_evidence": [
+        {
+          "page": 4,
+          "element_ids": [
+            "p4-native-000119",
+            "p4-native-000120",
+            "p4-native-000121",
+            "p4-native-000122",
+            "p4-native-000123"
+          ],
+          "raw_text": "Article 7. Visite des lieux"
+        }
+      ],
+      "page_end": 4,
+      "parent_section": "A"
+    },
+    {
+      "number": "8",
+      "title": "Présentation des offres",
+      "page_start": 4,
+      "source_evidence": [
+        {
+          "page": 4,
+          "element_ids": [
+            "p4-native-000289",
+            "p4-native-000290",
+            "p4-native-000291",
+            "p4-native-000292",
+            "p4-native-000293"
+          ],
+          "raw_text": "Article 8. Présentation des offres"
+        }
+      ],
+      "page_end": 5,
+      "parent_section": "A"
+    },
+    {
+      "number": "9",
+      "title": "Caution provisoire",
+      "page_start": 5,
+      "source_evidence": [
+        {
+          "page": 5,
+          "element_ids": [
+            "p5-native-000302",
+            "p5-native-000303",
+            "p5-native-000304",
+            "p5-native-000305"
+          ],
+          "raw_text": "Article 9. Caution provisoire"
+        }
+      ],
+      "page_end": 5,
+      "parent_section": "A"
+    },
+    {
+      "number": "10",
+      "title": "Pièces contractuelles",
+      "page_start": 5,
+      "source_evidence": [
+        {
+          "page": 5,
+          "element_ids": [
+            "p5-native-000346",
+            "p5-native-000347",
+            "p5-native-000348",
+            "p5-native-000349"
+          ],
+          "raw_text": "Article 10. Pièces contractuelles"
+        }
+      ],
+      "page_end": 5,
+      "parent_section": "A"
+    },
+    {
+      "number": "11",
+      "title": "Demandes d’éclaircissement",
+      "page_start": 6,
+      "source_evidence": [
+        {
+          "page": 6,
+          "element_ids": [
+            "p6-native-000001",
+            "p6-native-000002",
+            "p6-native-000003",
+            "p6-native-000004"
+          ],
+          "raw_text": "Article 11. Demandes d’éclaircissement"
+        }
+      ],
+      "page_end": 6,
+      "parent_section": "A"
+    },
+    {
+      "number": "12",
+      "title": "Montant de l'offre",
+      "page_start": 6,
+      "source_evidence": [
+        {
+          "page": 6,
+          "element_ids": [
+            "p6-native-000119",
+            "p6-native-000120",
+            "p6-native-000121",
+            "p6-native-000122",
+            "p6-native-000123"
+          ],
+          "raw_text": "Article 12. Montant de l'offre"
+        }
+      ],
+      "page_end": 6,
+      "parent_section": "A"
+    },
+    {
+      "number": "13",
+      "title": "Conditions des prix",
+      "page_start": 6,
+      "source_evidence": [
+        {
+          "page": 6,
+          "element_ids": [
+            "p6-native-000261",
+            "p6-native-000262",
+            "p6-native-000263",
+            "p6-native-000264",
+            "p6-native-000265"
+          ],
+          "raw_text": "Article 13. Conditions des prix"
+        }
+      ],
+      "page_end": 6,
+      "parent_section": "A"
+    },
+    {
+      "number": "14",
+      "title": "Réception des offres",
+      "page_start": 6,
+      "source_evidence": [
+        {
+          "page": 6,
+          "element_ids": [
+            "p6-native-000338",
+            "p6-native-000339",
+            "p6-native-000340",
+            "p6-native-000341",
+            "p6-native-000342"
+          ],
+          "raw_text": "Article 14. Réception des offres"
+        }
+      ],
+      "page_end": 6,
+      "parent_section": "A"
+    },
+    {
+      "number": "15",
+      "title": "Date limite de réception des offres",
+      "page_start": 6,
+      "source_evidence": [
+        {
+          "page": 6,
+          "element_ids": [
+            "p6-native-000451",
+            "p6-native-000452",
+            "p6-native-000453",
+            "p6-native-000454",
+            "p6-native-000455",
+            "p6-native-000456",
+            "p6-native-000457",
+            "p6-native-000458"
+          ],
+          "raw_text": "Article 15. Date limite de réception des offres"
+        }
+      ],
+      "page_end": 7,
+      "parent_section": "A"
+    },
+    {
+      "number": "16",
+      "title": "La validité des offres",
+      "page_start": 7,
+      "source_evidence": [
+        {
+          "page": 7,
+          "element_ids": [
+            "p7-native-000094",
+            "p7-native-000095",
+            "p7-native-000096",
+            "p7-native-000097",
+            "p7-native-000098",
+            "p7-native-000099"
+          ],
+          "raw_text": "Article 16. La validité des offres"
+        }
+      ],
+      "page_end": 7,
+      "parent_section": "A"
+    },
+    {
+      "number": "17",
+      "title": "Ouverture des plis",
+      "page_start": 7,
+      "source_evidence": [
+        {
+          "page": 7,
+          "element_ids": [
+            "p7-native-000155",
+            "p7-native-000156",
+            "p7-native-000157",
+            "p7-native-000158",
+            "p7-native-000159"
+          ],
+          "raw_text": "Article 17. Ouverture des plis"
+        }
+      ],
+      "page_end": 7,
+      "parent_section": "A"
+    },
+    {
+      "number": "18",
+      "title": "Méthodologie de dépouillement",
+      "page_start": 7,
+      "source_evidence": [
+        {
+          "page": 7,
+          "element_ids": [
+            "p7-native-000204",
+            "p7-native-000205",
+            "p7-native-000206",
+            "p7-native-000207",
+            "p7-native-000208"
+          ],
+          "raw_text": "Article 18. Méthodologie de dépouillement"
+        }
+      ],
+      "page_end": 7,
+      "parent_section": "A"
+    },
+    {
+      "number": "19",
+      "title": "Attribution de la prestation",
+      "page_start": 7,
+      "source_evidence": [
+        {
+          "page": 7,
+          "element_ids": [
+            "p7-native-000380",
+            "p7-native-000381",
+            "p7-native-000382",
+            "p7-native-000383",
+            "p7-native-000384",
+            "p7-native-000385"
+          ],
+          "raw_text": "Article 19. Attribution de la prestation"
+        }
+      ],
+      "page_end": 7,
+      "parent_section": "A"
+    },
+    {
+      "number": "20",
+      "title": "Caution définitive",
+      "page_start": 7,
+      "source_evidence": [
+        {
+          "page": 7,
+          "element_ids": [
+            "p7-native-000449",
+            "p7-native-000450",
+            "p7-native-000451",
+            "p7-native-000452"
+          ],
+          "raw_text": "Article 20. Caution définitive"
+        }
+      ],
+      "page_end": 7,
+      "parent_section": "A"
+    },
+    {
+      "number": "21",
+      "title": "Modalités de paiement et retenue de garantie",
+      "page_start": 8,
+      "source_evidence": [
+        {
+          "page": 8,
+          "element_ids": [
+            "p8-native-000001",
+            "p8-native-000002",
+            "p8-native-000003",
+            "p8-native-000004",
+            "p8-native-000005",
+            "p8-native-000006",
+            "p8-native-000007",
+            "p8-native-000008",
+            "p8-native-000009"
+          ],
+          "raw_text": "Article 21. Modalités de paiement et retenue de garantie"
+        }
+      ],
+      "page_end": 8,
+      "parent_section": "A"
+    },
+    {
+      "number": "22",
+      "title": "Délai d’exécution et pénalités de retard",
+      "page_start": 8,
+      "source_evidence": [
+        {
+          "page": 8,
+          "element_ids": [
+            "p8-native-000187",
+            "p8-native-000188",
+            "p8-native-000189",
+            "p8-native-000190",
+            "p8-native-000191",
+            "p8-native-000192",
+            "p8-native-000193",
+            "p8-native-000194"
+          ],
+          "raw_text": "Article 22. Délai d’exécution et pénalités de retard"
+        }
+      ],
+      "page_end": 8,
+      "parent_section": "A"
+    },
+    {
+      "number": "23",
+      "title": "Réception provisoire",
+      "page_start": 8,
+      "source_evidence": [
+        {
+          "page": 8,
+          "element_ids": [
+            "p8-native-000297",
+            "p8-native-000298",
+            "p8-native-000299",
+            "p8-native-000300"
+          ],
+          "raw_text": "Article 23. Réception provisoire"
+        }
+      ],
+      "page_end": 8,
+      "parent_section": "A"
+    },
+    {
+      "number": "24",
+      "title": "Délai de garantie et réception définitive",
+      "page_start": 8,
+      "source_evidence": [
+        {
+          "page": 8,
+          "element_ids": [
+            "p8-native-000460",
+            "p8-native-000461",
+            "p8-native-000462",
+            "p8-native-000463",
+            "p8-native-000464",
+            "p8-native-000465",
+            "p8-native-000466",
+            "p8-native-000467"
+          ],
+          "raw_text": "Article 24. Délai de garantie et réception définitive"
+        }
+      ],
+      "page_end": 9,
+      "parent_section": "A"
+    },
+    {
+      "number": "25",
+      "title": "Variation du volume de la commande",
+      "page_start": 9,
+      "source_evidence": [
+        {
+          "page": 9,
+          "element_ids": [
+            "p9-native-000051",
+            "p9-native-000052",
+            "p9-native-000053",
+            "p9-native-000054",
+            "p9-native-000055",
+            "p9-native-000056",
+            "p9-native-000057",
+            "p9-native-000058"
+          ],
+          "raw_text": "Article 25. Variation du volume de la commande"
+        }
+      ],
+      "page_end": 9,
+      "parent_section": "A"
+    },
+    {
+      "number": "26",
+      "title": "Litige ou différend",
+      "page_start": 9,
+      "source_evidence": [
+        {
+          "page": 9,
+          "element_ids": [
+            "p9-native-000170",
+            "p9-native-000171",
+            "p9-native-000172",
+            "p9-native-000173",
+            "p9-native-000174"
+          ],
+          "raw_text": "Article 26. Litige ou différend"
+        }
+      ],
+      "page_end": 9,
+      "parent_section": "A"
+    },
+    {
+      "number": "27",
+      "title": "Réglementation",
+      "page_start": 9,
+      "source_evidence": [
+        {
+          "page": 9,
+          "element_ids": [
+            "p9-native-000231",
+            "p9-native-000232",
+            "p9-native-000233"
+          ],
+          "raw_text": "Article 27. Réglementation"
+        }
+      ],
+      "page_end": 9,
+      "parent_section": "A"
+    },
+    {
+      "number": "1",
+      "title": "Objet des travaux",
+      "page_start": 10,
+      "source_evidence": [
+        {
+          "page": 10,
+          "element_ids": [
+            "p10-native-000006",
+            "p10-native-000007",
+            "p10-native-000008",
+            "p10-native-000009",
+            "p10-native-000010"
+          ],
+          "raw_text": "Article 1. Objet des travaux"
+        }
+      ],
+      "page_end": 10,
+      "parent_section": "B"
+    },
+    {
+      "number": "2",
+      "title": "Capacité technique",
+      "page_start": 10,
+      "source_evidence": [
+        {
+          "page": 10,
+          "element_ids": [
+            "p10-native-000064",
+            "p10-native-000065",
+            "p10-native-000066",
+            "p10-native-000067"
+          ],
+          "raw_text": "Article 2. Capacité technique"
+        }
+      ],
+      "page_end": 10,
+      "parent_section": "B"
+    },
+    {
+      "number": "3",
+      "title": "Conformité aux règles de l’art",
+      "page_start": 10,
+      "source_evidence": [
+        {
+          "page": 10,
+          "element_ids": [
+            "p10-native-000122",
+            "p10-native-000123",
+            "p10-native-000124",
+            "p10-native-000125",
+            "p10-native-000126",
+            "p10-native-000127",
+            "p10-native-000128"
+          ],
+          "raw_text": "Article 3. Conformité aux règles de l’art"
+        }
+      ],
+      "page_end": 10,
+      "parent_section": "B"
+    },
+    {
+      "number": "4",
+      "title": "Signalisation de chantier et Echafaudages",
+      "page_start": 10,
+      "source_evidence": [
+        {
+          "page": 10,
+          "element_ids": [
+            "p10-native-000169",
+            "p10-native-000170",
+            "p10-native-000171",
+            "p10-native-000172",
+            "p10-native-000173",
+            "p10-native-000174",
+            "p10-native-000175"
+          ],
+          "raw_text": "Article 4. Signalisation de chantier et Echafaudages"
+        }
+      ],
+      "page_end": 10,
+      "parent_section": "B"
+    },
+    {
+      "number": "5",
+      "title": "Travaux préparatoires",
+      "page_start": 10,
+      "source_evidence": [
+        {
+          "page": 10,
+          "element_ids": [
+            "p10-native-000274",
+            "p10-native-000275",
+            "p10-native-000276",
+            "p10-native-000277"
+          ],
+          "raw_text": "Article 5. Travaux préparatoires"
+        }
+      ],
+      "page_end": 10,
+      "parent_section": "B"
+    },
+    {
+      "number": "6",
+      "title": "Règles d’exécution",
+      "page_start": 10,
+      "source_evidence": [
+        {
+          "page": 10,
+          "element_ids": [
+            "p10-native-000345",
+            "p10-native-000346",
+            "p10-native-000347",
+            "p10-native-000348"
+          ],
+          "raw_text": "Article 6. Règles d’exécution"
+        }
+      ],
+      "page_end": 10,
+      "parent_section": "B"
+    },
+    {
+      "number": "7",
+      "title": "Précautions à prendre",
+      "page_start": 11,
+      "source_evidence": [
+        {
+          "page": 11,
+          "element_ids": [
+            "p11-native-000001",
+            "p11-native-000002",
+            "p11-native-000003",
+            "p11-native-000004",
+            "p11-native-000005"
+          ],
+          "raw_text": "Article 7. Précautions à prendre"
+        }
+      ],
+      "page_end": 11,
+      "parent_section": "B"
+    },
+    {
+      "number": "8",
+      "title": "Prescriptions techniques",
+      "page_start": 11,
+      "source_evidence": [
+        {
+          "page": 11,
+          "element_ids": [
+            "p11-native-000040",
+            "p11-native-000041",
+            "p11-native-000042",
+            "p11-native-000043"
+          ],
+          "raw_text": "Article 8. Prescriptions techniques"
+        }
+      ],
+      "page_end": 11,
+      "parent_section": "B"
+    },
+    {
+      "number": "9",
+      "title": "Nettoyage en fin de chantier",
+      "page_start": 11,
+      "source_evidence": [
+        {
+          "page": 11,
+          "element_ids": [
+            "p11-native-000269",
+            "p11-native-000270",
+            "p11-native-000271",
+            "p11-native-000272",
+            "p11-native-000273",
+            "p11-native-000274",
+            "p11-native-000275"
+          ],
+          "raw_text": "Article 9. Nettoyage en fin de chantier"
+        }
+      ],
+      "page_end": 11,
+      "parent_section": "B"
+    }
+  ],
+  "technical_hierarchy": [
+    {
+      "number": "1",
+      "title": "TRAVAUX DE MACONNERIE D’ENTRETIEN ET DE REPARATION",
+      "page_start": 12,
+      "page_end": 14,
+      "source_evidence": [
+        {
+          "page": 12,
+          "element_ids": [
+            "p12-native-000005",
+            "p12-native-000006",
+            "p12-native-000007",
+            "p12-native-000008",
+            "p12-native-000009",
+            "p12-native-000010",
+            "p12-native-000011",
+            "p12-native-000012"
+          ],
+          "raw_text": "1. TRAVAUX DE MACONNERIE D’ENTRETIEN ET DE REPARATION"
+        }
+      ],
+      "parent_number": "1"
+    },
+    {
+      "number": "1.1",
+      "title": "BRIQUETAGE",
+      "page_start": 12,
+      "page_end": 12,
+      "source_evidence": [
+        {
+          "page": 12,
+          "element_ids": [
+            "p12-native-000013",
+            "p12-native-000014"
+          ],
+          "raw_text": "1.1. BRIQUETAGE"
+        }
+      ],
+      "parent_number": "1"
+    },
+    {
+      "number": "1.2",
+      "title": "MORTIER DE PAUSE",
+      "page_start": 12,
+      "page_end": 12,
+      "source_evidence": [
+        {
+          "page": 12,
+          "element_ids": [
+            "p12-native-000173",
+            "p12-native-000174",
+            "p12-native-000175",
+            "p12-native-000176"
+          ],
+          "raw_text": "1.2. MORTIER DE PAUSE"
+        }
+      ],
+      "parent_number": "1"
+    },
+    {
+      "number": "1.3",
+      "title": "ENDUITS",
+      "page_start": 12,
+      "page_end": 12,
+      "source_evidence": [
+        {
+          "page": 12,
+          "element_ids": [
+            "p12-native-000227",
+            "p12-native-000228"
+          ],
+          "raw_text": "1.3. ENDUITS"
+        }
+      ],
+      "parent_number": "1"
+    },
+    {
+      "number": "1.4",
+      "title": "GACHAGES DES MORTIERS",
+      "page_start": 12,
+      "page_end": 12,
+      "source_evidence": [
+        {
+          "page": 12,
+          "element_ids": [
+            "p12-native-000287",
+            "p12-native-000288",
+            "p12-native-000289",
+            "p12-native-000290"
+          ],
+          "raw_text": "1.4. GACHAGES DES MORTIERS"
+        }
+      ],
+      "parent_number": "1"
+    },
+    {
+      "number": "1.5",
+      "title": "PREPARATION DES SUPPORTS",
+      "page_start": 12,
+      "page_end": 13,
+      "source_evidence": [
+        {
+          "page": 12,
+          "element_ids": [
+            "p12-native-000355",
+            "p12-native-000356",
+            "p12-native-000357",
+            "p12-native-000358"
+          ],
+          "raw_text": "1.5. PREPARATION DES SUPPORTS"
+        }
+      ],
+      "parent_number": "1"
+    },
+    {
+      "number": "1.6",
+      "title": "EXECUTION DES ENDUITS",
+      "page_start": 13,
+      "page_end": 13,
+      "source_evidence": [
+        {
+          "page": 13,
+          "element_ids": [
+            "p13-native-000172",
+            "p13-native-000173",
+            "p13-native-000174",
+            "p13-native-000175"
+          ],
+          "raw_text": "1.6. EXECUTION DES ENDUITS"
+        }
+      ],
+      "parent_number": "1"
+    },
+    {
+      "number": "1.7",
+      "title": "QUALITES DES ENDUITS FINIS",
+      "page_start": 13,
+      "page_end": 13,
+      "source_evidence": [
+        {
+          "page": 13,
+          "element_ids": [
+            "p13-native-000332",
+            "p13-native-000333",
+            "p13-native-000334",
+            "p13-native-000335",
+            "p13-native-000336"
+          ],
+          "raw_text": "1.7. QUALITES DES ENDUITS FINIS"
+        }
+      ],
+      "parent_number": "1"
+    },
+    {
+      "number": "1.8",
+      "title": "ENDUIT EXTERIEUR À TROIS COUCHES",
+      "page_start": 13,
+      "page_end": 14,
+      "source_evidence": [
+        {
+          "page": 13,
+          "element_ids": [
+            "p13-native-000422",
+            "p13-native-000423",
+            "p13-native-000424",
+            "p13-native-000425",
+            "p13-native-000426",
+            "p13-native-000427"
+          ],
+          "raw_text": "1.8. ENDUIT EXTERIEUR À TROIS COUCHES"
+        }
+      ],
+      "parent_number": "1"
+    },
+    {
+      "number": "2",
+      "title": "TRAVAUX DE REVETEMENT",
+      "page_start": 14,
+      "page_end": 16,
+      "source_evidence": [
+        {
+          "page": 14,
+          "element_ids": [
+            "p14-native-000400",
+            "p14-native-000401",
+            "p14-native-000402",
+            "p14-native-000403"
+          ],
+          "raw_text": "2. TRAVAUX DE REVETEMENT"
+        }
+      ],
+      "parent_number": "2"
+    },
+    {
+      "number": "2.1",
+      "title": "AIRE EN BETON",
+      "page_start": 14,
+      "page_end": 15,
+      "source_evidence": [
+        {
+          "page": 14,
+          "element_ids": [
+            "p14-native-000404",
+            "p14-native-000405",
+            "p14-native-000406",
+            "p14-native-000407"
+          ],
+          "raw_text": "2.1. AIRE EN BETON"
+        }
+      ],
+      "parent_number": "2"
+    },
+    {
+      "number": "2.2",
+      "title": "CHAPE D'USURE",
+      "page_start": 15,
+      "page_end": 15,
+      "source_evidence": [
+        {
+          "page": 15,
+          "element_ids": [
+            "p15-native-000049",
+            "p15-native-000050",
+            "p15-native-000051"
+          ],
+          "raw_text": "2.2. CHAPE D'USURE"
+        }
+      ],
+      "parent_number": "2"
+    },
+    {
+      "number": "2.3",
+      "title": "ELÉMENTS PRÉFABRIQUÉS EN BÉTON",
+      "page_start": 15,
+      "page_end": 16,
+      "source_evidence": [
+        {
+          "page": 15,
+          "element_ids": [
+            "p15-native-000348",
+            "p15-native-000349",
+            "p15-native-000350",
+            "p15-native-000351",
+            "p15-native-000352"
+          ],
+          "raw_text": "2.3. ELÉMENTS PRÉFABRIQUÉS EN BÉTON"
+        }
+      ],
+      "parent_number": "2"
+    },
+    {
+      "number": "3",
+      "title": "TRAVAUX D’ETANCHEITE DES TOITURES",
+      "page_start": 16,
+      "page_end": 17,
+      "source_evidence": [
+        {
+          "page": 16,
+          "element_ids": [
+            "p16-native-000209",
+            "p16-native-000210",
+            "p16-native-000211",
+            "p16-native-000212",
+            "p16-native-000213"
+          ],
+          "raw_text": "3. TRAVAUX D’ETANCHEITE DES TOITURES"
+        }
+      ],
+      "parent_number": "3"
+    },
+    {
+      "number": "3.1",
+      "title": "RELIEFS ET ACROTERES",
+      "page_start": 16,
+      "page_end": 16,
+      "source_evidence": [
+        {
+          "page": 16,
+          "element_ids": [
+            "p16-native-000232",
+            "p16-native-000233",
+            "p16-native-000234",
+            "p16-native-000235"
+          ],
+          "raw_text": "3.1. RELIEFS ET ACROTERES"
+        }
+      ],
+      "parent_number": "3"
+    },
+    {
+      "number": "3.2",
+      "title": "ETANCHEITE MONOCOUCHE AUTOPROTEGEE",
+      "page_start": 16,
+      "page_end": 16,
+      "source_evidence": [
+        {
+          "page": 16,
+          "element_ids": [
+            "p16-native-000380",
+            "p16-native-000381",
+            "p16-native-000382",
+            "p16-native-000383"
+          ],
+          "raw_text": "3.2. ETANCHEITE MONOCOUCHE AUTOPROTEGEE"
+        }
+      ],
+      "parent_number": "3"
+    },
+    {
+      "number": "3.3",
+      "title": "REVETEMENTS APPLIQUES EN RELEVE",
+      "page_start": 16,
+      "page_end": 16,
+      "source_evidence": [
+        {
+          "page": 16,
+          "element_ids": [
+            "p16-native-000456",
+            "p16-native-000457",
+            "p16-native-000458",
+            "p16-native-000459",
+            "p16-native-000460"
+          ],
+          "raw_text": "3.3. REVETEMENTS APPLIQUES EN RELEVE"
+        }
+      ],
+      "parent_number": "3"
+    },
+    {
+      "number": "3.4",
+      "title": "RELEVES RACCORDES A UN REVETEMENT MONOCOUCHE SOUS PROTECTION",
+      "page_start": 16,
+      "page_end": 16,
+      "source_evidence": [
+        {
+          "page": 16,
+          "element_ids": [
+            "p16-native-000504",
+            "p16-native-000505",
+            "p16-native-000506",
+            "p16-native-000507",
+            "p16-native-000508",
+            "p16-native-000509",
+            "p16-native-000510",
+            "p16-native-000511",
+            "p16-native-000512"
+          ],
+          "raw_text": "3.4. RELEVES RACCORDES A UN REVETEMENT MONOCOUCHE SOUS PROTECTION"
+        }
+      ],
+      "parent_number": "3"
+    },
+    {
+      "number": "3.5",
+      "title": "EVACUATION DES EAUX PLUVIALES",
+      "page_start": 17,
+      "page_end": 17,
+      "source_evidence": [
+        {
+          "page": 17,
+          "element_ids": [
+            "p17-native-000001",
+            "p17-native-000002",
+            "p17-native-000003",
+            "p17-native-000004",
+            "p17-native-000005"
+          ],
+          "raw_text": "3.5. EVACUATION DES EAUX PLUVIALES"
+        }
+      ],
+      "parent_number": "3"
+    },
+    {
+      "number": "4",
+      "title": "TRAVAUX DE PEINTURE",
+      "page_start": 17,
+      "page_end": 19,
+      "source_evidence": [
+        {
+          "page": 17,
+          "element_ids": [
+            "p17-native-000322",
+            "p17-native-000323",
+            "p17-native-000324",
+            "p17-native-000325"
+          ],
+          "raw_text": "4. TRAVAUX DE PEINTURE"
+        }
+      ],
+      "parent_number": "4"
+    },
+    {
+      "number": "4.1",
+      "title": "CHOIX DES PRODUITS DE PEINTURE",
+      "page_start": 17,
+      "page_end": 17,
+      "source_evidence": [
+        {
+          "page": 17,
+          "element_ids": [
+            "p17-native-000326",
+            "p17-native-000327",
+            "p17-native-000328",
+            "p17-native-000329",
+            "p17-native-000330",
+            "p17-native-000331"
+          ],
+          "raw_text": "4.1. CHOIX DES PRODUITS DE PEINTURE"
+        }
+      ],
+      "parent_number": "4"
+    },
+    {
+      "number": "4.2",
+      "title": "PRÉPARATION DES SUPPORTS",
+      "page_start": 17,
+      "page_end": 18,
+      "source_evidence": [
+        {
+          "page": 17,
+          "element_ids": [
+            "p17-native-000417",
+            "p17-native-000418",
+            "p17-native-000419",
+            "p17-native-000420"
+          ],
+          "raw_text": "4.2. PRÉPARATION DES SUPPORTS"
+        }
+      ],
+      "parent_number": "4"
+    },
+    {
+      "number": "4.3",
+      "title": "EXECUTION DES PEINTURES",
+      "page_start": 19,
+      "page_end": 19,
+      "source_evidence": [
+        {
+          "page": 19,
+          "element_ids": [
+            "p19-native-000001",
+            "p19-native-000002",
+            "p19-native-000003",
+            "p19-native-000004"
+          ],
+          "raw_text": "4.3. EXECUTION DES PEINTURES"
+        }
+      ],
+      "parent_number": "4"
+    },
+    {
+      "number": "4.4",
+      "title": "PEINTURE A L’EAU SUR MACONNERIE EXTERIEURE",
+      "page_start": 19,
+      "page_end": 19,
+      "source_evidence": [
+        {
+          "page": 19,
+          "element_ids": [
+            "p19-native-000103",
+            "p19-native-000104",
+            "p19-native-000105",
+            "p19-native-000106",
+            "p19-native-000107",
+            "p19-native-000108",
+            "p19-native-000109"
+          ],
+          "raw_text": "4.4. PEINTURE A L’EAU SUR MACONNERIE EXTERIEURE"
+        }
+      ],
+      "parent_number": "4"
+    }
+  ],
+  "annexes": [
+    {
+      "number": "01",
+      "title": "DECLARATIONS SUR L’HONNEUR",
+      "page_start": 21,
+      "source_evidence": [
+        {
+          "page": 21,
+          "element_ids": [
+            "p21-native-000001",
+            "p21-native-000002"
+          ],
+          "raw_text": "Annexe 01",
+          "bbox": [
+            533.9600219726562,
+            147.159912109375,
+            656.4560546875,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ],
+      "annex_type": "administrative_declaration",
+      "subsections": [],
+      "page_end": 21,
+      "title_source_evidence": [
+        {
+          "page": 21,
+          "element_ids": [
+            "p21-native-000011",
+            "p21-native-000012",
+            "p21-native-000013"
+          ],
+          "raw_text": "DECLARATIONS SUR L’HONNEUR"
+        }
+      ]
+    },
+    {
+      "number": "02",
+      "title": "FICHE DE RENSEIGNEMENTS",
+      "page_start": 22,
+      "source_evidence": [
+        {
+          "page": 22,
+          "element_ids": [
+            "p22-native-000001",
+            "p22-native-000002"
+          ],
+          "raw_text": "Annexe 02",
+          "bbox": [
+            533.9600219726562,
+            147.159912109375,
+            656.4560546875,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ],
+      "annex_type": "information_sheet",
+      "subsections": [],
+      "page_end": 22,
+      "title_source_evidence": [
+        {
+          "page": 22,
+          "element_ids": [
+            "p22-native-000011",
+            "p22-native-000012",
+            "p22-native-000013"
+          ],
+          "raw_text": "FICHE DE RENSEIGNEMENTS"
+        }
+      ]
+    },
+    {
+      "number": "03",
+      "title": "ENGAGEMENT POUR LA CAPACITÉ TECHNIQUE",
+      "page_start": 23,
+      "source_evidence": [
+        {
+          "page": 23,
+          "element_ids": [
+            "p23-native-000001",
+            "p23-native-000002"
+          ],
+          "raw_text": "Annexe 03",
+          "bbox": [
+            533.9600219726562,
+            147.159912109375,
+            656.4560546875,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ],
+      "annex_type": "technical_capacity_form",
+      "subsections": [],
+      "page_end": 23,
+      "title_source_evidence": [
+        {
+          "page": 23,
+          "element_ids": [
+            "p23-native-000010",
+            "p23-native-000011",
+            "p23-native-000012",
+            "p23-native-000013",
+            "p23-native-000014"
+          ],
+          "raw_text": "ENGAGEMENT POUR LA CAPACITÉ TECHNIQUE"
+        }
+      ]
+    },
+    {
+      "number": "04",
+      "title": "SOUMISSION",
+      "page_start": 24,
+      "source_evidence": [
+        {
+          "page": 24,
+          "element_ids": [
+            "p24-native-000001",
+            "p24-native-000002"
+          ],
+          "raw_text": "Annexe 04",
+          "bbox": [
+            533.9600219726562,
+            147.159912109375,
+            656.4560546875,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ],
+      "annex_type": "submission_form",
+      "subsections": [],
+      "page_end": 24,
+      "title_source_evidence": [
+        {
+          "page": 24,
+          "element_ids": [
+            "p24-native-000011"
+          ],
+          "raw_text": "SOUMISSION"
+        }
+      ]
+    },
+    {
+      "number": "05",
+      "title": "BORDERAU DES PRIX – DEVIS ESTIMATIF",
+      "page_start": 25,
+      "source_evidence": [
+        {
+          "page": 25,
+          "element_ids": [
+            "p25-native-000001",
+            "p25-native-000002"
+          ],
+          "raw_text": "Annexe 05",
+          "bbox": [
+            533.9600219726562,
+            147.159912109375,
+            656.4560546875,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ],
+      "annex_type": "boq",
+      "subsections": [],
+      "page_end": 25,
+      "title_source_evidence": [
+        {
+          "page": 25,
+          "element_ids": [
+            "p25-native-000011",
+            "p25-native-000012",
+            "p25-native-000013",
+            "p25-native-000014",
+            "p25-native-000015",
+            "p25-native-000016"
+          ],
+          "raw_text": "BORDERAU DES PRIX – DEVIS ESTIMATIF"
+        }
+      ]
+    },
+    {
+      "number": "06",
+      "title": "Engagements de cautions personnelles et solidaires au titre de :",
+      "page_start": 26,
+      "source_evidence": [
+        {
+          "page": 26,
+          "element_ids": [
+            "p26-native-000001",
+            "p26-native-000002"
+          ],
+          "raw_text": "Annexe 06",
+          "bbox": [
+            534.4400024414062,
+            147.159912109375,
+            657.0403442382812,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        },
+        {
+          "page": 20,
+          "element_ids": [
+            "p20-native-000055",
+            "p20-native-000056",
+            "p20-native-000057",
+            "p20-native-000058",
+            "p20-native-000059",
+            "p20-native-000060",
+            "p20-native-000061",
+            "p20-native-000062",
+            "p20-native-000063",
+            "p20-native-000064",
+            "p20-native-000065",
+            "p20-native-000066"
+          ],
+          "raw_text": "Annexes 06 Engagements de cautions personnelles et solidaires au titre de :",
+          "evidence_role": "annex_index_title"
+        }
+      ],
+      "annex_type": "guarantee_form",
+      "subsections": [
+        {
+          "number": "6.1",
+          "title": "Modèle d’engagement d’une caution personnelle et solidaire",
+          "page_start": 26,
+          "page_end": 26,
+          "source_evidence": [
+            {
+              "page": 26,
+              "element_ids": [
+                "p26-native-000003",
+                "p26-native-000004",
+                "p26-native-000005",
+                "p26-native-000006",
+                "p26-native-000007",
+                "p26-native-000008",
+                "p26-native-000009",
+                "p26-native-000010"
+              ],
+              "raw_text": "6.1. Modèle d’engagement d’une caution personnelle et solidaire"
+            }
+          ]
+        },
+        {
+          "number": "6.2",
+          "title": "Modèle d’engagement d’une caution personnelle et solidaire",
+          "page_start": 27,
+          "page_end": 27,
+          "source_evidence": [
+            {
+              "page": 27,
+              "element_ids": [
+                "p27-native-000003",
+                "p27-native-000004",
+                "p27-native-000005",
+                "p27-native-000006",
+                "p27-native-000007",
+                "p27-native-000008",
+                "p27-native-000009",
+                "p27-native-000010"
+              ],
+              "raw_text": "6.2. Modèle d’engagement d’une caution personnelle et solidaire"
+            }
+          ]
+        },
+        {
+          "number": "6.3",
+          "title": "Modèle d’engagement d’une caution personnelle et solidaire",
+          "page_start": 28,
+          "page_end": 28,
+          "source_evidence": [
+            {
+              "page": 28,
+              "element_ids": [
+                "p28-native-000003",
+                "p28-native-000004",
+                "p28-native-000005",
+                "p28-native-000006",
+                "p28-native-000007",
+                "p28-native-000008",
+                "p28-native-000009",
+                "p28-native-000010"
+              ],
+              "raw_text": "6.3. Modèle d’engagement d’une caution personnelle et solidaire"
+            }
+          ]
+        }
+      ],
+      "page_end": 28,
+      "title_source_evidence": [
+        {
+          "page": 20,
+          "element_ids": [
+            "p20-native-000057",
+            "p20-native-000058",
+            "p20-native-000059",
+            "p20-native-000060",
+            "p20-native-000061",
+            "p20-native-000062",
+            "p20-native-000063",
+            "p20-native-000064",
+            "p20-native-000065",
+            "p20-native-000066"
+          ],
+          "raw_text": "Engagements de cautions personnelles et solidaires au titre de :",
+          "evidence_role": "annex_index_title"
+        }
+      ]
+    }
+  ],
+  "special_documents": [
+    {
+      "document_type": "technical_specification",
+      "number": "C",
+      "page_start": 12,
+      "page_end": 19,
+      "source_evidence": [
+        {
+          "page": 12,
+          "element_ids": [
+            "p12-native-000001",
+            "p12-native-000002",
+            "p12-native-000003",
+            "p12-native-000004"
+          ],
+          "raw_text": "C – SPECIFICATIONS TECHNIQUES"
+        }
+      ]
+    },
+    {
+      "document_type": "administrative_declaration",
+      "number": "01",
+      "page_start": 21,
+      "page_end": 21,
+      "source_evidence": [
+        {
+          "page": 21,
+          "element_ids": [
+            "p21-native-000001",
+            "p21-native-000002"
+          ],
+          "raw_text": "Annexe 01",
+          "bbox": [
+            533.9600219726562,
+            147.159912109375,
+            656.4560546875,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ]
+    },
+    {
+      "document_type": "information_sheet",
+      "number": "02",
+      "page_start": 22,
+      "page_end": 22,
+      "source_evidence": [
+        {
+          "page": 22,
+          "element_ids": [
+            "p22-native-000001",
+            "p22-native-000002"
+          ],
+          "raw_text": "Annexe 02",
+          "bbox": [
+            533.9600219726562,
+            147.159912109375,
+            656.4560546875,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ]
+    },
+    {
+      "document_type": "technical_capacity_form",
+      "number": "03",
+      "page_start": 23,
+      "page_end": 23,
+      "source_evidence": [
+        {
+          "page": 23,
+          "element_ids": [
+            "p23-native-000001",
+            "p23-native-000002"
+          ],
+          "raw_text": "Annexe 03",
+          "bbox": [
+            533.9600219726562,
+            147.159912109375,
+            656.4560546875,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ]
+    },
+    {
+      "document_type": "submission_form",
+      "number": "04",
+      "page_start": 24,
+      "page_end": 24,
+      "source_evidence": [
+        {
+          "page": 24,
+          "element_ids": [
+            "p24-native-000001",
+            "p24-native-000002"
+          ],
+          "raw_text": "Annexe 04",
+          "bbox": [
+            533.9600219726562,
+            147.159912109375,
+            656.4560546875,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ]
+    },
+    {
+      "document_type": "boq",
+      "number": "05",
+      "page_start": 25,
+      "page_end": 25,
+      "source_evidence": [
+        {
+          "page": 25,
+          "element_ids": [
+            "p25-native-000001",
+            "p25-native-000002"
+          ],
+          "raw_text": "Annexe 05",
+          "bbox": [
+            533.9600219726562,
+            147.159912109375,
+            656.4560546875,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ]
+    },
+    {
+      "document_type": "guarantee_form",
+      "number": "06",
+      "page_start": 26,
+      "page_end": 28,
+      "source_evidence": [
+        {
+          "page": 26,
+          "element_ids": [
+            "p26-native-000001",
+            "p26-native-000002"
+          ],
+          "raw_text": "Annexe 06",
+          "bbox": [
+            534.4400024414062,
+            147.159912109375,
+            657.0403442382812,
+            174.9999237060547
+          ],
+          "coordinate_space": "rendered_page_pixels"
+        }
+      ]
+    }
+  ],
+  "records": {
+    "sections": [
+      {
+        "parent": "document",
+        "number": "A",
+        "title": "CONDITIONS DE LA CONSULTATION / A.O",
+        "start": 3,
+        "end": 9,
+        "source_page": 3
+      },
+      {
+        "parent": "document",
+        "number": "B",
+        "title": "CLAUSES TECHNIQUES PARTICULIERES",
+        "start": 10,
+        "end": 11,
+        "source_page": 10
+      },
+      {
+        "parent": "document",
+        "number": "C",
+        "title": "SPECIFICATIONS TECHNIQUES",
+        "start": 12,
+        "end": 19,
+        "source_page": 12
+      },
+      {
+        "parent": "document/section[2]",
+        "number": "1",
+        "title": "TRAVAUX DE MACONNERIE D’ENTRETIEN ET DE REPARATION",
+        "start": 12,
+        "end": 14,
+        "source_page": 12
+      },
+      {
+        "parent": "document/section[2]/section[0]",
+        "number": "1.1",
+        "title": "BRIQUETAGE",
+        "start": 12,
+        "end": 12,
+        "source_page": 12
+      },
+      {
+        "parent": "document/section[2]/section[0]",
+        "number": "1.2",
+        "title": "MORTIER DE PAUSE",
+        "start": 12,
+        "end": 12,
+        "source_page": 12
+      },
+      {
+        "parent": "document/section[2]/section[0]",
+        "number": "1.3",
+        "title": "ENDUITS",
+        "start": 12,
+        "end": 12,
+        "source_page": 12
+      },
+      {
+        "parent": "document/section[2]/section[0]",
+        "number": "1.4",
+        "title": "GACHAGES DES MORTIERS",
+        "start": 12,
+        "end": 12,
+        "source_page": 12
+      },
+      {
+        "parent": "document/section[2]/section[0]",
+        "number": "1.5",
+        "title": "PREPARATION DES SUPPORTS",
+        "start": 12,
+        "end": 13,
+        "source_page": 12
+      },
+      {
+        "parent": "document/section[2]/section[0]",
+        "number": "1.6",
+        "title": "EXECUTION DES ENDUITS",
+        "start": 13,
+        "end": 13,
+        "source_page": 13
+      },
+      {
+        "parent": "document/section[2]/section[0]",
+        "number": "1.7",
+        "title": "QUALITES DES ENDUITS FINIS",
+        "start": 13,
+        "end": 13,
+        "source_page": 13
+      },
+      {
+        "parent": "document/section[2]/section[0]",
+        "number": "1.8",
+        "title": "ENDUIT EXTERIEUR À TROIS COUCHES",
+        "start": 13,
+        "end": 14,
+        "source_page": 13
+      },
+      {
+        "parent": "document/section[2]",
+        "number": "2",
+        "title": "TRAVAUX DE REVETEMENT",
+        "start": 14,
+        "end": 16,
+        "source_page": 14
+      },
+      {
+        "parent": "document/section[2]/section[1]",
+        "number": "2.1",
+        "title": "AIRE EN BETON",
+        "start": 14,
+        "end": 15,
+        "source_page": 14
+      },
+      {
+        "parent": "document/section[2]/section[1]",
+        "number": "2.2",
+        "title": "CHAPE D'USURE",
+        "start": 15,
+        "end": 15,
+        "source_page": 15
+      },
+      {
+        "parent": "document/section[2]/section[1]",
+        "number": "2.3",
+        "title": "ELÉMENTS PRÉFABRIQUÉS EN BÉTON",
+        "start": 15,
+        "end": 16,
+        "source_page": 15
+      },
+      {
+        "parent": "document/section[2]",
+        "number": "3",
+        "title": "TRAVAUX D’ETANCHEITE DES TOITURES",
+        "start": 16,
+        "end": 17,
+        "source_page": 16
+      },
+      {
+        "parent": "document/section[2]/section[2]",
+        "number": "3.1",
+        "title": "RELIEFS ET ACROTERES",
+        "start": 16,
+        "end": 16,
+        "source_page": 16
+      },
+      {
+        "parent": "document/section[2]/section[2]",
+        "number": "3.2",
+        "title": "ETANCHEITE MONOCOUCHE AUTOPROTEGEE",
+        "start": 16,
+        "end": 16,
+        "source_page": 16
+      },
+      {
+        "parent": "document/section[2]/section[2]",
+        "number": "3.3",
+        "title": "REVETEMENTS APPLIQUES EN RELEVE",
+        "start": 16,
+        "end": 16,
+        "source_page": 16
+      },
+      {
+        "parent": "document/section[2]/section[2]",
+        "number": "3.4",
+        "title": "RELEVES RACCORDES A UN REVETEMENT MONOCOUCHE SOUS PROTECTION",
+        "start": 16,
+        "end": 16,
+        "source_page": 16
+      },
+      {
+        "parent": "document/section[2]/section[2]",
+        "number": "3.5",
+        "title": "EVACUATION DES EAUX PLUVIALES",
+        "start": 17,
+        "end": 17,
+        "source_page": 17
+      },
+      {
+        "parent": "document/section[2]",
+        "number": "4",
+        "title": "TRAVAUX DE PEINTURE",
+        "start": 17,
+        "end": 19,
+        "source_page": 17
+      },
+      {
+        "parent": "document/section[2]/section[3]",
+        "number": "4.1",
+        "title": "CHOIX DES PRODUITS DE PEINTURE",
+        "start": 17,
+        "end": 17,
+        "source_page": 17
+      },
+      {
+        "parent": "document/section[2]/section[3]",
+        "number": "4.2",
+        "title": "PRÉPARATION DES SUPPORTS",
+        "start": 17,
+        "end": 18,
+        "source_page": 17
+      },
+      {
+        "parent": "document/section[2]/section[3]",
+        "number": "4.3",
+        "title": "EXECUTION DES PEINTURES",
+        "start": 19,
+        "end": 19,
+        "source_page": 19
+      },
+      {
+        "parent": "document/section[2]/section[3]",
+        "number": "4.4",
+        "title": "PEINTURE A L’EAU SUR MACONNERIE EXTERIEURE",
+        "start": 19,
+        "end": 19,
+        "source_page": 19
+      },
+      {
+        "parent": "document",
+        "number": "D",
+        "title": "ANNEXES : Modèles à suivre",
+        "start": 20,
+        "end": 28,
+        "source_page": 20
+      },
+      {
+        "parent": "document",
+        "number": "E",
+        "title": "DESSINS ET PLANS",
+        "start": 29,
+        "end": 29,
+        "source_page": 29
+      }
+    ],
+    "articles": [
+      {
+        "parent": "document/section[0]",
+        "number": "1",
+        "title": "Objet de la consultation : A.O",
+        "start": 3,
+        "end": 3,
+        "source_page": 3
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "2",
+        "title": "Financement",
+        "start": 3,
+        "end": 3,
+        "source_page": 3
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "3",
+        "title": "Cahier des charges",
+        "start": 3,
+        "end": 3,
+        "source_page": 3
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "4",
+        "title": "Obligations générales des parties contractantes",
+        "start": 3,
+        "end": 3,
+        "source_page": 3
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "5",
+        "title": "Conditions de la consultation",
+        "start": 3,
+        "end": 4,
+        "source_page": 3
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "6",
+        "title": "Allotissement",
+        "start": 4,
+        "end": 4,
+        "source_page": 4
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "7",
+        "title": "Visite des lieux",
+        "start": 4,
+        "end": 4,
+        "source_page": 4
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "8",
+        "title": "Présentation des offres",
+        "start": 4,
+        "end": 5,
+        "source_page": 4
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "9",
+        "title": "Caution provisoire",
+        "start": 5,
+        "end": 5,
+        "source_page": 5
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "10",
+        "title": "Pièces contractuelles",
+        "start": 5,
+        "end": 5,
+        "source_page": 5
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "11",
+        "title": "Demandes d’éclaircissement",
+        "start": 6,
+        "end": 6,
+        "source_page": 6
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "12",
+        "title": "Montant de l'offre",
+        "start": 6,
+        "end": 6,
+        "source_page": 6
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "13",
+        "title": "Conditions des prix",
+        "start": 6,
+        "end": 6,
+        "source_page": 6
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "14",
+        "title": "Réception des offres",
+        "start": 6,
+        "end": 6,
+        "source_page": 6
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "15",
+        "title": "Date limite de réception des offres",
+        "start": 6,
+        "end": 7,
+        "source_page": 6
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "16",
+        "title": "La validité des offres",
+        "start": 7,
+        "end": 7,
+        "source_page": 7
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "17",
+        "title": "Ouverture des plis",
+        "start": 7,
+        "end": 7,
+        "source_page": 7
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "18",
+        "title": "Méthodologie de dépouillement",
+        "start": 7,
+        "end": 7,
+        "source_page": 7
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "19",
+        "title": "Attribution de la prestation",
+        "start": 7,
+        "end": 7,
+        "source_page": 7
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "20",
+        "title": "Caution définitive",
+        "start": 7,
+        "end": 7,
+        "source_page": 7
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "21",
+        "title": "Modalités de paiement et retenue de garantie",
+        "start": 8,
+        "end": 8,
+        "source_page": 8
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "22",
+        "title": "Délai d’exécution et pénalités de retard",
+        "start": 8,
+        "end": 8,
+        "source_page": 8
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "23",
+        "title": "Réception provisoire",
+        "start": 8,
+        "end": 8,
+        "source_page": 8
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "24",
+        "title": "Délai de garantie et réception définitive",
+        "start": 8,
+        "end": 9,
+        "source_page": 8
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "25",
+        "title": "Variation du volume de la commande",
+        "start": 9,
+        "end": 9,
+        "source_page": 9
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "26",
+        "title": "Litige ou différend",
+        "start": 9,
+        "end": 9,
+        "source_page": 9
+      },
+      {
+        "parent": "document/section[0]",
+        "number": "27",
+        "title": "Réglementation",
+        "start": 9,
+        "end": 9,
+        "source_page": 9
+      },
+      {
+        "parent": "document/section[1]",
+        "number": "1",
+        "title": "Objet des travaux",
+        "start": 10,
+        "end": 10,
+        "source_page": 10
+      },
+      {
+        "parent": "document/section[1]",
+        "number": "2",
+        "title": "Capacité technique",
+        "start": 10,
+        "end": 10,
+        "source_page": 10
+      },
+      {
+        "parent": "document/section[1]",
+        "number": "3",
+        "title": "Conformité aux règles de l’art",
+        "start": 10,
+        "end": 10,
+        "source_page": 10
+      },
+      {
+        "parent": "document/section[1]",
+        "number": "4",
+        "title": "Signalisation de chantier et Echafaudages",
+        "start": 10,
+        "end": 10,
+        "source_page": 10
+      },
+      {
+        "parent": "document/section[1]",
+        "number": "5",
+        "title": "Travaux préparatoires",
+        "start": 10,
+        "end": 10,
+        "source_page": 10
+      },
+      {
+        "parent": "document/section[1]",
+        "number": "6",
+        "title": "Règles d’exécution",
+        "start": 10,
+        "end": 10,
+        "source_page": 10
+      },
+      {
+        "parent": "document/section[1]",
+        "number": "7",
+        "title": "Précautions à prendre",
+        "start": 11,
+        "end": 11,
+        "source_page": 11
+      },
+      {
+        "parent": "document/section[1]",
+        "number": "8",
+        "title": "Prescriptions techniques",
+        "start": 11,
+        "end": 11,
+        "source_page": 11
+      },
+      {
+        "parent": "document/section[1]",
+        "number": "9",
+        "title": "Nettoyage en fin de chantier",
+        "start": 11,
+        "end": 11,
+        "source_page": 11
+      }
+    ],
+    "annexes": [
+      {
+        "number": "01",
+        "title": "DECLARATIONS SUR L’HONNEUR",
+        "start": 21,
+        "end": 21,
+        "annex_type": "administrative_declaration",
+        "source_page": 21
+      },
+      {
+        "number": "02",
+        "title": "FICHE DE RENSEIGNEMENTS",
+        "start": 22,
+        "end": 22,
+        "annex_type": "information_sheet",
+        "source_page": 22
+      },
+      {
+        "number": "03",
+        "title": "ENGAGEMENT POUR LA CAPACITÉ TECHNIQUE",
+        "start": 23,
+        "end": 23,
+        "annex_type": "technical_capacity_form",
+        "source_page": 23
+      },
+      {
+        "number": "04",
+        "title": "SOUMISSION",
+        "start": 24,
+        "end": 24,
+        "annex_type": "submission_form",
+        "source_page": 24
+      },
+      {
+        "number": "05",
+        "title": "BORDERAU DES PRIX – DEVIS ESTIMATIF",
+        "start": 25,
+        "end": 25,
+        "annex_type": "boq",
+        "source_page": 25
+      },
+      {
+        "number": "06",
+        "title": "Engagements de cautions personnelles et solidaires au titre de :",
+        "start": 26,
+        "end": 28,
+        "annex_type": "guarantee_form",
+        "source_page": 26
+      }
+    ],
+    "special_documents": [
+      {
+        "document_type": "technical_specification",
+        "number": "C",
+        "start": 12,
+        "end": 19,
+        "source_page": 12
+      },
+      {
+        "document_type": "administrative_declaration",
+        "number": "01",
+        "start": 21,
+        "end": 21,
+        "source_page": 21
+      },
+      {
+        "document_type": "information_sheet",
+        "number": "02",
+        "start": 22,
+        "end": 22,
+        "source_page": 22
+      },
+      {
+        "document_type": "technical_capacity_form",
+        "number": "03",
+        "start": 23,
+        "end": 23,
+        "source_page": 23
+      },
+      {
+        "document_type": "submission_form",
+        "number": "04",
+        "start": 24,
+        "end": 24,
+        "source_page": 24
+      },
+      {
+        "document_type": "boq",
+        "number": "05",
+        "start": 25,
+        "end": 25,
+        "source_page": 25
+      },
+      {
+        "document_type": "guarantee_form",
+        "number": "06",
+        "start": 26,
+        "end": 28,
+        "source_page": 26
+      }
+    ],
+    "annex_subsections": [
+      {
+        "parent": "06",
+        "number": "6.1",
+        "title": "Modèle d’engagement d’une caution personnelle et solidaire",
+        "start": 26,
+        "end": 26,
+        "source_page": 26
+      },
+      {
+        "parent": "06",
+        "number": "6.2",
+        "title": "Modèle d’engagement d’une caution personnelle et solidaire",
+        "start": 27,
+        "end": 27,
+        "source_page": 27
+      },
+      {
+        "parent": "06",
+        "number": "6.3",
+        "title": "Modèle d’engagement d’une caution personnelle et solidaire",
+        "start": 28,
+        "end": 28,
+        "source_page": 28
+      }
+    ]
+  },
+  "review_notes": [
+    "All 30 PDF pages have been visually inspected against the producer-derived annotation draft; independent reviewer sign-off is still required before setting verification_status=verified.",
+    "The TOC/body D heading title differs: the TOC prints “ANNEXEX (Modèles à respecter)” and the body prints “ANNEXES : Modèles à suivre”. Both labels and evidence are preserved.",
+    "Section E appears only on physical page 29. Physical page 30 is the ministry back-cover/contact page.",
+    "Annexe 06 title is provided by the annex overview on page 20; its body forms 6.1, 6.2 and 6.3 occupy pages 26–28."
+  ],
+  "visual_review": {
+    "pages_inspected": "1-30",
+    "method": "Rendered source PDF pages and compared structural labels/ranges with the source evidence",
+    "reviewer": "assistant; not human sign-off",
+    "reviewed_at": "2026-09-28"
+  }
+}

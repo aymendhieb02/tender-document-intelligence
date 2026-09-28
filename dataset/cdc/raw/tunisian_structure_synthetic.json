@@ -1,0 +1,103 @@
+{
+  "document_id": "tunisian-structure-SYNTHETIC",
+  "metadata": {
+    "fixture_status": "synthetic",
+    "source": "User-described section titles; invented test content and page positions; NOT a transcription or verified ground truth"
+  },
+  "pages": [
+    {
+      "page_number": 1,
+      "elements": [
+        {
+          "id": "p1-e0",
+          "text": "Cahier des Charges"
+        },
+        {
+          "id": "p1-e1",
+          "text": "A — Conditions de la Consultation / A.O"
+        },
+        {
+          "id": "p1-e2",
+          "text": "Article 1 - Objet"
+        },
+        {
+          "id": "p1-e3",
+          "text": "Objet : Fourniture de matériel (exemple synthétique)."
+        }
+      ]
+    },
+    {
+      "page_number": 2,
+      "elements": [
+        {
+          "id": "p2-e0",
+          "text": "Article 2 - Délais"
+        },
+        {
+          "id": "p2-e1",
+          "text": "Date limite de soumission : à préciser."
+        },
+        {
+          "id": "p2-e2",
+          "text": "Les candidats doivent joindre une attestation."
+        }
+      ]
+    },
+    {
+      "page_number": 3,
+      "elements": [
+        {
+          "id": "p3-e0",
+          "text": "B — Clauses Techniques Particulières"
+        },
+        {
+          "id": "p3-e1",
+          "text": "Article 1 - Exécution"
+        },
+        {
+          "id": "p3-e2",
+          "text": "Délai d’exécution : 30 jours."
+        }
+      ]
+    },
+    {
+      "page_number": 4,
+      "elements": [
+        {
+          "id": "p4-e0",
+          "text": "C — Spécifications Techniques"
+        },
+        {
+          "id": "p4-e1",
+          "text": "Article 1 - Conformité"
+        },
+        {
+          "id": "p4-e2",
+          "text": "Le matériel doit être conforme aux spécifications."
+        }
+      ]
+    },
+    {
+      "page_number": 5,
+      "elements": [
+        {
+          "id": "p5-e0",
+          "text": "D — Annexes"
+        },
+        {
+          "id": "p5-e1",
+          "text": "Annexe 01 - Acte de soumission"
+        }
+      ]
+    },
+    {
+      "page_number": 6,
+      "elements": [
+        {
+          "id": "p6-e0",
+          "text": "Annexe 02 - Bordereau des prix – devis estimatif"
+        }
+      ]
+    }
+  ]
+}

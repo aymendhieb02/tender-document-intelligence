@@ -1,0 +1,10 @@
+{
+  "document_id": "tunisian-reference-pending",
+  "status": "awaiting_source_and_human_verification",
+  "source_path": null,
+  "source_sha256": null,
+  "reviewer": null,
+  "verified_at": null,
+  "records": {},
+  "note": "The attachment contains implementation instructions, not the source CDC. No verified labels or corpus accuracy are claimed."
+}

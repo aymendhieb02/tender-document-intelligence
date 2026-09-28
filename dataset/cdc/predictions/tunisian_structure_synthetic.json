@@ -1,0 +1,693 @@
+{
+  "schema_version": "1.0",
+  "document_id": "tunisian-structure-SYNTHETIC",
+  "metadata": {
+    "fixture_status": "synthetic",
+    "source": "User-described section titles; invented test content and page positions; NOT a transcription or verified ground truth"
+  },
+  "title": "Cahier des Charges",
+  "title_evidence": [
+    {
+      "document_id": "tunisian-structure-SYNTHETIC",
+      "page": 1,
+      "element_id": "p1-e0",
+      "raw_text": "Cahier des Charges",
+      "bbox": null,
+      "coordinate_space": null,
+      "page_width": null,
+      "page_height": null,
+      "line_index": 0
+    }
+  ],
+  "sections": [
+    {
+      "id": "section-1",
+      "number": "A",
+      "title": "Conditions de la Consultation / A.O",
+      "normalized_title": "conditions de la consultation / a.o",
+      "start_page": 1,
+      "end_page": 2,
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 1,
+          "element_id": "p1-e1",
+          "raw_text": "A — Conditions de la Consultation / A.O",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "subsections": [],
+      "articles": [
+        {
+          "id": "article-1",
+          "number": "1",
+          "title": "Objet",
+          "text": "Objet : Fourniture de matériel (exemple synthétique).",
+          "page_start": 1,
+          "page_end": 1,
+          "source_evidence": [
+            {
+              "document_id": "tunisian-structure-SYNTHETIC",
+              "page": 1,
+              "element_id": "p1-e2",
+              "raw_text": "Article 1 - Objet",
+              "bbox": null,
+              "coordinate_space": null,
+              "page_width": null,
+              "page_height": null,
+              "line_index": 0
+            },
+            {
+              "document_id": "tunisian-structure-SYNTHETIC",
+              "page": 1,
+              "element_id": "p1-e3",
+              "raw_text": "Objet : Fourniture de matériel (exemple synthétique).",
+              "bbox": null,
+              "coordinate_space": null,
+              "page_width": null,
+              "page_height": null,
+              "line_index": 0
+            }
+          ],
+          "clauses": [
+            {
+              "id": "paragraph-1",
+              "number": null,
+              "text": "Objet : Fourniture de matériel (exemple synthétique).",
+              "page_start": 1,
+              "page_end": 1,
+              "source_evidence": [
+                {
+                  "document_id": "tunisian-structure-SYNTHETIC",
+                  "page": 1,
+                  "element_id": "p1-e3",
+                  "raw_text": "Objet : Fourniture de matériel (exemple synthétique).",
+                  "bbox": null,
+                  "coordinate_space": null,
+                  "page_width": null,
+                  "page_height": null,
+                  "line_index": 0
+                }
+              ]
+            }
+          ],
+          "table_refs": [],
+          "evidence_status": "detected"
+        },
+        {
+          "id": "article-2",
+          "number": "2",
+          "title": "Délais",
+          "text": "Date limite de soumission : à préciser.\nLes candidats doivent joindre une attestation.",
+          "page_start": 2,
+          "page_end": 2,
+          "source_evidence": [
+            {
+              "document_id": "tunisian-structure-SYNTHETIC",
+              "page": 2,
+              "element_id": "p2-e0",
+              "raw_text": "Article 2 - Délais",
+              "bbox": null,
+              "coordinate_space": null,
+              "page_width": null,
+              "page_height": null,
+              "line_index": 0
+            },
+            {
+              "document_id": "tunisian-structure-SYNTHETIC",
+              "page": 2,
+              "element_id": "p2-e1",
+              "raw_text": "Date limite de soumission : à préciser.",
+              "bbox": null,
+              "coordinate_space": null,
+              "page_width": null,
+              "page_height": null,
+              "line_index": 0
+            },
+            {
+              "document_id": "tunisian-structure-SYNTHETIC",
+              "page": 2,
+              "element_id": "p2-e2",
+              "raw_text": "Les candidats doivent joindre une attestation.",
+              "bbox": null,
+              "coordinate_space": null,
+              "page_width": null,
+              "page_height": null,
+              "line_index": 0
+            }
+          ],
+          "clauses": [
+            {
+              "id": "paragraph-2",
+              "number": null,
+              "text": "Date limite de soumission : à préciser.",
+              "page_start": 2,
+              "page_end": 2,
+              "source_evidence": [
+                {
+                  "document_id": "tunisian-structure-SYNTHETIC",
+                  "page": 2,
+                  "element_id": "p2-e1",
+                  "raw_text": "Date limite de soumission : à préciser.",
+                  "bbox": null,
+                  "coordinate_space": null,
+                  "page_width": null,
+                  "page_height": null,
+                  "line_index": 0
+                }
+              ]
+            },
+            {
+              "id": "paragraph-3",
+              "number": null,
+              "text": "Les candidats doivent joindre une attestation.",
+              "page_start": 2,
+              "page_end": 2,
+              "source_evidence": [
+                {
+                  "document_id": "tunisian-structure-SYNTHETIC",
+                  "page": 2,
+                  "element_id": "p2-e2",
+                  "raw_text": "Les candidats doivent joindre une attestation.",
+                  "bbox": null,
+                  "coordinate_space": null,
+                  "page_width": null,
+                  "page_height": null,
+                  "line_index": 0
+                }
+              ]
+            }
+          ],
+          "table_refs": [],
+          "evidence_status": "detected"
+        }
+      ],
+      "paragraphs": [],
+      "table_refs": [],
+      "evidence_status": "detected",
+      "signals": {
+        "numbering_pattern": true,
+        "typography_signal": false,
+        "toc_match": false
+      }
+    },
+    {
+      "id": "section-2",
+      "number": "B",
+      "title": "Clauses Techniques Particulières",
+      "normalized_title": "clauses techniques particulieres",
+      "start_page": 3,
+      "end_page": 3,
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 3,
+          "element_id": "p3-e0",
+          "raw_text": "B — Clauses Techniques Particulières",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "subsections": [],
+      "articles": [
+        {
+          "id": "article-3",
+          "number": "1",
+          "title": "Exécution",
+          "text": "Délai d’exécution : 30 jours.",
+          "page_start": 3,
+          "page_end": 3,
+          "source_evidence": [
+            {
+              "document_id": "tunisian-structure-SYNTHETIC",
+              "page": 3,
+              "element_id": "p3-e1",
+              "raw_text": "Article 1 - Exécution",
+              "bbox": null,
+              "coordinate_space": null,
+              "page_width": null,
+              "page_height": null,
+              "line_index": 0
+            },
+            {
+              "document_id": "tunisian-structure-SYNTHETIC",
+              "page": 3,
+              "element_id": "p3-e2",
+              "raw_text": "Délai d’exécution : 30 jours.",
+              "bbox": null,
+              "coordinate_space": null,
+              "page_width": null,
+              "page_height": null,
+              "line_index": 0
+            }
+          ],
+          "clauses": [
+            {
+              "id": "paragraph-4",
+              "number": null,
+              "text": "Délai d’exécution : 30 jours.",
+              "page_start": 3,
+              "page_end": 3,
+              "source_evidence": [
+                {
+                  "document_id": "tunisian-structure-SYNTHETIC",
+                  "page": 3,
+                  "element_id": "p3-e2",
+                  "raw_text": "Délai d’exécution : 30 jours.",
+                  "bbox": null,
+                  "coordinate_space": null,
+                  "page_width": null,
+                  "page_height": null,
+                  "line_index": 0
+                }
+              ]
+            }
+          ],
+          "table_refs": [],
+          "evidence_status": "detected"
+        }
+      ],
+      "paragraphs": [],
+      "table_refs": [],
+      "evidence_status": "detected",
+      "signals": {
+        "numbering_pattern": true,
+        "typography_signal": false,
+        "toc_match": false
+      }
+    },
+    {
+      "id": "section-3",
+      "number": "C",
+      "title": "Spécifications Techniques",
+      "normalized_title": "specifications techniques",
+      "start_page": 4,
+      "end_page": 4,
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 4,
+          "element_id": "p4-e0",
+          "raw_text": "C — Spécifications Techniques",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "subsections": [],
+      "articles": [
+        {
+          "id": "article-4",
+          "number": "1",
+          "title": "Conformité",
+          "text": "Le matériel doit être conforme aux spécifications.",
+          "page_start": 4,
+          "page_end": 4,
+          "source_evidence": [
+            {
+              "document_id": "tunisian-structure-SYNTHETIC",
+              "page": 4,
+              "element_id": "p4-e1",
+              "raw_text": "Article 1 - Conformité",
+              "bbox": null,
+              "coordinate_space": null,
+              "page_width": null,
+              "page_height": null,
+              "line_index": 0
+            },
+            {
+              "document_id": "tunisian-structure-SYNTHETIC",
+              "page": 4,
+              "element_id": "p4-e2",
+              "raw_text": "Le matériel doit être conforme aux spécifications.",
+              "bbox": null,
+              "coordinate_space": null,
+              "page_width": null,
+              "page_height": null,
+              "line_index": 0
+            }
+          ],
+          "clauses": [
+            {
+              "id": "paragraph-5",
+              "number": null,
+              "text": "Le matériel doit être conforme aux spécifications.",
+              "page_start": 4,
+              "page_end": 4,
+              "source_evidence": [
+                {
+                  "document_id": "tunisian-structure-SYNTHETIC",
+                  "page": 4,
+                  "element_id": "p4-e2",
+                  "raw_text": "Le matériel doit être conforme aux spécifications.",
+                  "bbox": null,
+                  "coordinate_space": null,
+                  "page_width": null,
+                  "page_height": null,
+                  "line_index": 0
+                }
+              ]
+            }
+          ],
+          "table_refs": [],
+          "evidence_status": "detected"
+        }
+      ],
+      "paragraphs": [],
+      "table_refs": [],
+      "evidence_status": "detected",
+      "signals": {
+        "numbering_pattern": true,
+        "typography_signal": false,
+        "toc_match": false
+      }
+    },
+    {
+      "id": "section-4",
+      "number": "D",
+      "title": "Annexes",
+      "normalized_title": "annexes",
+      "start_page": 5,
+      "end_page": 6,
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 5,
+          "element_id": "p5-e0",
+          "raw_text": "D — Annexes",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "subsections": [],
+      "articles": [],
+      "paragraphs": [],
+      "table_refs": [],
+      "evidence_status": "detected",
+      "signals": {
+        "numbering_pattern": true,
+        "typography_signal": false,
+        "toc_match": false
+      }
+    }
+  ],
+  "articles": [],
+  "annexes": [
+    {
+      "id": "annex-1",
+      "number": "01",
+      "title": "Acte de soumission",
+      "page_start": 5,
+      "page_end": 5,
+      "annex_type": "submission_form",
+      "source_section": "section-4",
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 5,
+          "element_id": "p5-e1",
+          "raw_text": "Annexe 01 - Acte de soumission",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "paragraphs": [],
+      "articles": [],
+      "table_refs": [],
+      "evidence_status": "detected"
+    },
+    {
+      "id": "annex-2",
+      "number": "02",
+      "title": "Bordereau des prix – devis estimatif",
+      "page_start": 6,
+      "page_end": 6,
+      "annex_type": "boq",
+      "source_section": "section-4",
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 6,
+          "element_id": "p6-e0",
+          "raw_text": "Annexe 02 - Bordereau des prix – devis estimatif",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "paragraphs": [],
+      "articles": [],
+      "table_refs": [],
+      "evidence_status": "detected"
+    }
+  ],
+  "paragraphs": [],
+  "tables": [],
+  "requirements": [
+    {
+      "id": "requirement-1",
+      "type": "project_subject",
+      "text": "Objet : Fourniture de matériel (exemple synthétique).",
+      "normalized_value": null,
+      "unit": null,
+      "source_page": 1,
+      "source_bbox": null,
+      "source_section": "section-1",
+      "source_article": "article-1",
+      "source_annex": null,
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 1,
+          "element_id": "p1-e3",
+          "raw_text": "Objet : Fourniture de matériel (exemple synthétique).",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "evidence_status": "probable"
+    },
+    {
+      "id": "requirement-2",
+      "type": "deadline",
+      "text": "Date limite de soumission : à préciser.",
+      "normalized_value": null,
+      "unit": null,
+      "source_page": 2,
+      "source_bbox": null,
+      "source_section": "section-1",
+      "source_article": "article-2",
+      "source_annex": null,
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 2,
+          "element_id": "p2-e1",
+          "raw_text": "Date limite de soumission : à préciser.",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "evidence_status": "probable"
+    },
+    {
+      "id": "requirement-3",
+      "type": "document_required",
+      "text": "Les candidats doivent joindre une attestation.",
+      "normalized_value": null,
+      "unit": null,
+      "source_page": 2,
+      "source_bbox": null,
+      "source_section": "section-1",
+      "source_article": "article-2",
+      "source_annex": null,
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 2,
+          "element_id": "p2-e2",
+          "raw_text": "Les candidats doivent joindre une attestation.",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "evidence_status": "probable"
+    },
+    {
+      "id": "requirement-4",
+      "type": "execution_duration",
+      "text": "Délai d’exécution : 30 jours.",
+      "normalized_value": null,
+      "unit": null,
+      "source_page": 3,
+      "source_bbox": null,
+      "source_section": "section-2",
+      "source_article": "article-3",
+      "source_annex": null,
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 3,
+          "element_id": "p3-e2",
+          "raw_text": "Délai d’exécution : 30 jours.",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "evidence_status": "probable"
+    },
+    {
+      "id": "requirement-5",
+      "type": "technical_requirement",
+      "text": "Le matériel doit être conforme aux spécifications.",
+      "normalized_value": null,
+      "unit": null,
+      "source_page": 4,
+      "source_bbox": null,
+      "source_section": "section-3",
+      "source_article": "article-4",
+      "source_annex": null,
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 4,
+          "element_id": "p4-e2",
+          "raw_text": "Le matériel doit être conforme aux spécifications.",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "evidence_status": "probable"
+    }
+  ],
+  "detected_special_documents": [
+    {
+      "id": "special-section-3",
+      "document_type": "technical_specification",
+      "page_start": 4,
+      "page_end": 4,
+      "source_node": "section-3",
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 4,
+          "element_id": "p4-e0",
+          "raw_text": "C — Spécifications Techniques",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "id": "special-annex-1",
+      "document_type": "submission_form",
+      "page_start": 5,
+      "page_end": 5,
+      "source_node": "annex-1",
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 5,
+          "element_id": "p5-e1",
+          "raw_text": "Annexe 01 - Acte de soumission",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "handoff": null
+    },
+    {
+      "id": "special-annex-2",
+      "document_type": "boq",
+      "page_start": 6,
+      "page_end": 6,
+      "source_node": "annex-2",
+      "source_evidence": [
+        {
+          "document_id": "tunisian-structure-SYNTHETIC",
+          "page": 6,
+          "element_id": "p6-e0",
+          "raw_text": "Annexe 02 - Bordereau des prix – devis estimatif",
+          "bbox": null,
+          "coordinate_space": null,
+          "page_width": null,
+          "page_height": null,
+          "line_index": 0
+        }
+      ],
+      "handoff": "boq_agent"
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": "limited_layout",
+      "message": "Missing geometry limits automatic furniture suppression and heading disambiguation",
+      "evidence_status": "needs_review",
+      "source_evidence": []
+    }
+  ],
+  "furniture_evidence": [],
+  "toc_evidence": [],
+  "source_order": [
+    "section-1",
+    "article-1",
+    "paragraph-1",
+    "requirement-1",
+    "article-2",
+    "paragraph-2",
+    "requirement-2",
+    "paragraph-3",
+    "requirement-3",
+    "section-2",
+    "article-3",
+    "paragraph-4",
+    "requirement-4",
+    "section-3",
+    "article-4",
+    "paragraph-5",
+    "requirement-5",
+    "section-4",
+    "annex-1",
+    "annex-2"
+  ],
+  "reviews": []
+}

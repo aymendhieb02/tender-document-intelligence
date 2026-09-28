@@ -1,0 +1,109 @@
+{
+  "document_id": "f3b99c74d7d1fad9cd438869be1aa8e19d2329d99e28900c444cc3f0b3b8545d",
+  "verification_status": "human_review_required",
+  "interpretation": "Draft comparison only. It is not benchmark performance until a reviewer verifies the source annotations.",
+  "draft_structure_comparison": {
+    "sections": {
+      "predicted": 29,
+      "annotation_draft": 29,
+      "equal_records_for_review": 29,
+      "draft_mismatches": 0
+    },
+    "articles": {
+      "predicted": 36,
+      "annotation_draft": 36,
+      "equal_records_for_review": 36,
+      "draft_mismatches": 0
+    },
+    "annexes": {
+      "predicted": 6,
+      "annotation_draft": 6,
+      "equal_records_for_review": 6,
+      "draft_mismatches": 0
+    },
+    "annex_subsections": {
+      "predicted": 3,
+      "annotation_draft": 0,
+      "equal_records_for_review": 0,
+      "draft_mismatches": 3
+    },
+    "special_documents": {
+      "predicted": 7,
+      "annotation_draft": 7,
+      "equal_records_for_review": 7,
+      "draft_mismatches": 0
+    }
+  },
+  "findings": [
+    {
+      "category": "ADAPTER_CONTRACT",
+      "status": "fixed_in_CDC_adapter",
+      "source_page": 2,
+      "expected": "one heading/body line with stable producer element IDs and source word boxes",
+      "predicted": "initial raw-word consumer pass treated 10,451 producer words as independent heading candidates",
+      "evidence": "The producer geometry.rows groups source elements into lines; final adapter retains all word IDs/text/bboxes. The integration fixture now reproduces sections/articles from these grouped rows.",
+      "probable_cause": "CDC consumed upstream word-level elements without first grouping by the producer row IDs.",
+      "owner": "AGENT_2_CDC_ANALYZER"
+    },
+    {
+      "category": "TOC_HANDLING",
+      "status": "reported_for_human_review",
+      "source_page": 2,
+      "expected": "TOC D heading ANNEXEX (Modèles à respecter)",
+      "predicted": "body D heading ANNEXES : Modèles à suivre; body retained and a title-disagreement diagnostic emitted",
+      "evidence": "TOC/body element evidence remains in prediction diagnostics; no page-number disagreement in the five section ranges.",
+      "probable_cause": "The source itself uses different wording in its TOC and body. Confirm both against the PDF.",
+      "owner": "DATA_ANNOTATION"
+    },
+    {
+      "category": "REQUIREMENT_EXTRACTION",
+      "status": "candidate_review_required",
+      "source_page": 5,
+      "expected": "independently reviewed useful legal/tender requirements",
+      "predicted": "62 lexical and topic-context candidates; 16 high-value candidates exported for review, all review_status=needs_review",
+      "evidence": "The broad lexical candidates include lot placeholders and line-fragment deadline/retention hits. Topic-gated normalizers retain article evidence and source element IDs.",
+      "probable_cause": "The deterministic keyword baseline overgenerates without verified requirement annotations.",
+      "owner": "AGENT_2_CDC_ANALYZER"
+    },
+    {
+      "category": "UPSTREAM_OCR",
+      "status": "no_blocker_observed",
+      "source_page": null,
+      "expected": "usable Unicode source text and source geometry",
+      "predicted": "auto mode selected native text on all 30 pages; 0 OCR/fallback pages; 0 missing-geometry elements; persisted text contains 0 U+FFFD characters",
+      "evidence": "Native source snippets: [{\"page\": 2, \"text\": \"Annexe 01 : Déclarations sur l'honneur (non faillite - non influence - non\", \"element_ids\": [\"p2-native-000230\", \"p2-native-000231\", \"p2-native-000232\", \"p2-native-000233\", \"p2-native-000234\", \"p2-native-000235\", \"p2-native-000236\", \"p2-native-000237\", \"p2-native-000238\", \"p2-native-000239\", \"p2-native-000240\", \"p2-native-000241\", \"p2-native-000242\"]}, {\"page\": 26, \"text\": \"6.1. Modèle d’engagement d’une caution personnelle et solidaire\", \"element_ids\": [\"p26-native-000003\", \"p26-native-000004\", \"p26-native-000005\", \"p26-native-000006\", \"p26-native-000007\", \"p26-native-000008\", \"p26-native-000009\", \"p26-native-000010\"]}]",
+      "probable_cause": "No demonstrated upstream text/geometry defect in this reference run.",
+      "owner": "AGENT_1_DOCUMENT_INTELLIGENCE"
+    },
+    {
+      "category": "SECTION_BOUNDARY",
+      "status": "draft_annotation_matches_machine",
+      "source_page": 3,
+      "expected": "A 3–9, B 10–11, C 12–19, D 20–28, E 29",
+      "predicted": "same ranges from body heading lines; page 30 classified as contact/footer-only evidence",
+      "evidence": "See source-linked ground-truth draft and prediction; human review remains pending.",
+      "probable_cause": null,
+      "owner": "DATA_ANNOTATION"
+    },
+    {
+      "category": "ARTICLE_DETECTION",
+      "status": "draft_annotation_matches_machine",
+      "source_page": 3,
+      "expected": "A articles 1–27; B articles 1–9",
+      "predicted": "27 + 9 body headings and ranges; draft rows currently match exactly",
+      "evidence": "Every article heading retains producer row and source word element IDs.",
+      "probable_cause": null,
+      "owner": "DATA_ANNOTATION"
+    },
+    {
+      "category": "ANNEX_CLASSIFICATION",
+      "status": "draft_annotation_matches_machine",
+      "source_page": 21,
+      "expected": "six body annexes on pages 21–28; Annexe 06 contains 6.1–6.3",
+      "predicted": "six annexes and three child headings; draft rows currently match exactly",
+      "evidence": "Annexe 05 p. 25 is type boq; node annex-5 has source evidence and boq_agent handoff.",
+      "probable_cause": null,
+      "owner": "DATA_ANNOTATION"
+    }
+  ]
+}
