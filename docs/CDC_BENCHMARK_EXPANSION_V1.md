@@ -26,9 +26,9 @@ This is not a scored failure attribution: the source-grounded annotation for CDC
 
 - `benchmarks/cdc_real_v1/ground_truth/CDC-DEV-001.json`: complete article inventory, scoped exhaustive financial/deadline facts, and reviewable negative candidates. Blank source values remain unresolved.
 - `benchmarks/cdc_real_v1/metrics_expansion_v1.json`: newly measurable metrics and explicit scope.
-- `scripts/score_cdc_expansion_v1.py`: reproducible scorer against saved V2 predictions.
+- `scripts/score_cdc_expansion_v1.py`: reproducible scorer; pass `--prediction <relative-path>` to a local saved prediction. The official V1 release does not commit generated predictions, so the script does not recreate or add them.
 - `tests/test_cdc_benchmark_expansion_v1.py`: guards the inventory, metric scope, negative examples, and DRAFT gate.
 
-Benchmark artifact and V2 structure tests passed: `10 passed`. The full project suite completed with `224 passed, 2 skipped, 2 failed`; both failures are Tesseract fallback tests because this environment has no `pytesseract` module.
+Benchmark artifact and V2 structure tests passed: `10 passed`. The full project suite passed with `226 passed, 2 skipped`, using `pytesseract==0.3.13` from the local package cache and Tesseract `5.4.0`. The temporary test dependency path was not committed.
 
 The earlier positive-example hit rates, the three complete section inventories, and the six verified documents remain unchanged. No production analyzer, OCR, raw PDF, OCR cache, or generated prediction was added or modified by this update. The corpus still has no negative BOQ inventory, document-role precision/recall, or scored Arabic scan.
