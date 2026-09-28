@@ -20,4 +20,5 @@ This adapter consumes DocumentResult text and its upstream geometry rows, preser
 
 ## Validation
 
-`python -m pytest tests/cdc_analysis -q`: **27 passed**. The real-document integration checks section/article counts and ranges, technical hierarchy, annexes and subforms, BOQ handoff, evidence, selected normalized requirements and deterministic prediction parity. The benchmark remains gated pending an authorized human label review.
+`python -m pytest tests/cdc_analysis -q`: **28 passed**. The real-document integration checks section/article counts and ranges, technical hierarchy, annexes and subforms, BOQ handoff, evidence, selected normalized requirements and deterministic prediction parity. The benchmark remains gated pending an authorized human label review.
+
