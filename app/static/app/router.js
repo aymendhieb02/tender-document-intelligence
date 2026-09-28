@@ -21,7 +21,7 @@ if (invoiceContent || path === "/invoice" || path.startsWith("/invoice/result/")
 }
 
 async function renderCdcRoute(outlet, route) {
-  const { renderCdcWorkspace } = await import("./pages/cdc-workspace.js?v=platform-refactor-qa1");
+  const { renderCdcWorkspace } = await import("./pages/cdc-workspace.js?v=ask-tender-mvp1");
   renderCdcUpload(outlet, {
     workflow: route.startsWith("/cdc/male") ? "male" : "cdc",
     showUnavailable: route.includes("/result/"),

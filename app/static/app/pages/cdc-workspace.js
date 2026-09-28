@@ -1,11 +1,11 @@
-import { analyzeTenderDocument } from "../api.js?v=platform-refactor-qa1";
+import { analyzeTenderDocument, askTenderQuestion } from "../api.js?v=ask-tender-mvp1";
 import { DocumentViewer } from "../components/document-viewer.js?v=platform-refactor-qa4";
 import { createEvidenceController } from "../components/evidence-highlight.js?v=platform-refactor-5";
 import { originBadge, statusBadge } from "../components/status-badge.js?v=platform-refactor-5";
 import { setActiveAnalysis } from "../state.js?v=platform-refactor-5";
 import { renderBoqWorkspace } from "./boq-workspace.js?v=platform-refactor-5";
 
-const viewLabels = ["Vue d’ensemble", "Structure", "Exigences", "Annexes", "Bordereau", "Preuves", "Diagnostics"];
+const viewLabels = ["Vue d’ensemble", "Structure", "Exigences", "Annexes", "Bordereau", "Preuves", "Diagnostics", "Ask Tender"];
 
 export function renderCdcWorkspace(outlet, payload, file, workflow) {
   const cdc = payload.tender_document;
@@ -13,12 +13,17 @@ export function renderCdcWorkspace(outlet, payload, file, workflow) {
   const male = workflow === "male";
   const pageCount = documentResult.pages?.length || 0;
   const refs = [];
-  outlet.innerHTML = `<section class="analysis-page"><header class="analysis-document-header"><div class="document-heading"><a class="text-back" href="${male ? "/cdc/male" : "/cdc"}">‹ Retour</a><h1>${escapeHtml(file?.name || cdc.title || "Document analysé")}</h1><div class="document-meta"><span>${pageCount} pages</span><span>Mode ${escapeHtml(documentResult.mode || "—")}</span><span>ID ${escapeHtml(documentResult.document_id || "—")}</span></div></div><div class="document-status">${statusBadge(male ? (payload.boq_document?.detected ? "detected" : "needs_review") : "needs_review")}</div></header>${male && !payload.boq_document?.detected ? `<div class="notice notice-warning"><strong>Document du Ministère non reconnu.</strong><span>Aucune extraction spécialisée n’a été lancée pour ce document.</span></div>` : ""}<div class="analysis-layout"><aside class="document-tree-panel"><div class="panel-overline">DOCUMENT</div><h2>Structure</h2><div class="tree-scroll">${renderDocumentTree(cdc, refs)}</div></aside><section class="viewer-panel"><div class="viewer-heading"><strong>Document source</strong><span>Page physique et preuve</span></div><div id="documentViewer" class="document-viewer"></div><section class="evidence-panel"><div id="evidenceInspector"></div></section></section><section class="analysis-panel"><nav class="analysis-tabs" aria-label="Vues de l’analyse">${viewLabels.map((label, i) => `<button type="button" class="analysis-tab ${i === 0 ? "active" : ""}" data-analysis-view="${i}">${label}</button>`).join("")}</nav><div class="analysis-view" id="analysisView"></div></section></div></section>`;
+  outlet.innerHTML = `<section class="analysis-page"><header class="analysis-document-header"><div class="document-heading"><a class="text-back" href="${male ? "/cdc/male" : "/cdc"}">‹ Retour</a><h1>${escapeHtml(file?.name || cdc.title || "Document analysé")}</h1><div class="document-meta"><span>${pageCount} pages</span><span>Mode ${escapeHtml(documentResult.mode || "—")}</span><span>ID ${escapeHtml(documentResult.document_id || "—")}</span></div></div><div class="document-status"><button type="button" class="button button-primary ask-tender-jump" data-open-ask>Ask Tender <span>✦</span></button>${statusBadge(male ? (payload.boq_document?.detected ? "detected" : "needs_review") : "needs_review")}</div></header>${male && !payload.boq_document?.detected ? `<div class="notice notice-warning"><strong>Document du Ministère non reconnu.</strong><span>Aucune extraction spécialisée n’a été lancée pour ce document.</span></div>` : ""}<div class="analysis-layout"><aside class="document-tree-panel"><div class="panel-overline">DOCUMENT</div><h2>Structure</h2><div class="tree-scroll">${renderDocumentTree(cdc, refs)}</div></aside><section class="viewer-panel"><div class="viewer-heading"><strong>Document source</strong><span>Page physique et preuve</span></div><div id="documentViewer" class="document-viewer"></div><section class="evidence-panel"><div id="evidenceInspector"></div></section></section><section class="analysis-panel"><nav class="analysis-tabs" aria-label="Vues de l’analyse">${viewLabels.map((label, i) => `<button type="button" class="analysis-tab ${i === 0 ? "active" : ""}" data-analysis-view="${i}">${label}</button>`).join("")}</nav><div class="analysis-view" id="analysisView"></div></section></div></section>`;
   const viewer = new DocumentViewer(outlet.querySelector("#documentViewer"), documentResult, file, payload.document_url);
   const evidenceController = createEvidenceController(viewer, outlet.querySelector("#evidenceInspector"));
   outlet.querySelectorAll("[data-evidence-ref]").forEach(button => button.addEventListener("click", () => selectReference(Number(button.dataset.evidenceRef))));
   const view = outlet.querySelector("#analysisView");
   const registerEvidence = (evidence, title) => refs.push({ evidence, title }) - 1;
+  outlet.querySelector("[data-open-ask]").addEventListener("click", () => {
+    const askTab = outlet.querySelector('[data-analysis-view="7"]');
+    askTab?.click();
+    outlet.querySelector(".analysis-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
   outlet.querySelectorAll("[data-analysis-view]").forEach(button => button.addEventListener("click", () => {
     outlet.querySelectorAll("[data-analysis-view]").forEach(tab => tab.classList.toggle("active", tab === button));
     renderAnalysisView(view, Number(button.dataset.analysisView), cdc, payload, documentResult, file, workflow, registerEvidence, selectReference);
@@ -34,11 +39,46 @@ export function renderCdcWorkspace(outlet, payload, file, workflow) {
     renderAnalysisView(view, 5, cdc, payload, documentResult, file, workflow, registerEvidence, selectReference, ref.evidence);
   }
   outlet.querySelector("#analysisView").addEventListener("click", async event => {
+    const askEvidence = event.target.closest("[data-ask-evidence]");
+    if (askEvidence) {
+      const item = JSON.parse(askEvidence.dataset.askEvidence);
+      const reference = item.reference || {};
+      evidenceController.select({
+        page: reference.page_number, element_id: reference.element_id,
+        source_element_ids: [reference.element_id], bbox: reference.bbox,
+        coordinate_space: reference.coordinate_space, raw_text: item.text,
+      }, item.label);
+      return;
+    }
     const evidenceButton = event.target.closest("[data-boq-evidence]");
     if (evidenceButton) {
       const [rowIndex, fieldName] = evidenceButton.dataset.boqEvidence.split(":");
       const value = payload.boq_document?.rows?.[Number(rowIndex)]?.[fieldName];
       if (value?.evidence?.[0]) evidenceController.select(adaptBoqEvidence(value.evidence[0], documentResult), `${fieldName} · ${value.value_origin || "OBSERVED"}`);
+      return;
+    }
+    const askSubmit = event.target.closest("[data-ask-submit]");
+    if (askSubmit) {
+      const form = askSubmit.closest("[data-ask-form]");
+      const input = form?.querySelector("[name=question]");
+      const question = input?.value.trim();
+      const result = outlet.querySelector("[data-ask-response]");
+      if (!question || !result) return;
+      const storedId = payload.document_url?.match(/\/api\/documents\/([^/?]+)/)?.[1];
+      if (!storedId) {
+        result.innerHTML = `<div class="ask-error" role="alert">La source stockée n’est plus disponible. Réimportez le document pour poser une question.</div>`;
+        return;
+      }
+      askSubmit.disabled = true;
+      result.innerHTML = `<div class="ask-loading" role="status"><span class="processing-indicator"></span>Recherche des preuves dans le dossier…</div>`;
+      try {
+        const answer = await askTenderQuestion(storedId, question);
+        result.innerHTML = renderAskResponse(answer);
+      } catch (error) {
+        result.innerHTML = `<div class="ask-error" role="alert">${escapeHtml(error.message)}</div>`;
+      } finally {
+        askSubmit.disabled = false;
+      }
       return;
     }
     if (!event.target.closest("[data-analyze-boq]")) return;
@@ -54,6 +94,11 @@ export function renderCdcWorkspace(outlet, payload, file, workflow) {
       const target = button.parentElement.querySelector(".handoff-error");
       if (target) target.textContent = error.message;
     }
+  });
+  outlet.querySelector("#analysisView").addEventListener("submit", event => {
+    if (!event.target.matches("[data-ask-form]")) return;
+    event.preventDefault();
+    event.target.querySelector("[data-ask-submit]")?.click();
   });
 }
 
@@ -88,7 +133,22 @@ function renderAnalysisView(root, index, cdc, payload, documentResult, file, wor
   if (index === 4) root.innerHTML = workflow === "male" ? renderBoqWorkspace(payload.boq_document) : renderBqHandoff(cdc, payload);
   if (index === 5) root.innerHTML = selectedEvidence ? `<div class="view-heading"><div><p class="eyebrow">PROVENANCE</p><h2>Élément source</h2></div></div>${renderEvidenceDetail(selectedEvidence)}` : `<div class="view-heading"><div><p class="eyebrow">PROVENANCE</p><h2>Preuves</h2><p>Sélectionnez une exigence, un article ou une annexe pour afficher sa preuve dans le panneau Document.</p></div></div><div class="empty-state"><strong>Aucune preuve sélectionnée</strong><span>Les identifiants et coordonnées sont issus du résultat d’analyse.</span></div>`;
   if (index === 6) root.innerHTML = renderDiagnostics(documentResult, cdc, payload);
+  if (index === 7) root.innerHTML = renderAskTender();
   root.querySelectorAll("[data-ref-select]").forEach(button => button.addEventListener("click", () => selectEvidence(Number(button.dataset.refSelect))));
+}
+
+function renderAskTender() {
+  return `<div class="view-heading"><div><p class="eyebrow">QUESTIONS SUR LE DOSSIER</p><h2>Ask Tender</h2><p>Posez une question sur le contenu analysé. Les réponses s’appuient sur des passages cités du document.</p></div></div><form class="ask-form" data-ask-form><label for="askTenderQuestion">Votre question</label><textarea id="askTenderQuestion" name="question" rows="3" maxlength="1000" placeholder="Ex. Quelle est la date limite de soumission ?" required></textarea><div class="ask-form-footer"><span>Traitement local · Réponses avec références de pages</span><button type="button" class="button button-primary" data-ask-submit>Poser la question <span>→</span></button></div></form><div class="ask-response" data-ask-response aria-live="polite"><div class="empty-state"><strong>Prêt à répondre</strong><span>Posez une question sur les délais, garanties, exigences, paiement ou le contenu d’un article.</span></div></div>`;
+}
+
+function renderAskResponse(result) {
+  const statusLabels = { answered: "Réponse fondée sur les preuves", insufficient_evidence: "Information non trouvée", generation_unavailable: "Génération locale indisponible" };
+  const citations = (result.evidence || []).map((item, index) => {
+    const reference = item.reference || {};
+    const value = JSON.stringify(item).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    return `<article class="ask-citation"><div><strong>${escapeHtml(item.label)}</strong><span>Page ${reference.page_number ?? "—"}${item.status ? ` · ${escapeHtml(item.status)}` : ""}</span></div><p>${escapeHtml(item.text)}</p><button type="button" class="button button-secondary" data-ask-evidence="${value}" aria-label="Afficher la preuve ${index + 1} dans le document">Voir la preuve →</button></article>`;
+  }).join("");
+  return `<article class="ask-answer"><div class="ask-answer-heading"><span class="ask-status">${escapeHtml(statusLabels[result.status] || result.status)}</span><span class="ask-backend">${escapeHtml(result.backend || "")}${result.model ? ` · ${escapeHtml(result.model)}` : ""}</span></div><p>${escapeHtml(result.answer)}</p></article>${citations ? `<section class="ask-citations"><h3>Preuves du dossier <span>${result.evidence.length}</span></h3>${citations}</section>` : ""}`;
 }
 
 function renderOverview(cdc, result, payload, workflow) {

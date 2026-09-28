@@ -37,3 +37,16 @@ export async function analyzeTenderDocument(file, workflow) {
     boq_document: firstBoq || { detected: false, rows: [], diagnostics: payload.diagnostics || [] },
   };
 }
+
+export async function askTenderQuestion(documentId, question) {
+  const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/ask`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question }),
+  });
+  const payload = await response.json();
+  if (!response.ok) {
+    const detail = payload.error || payload.detail || {};
+    throw new Error(typeof detail === "string" ? detail : detail.message || "La question n’a pas pu être traitée.");
+  }
+  return payload;
+}
