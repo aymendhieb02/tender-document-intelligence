@@ -79,6 +79,20 @@ def review_ui() -> FileResponse:
     return FileResponse(static_dir / "index.html")
 
 
+@app.get("/invoice", include_in_schema=False)
+@app.get("/invoice/{result_path:path}", include_in_schema=False)
+def invoice_ui(result_path: str = "") -> FileResponse:
+    return FileResponse(static_dir / "invoice.html")
+
+
+@app.get("/cdc", include_in_schema=False)
+@app.get("/cdc/male", include_in_schema=False)
+@app.get("/cdc/result/{result_id}", include_in_schema=False)
+@app.get("/cdc/male/result/{result_id}", include_in_schema=False)
+def cdc_ui(result_id: str = "") -> FileResponse:
+    return FileResponse(static_dir / "cdc.html")
+
+
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok", "service": settings.app_name}

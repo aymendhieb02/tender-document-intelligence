@@ -1,0 +1,40 @@
+:root {
+  color-scheme: light;
+  --page: #f3f5f7;
+  --surface: #ffffff;
+  --surface-muted: #f8fafb;
+  --ink: #172833;
+  --ink-secondary: #40535f;
+  --muted: #74848d;
+  --line: #dce3e7;
+  --line-strong: #c8d3d9;
+  --accent: #146c72;
+  --accent-strong: #0d555a;
+  --accent-soft: #e9f3f3;
+  --success: #276b4b;
+  --success-soft: #edf6f0;
+  --warning: #92651e;
+  --warning-soft: #fbf5e8;
+  --danger: #a3443e;
+  --danger-soft: #fbefee;
+  --radius-sm: 4px;
+  --radius-md: 7px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font-size: 14px; line-height: 1.45; }
+button, input, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+a { color: inherit; }
+.hidden { display: none !important; }

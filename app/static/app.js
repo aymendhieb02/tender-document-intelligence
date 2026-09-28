@@ -14,7 +14,6 @@ const results = document.getElementById("results");
 const previewCanvas = document.getElementById("previewCanvas");
 const regionDetails = document.getElementById("regionDetails");
 const validationSummary = document.getElementById("validationSummary");
-const demoButtons = document.querySelectorAll(".demo-button");
 const { t } = window.AppI18n;
 // Compatibility marker for the legacy static test: English key value "Advanced evidence" now lives in strings.js.
 
@@ -219,9 +218,6 @@ cameraModal?.addEventListener("click", (event) => {
 });
 captureCameraBtn?.addEventListener("click", () => captureCameraImage());
 document.getElementById("saveCorrectionsBtn")?.addEventListener("click", () => saveCorrections());
-demoButtons.forEach((button) => {
-  button.addEventListener("click", () => processDemoDocument(button.dataset.demoId, button.textContent));
-});
 
 
 async function openCamera() {
@@ -284,15 +280,17 @@ async function processUploadedFile() {
   results.classList.add("hidden");
 
   try {
-    const response = await fetch("/process-dossier", {
+    const response = await fetch("/api/invoices/analyze", {
       method: "POST",
       body: formData,
     });
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.detail || t("processing.failed"));
+      throw new Error(data.error?.message || data.detail || t("processing.failed"));
     }
+    if (data.document_id) history.pushState({ documentId: data.document_id }, "", `/invoice/result/${encodeURIComponent(data.document_id)}`);
     renderResults(data);
+    await renderSourceDocument(data);
   } catch (error) {
     showError(error.message);
   } finally {
@@ -300,22 +298,44 @@ async function processUploadedFile() {
   }
 }
 
-async function processDemoDocument(demoId, label) {
-  if (!demoId) return;
-  setLoading(true, t("demo.loading", { label: label || demoId }));
-  hideError();
-  results.classList.add("hidden");
-  fileName.textContent = t("demo.selected", { label: label || demoId });
-  resetCorrections();
+async function renderSourceDocument(data) {
+  const review = document.querySelector(".visual-review");
+  if (!review || !data.document_url) return;
+  let panel = review.querySelector(".invoice-source-document");
+  if (!panel) {
+    panel = document.createElement("section");
+    panel.className = "invoice-source-document";
+    review.insertBefore(panel, review.querySelector(".review-grid"));
+  }
+  const pages = data.document_preview?.pages || [];
+  const pageCount = Math.max(1, ...pages.map(page => Number(page.page || page.page_number) || 1));
+  panel.innerHTML = `<div class="invoice-source-toolbar"><strong>Document original</strong><div class="page-controls"><button type="button" data-source-step="-1" aria-label="Page précédente">‹</button><label>Page <input type="number" min="1" max="${pageCount}" value="1" aria-label="Numéro de page"></label><span>/ ${pageCount}</span><button type="button" data-source-step="1" aria-label="Page suivante">›</button></div><div class="zoom-controls"><button type="button" data-source-zoom="page-width">Ajuster à la largeur</button><button type="button" data-source-zoom="page-fit">Ajuster à la page</button></div></div><div class="invoice-source-frame"><p>Chargement du document…</p></div><p class="invoice-source-note">Les éléments de preuve affichés restent liés à leur page physique. Aucun surlignage n’est dessiné sans géométrie fiable.</p>`;
+  const frameHost = panel.querySelector(".invoice-source-frame");
+  let objectUrl;
   try {
-    const response = await fetch(`/demo-documents/${encodeURIComponent(demoId)}/process`, { method: "POST" });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || t("demo.failed"));
-    renderResults(data);
+    const response = await fetch(data.document_url);
+    if (!response.ok) throw new Error("Le document original n’est pas disponible.");
+    objectUrl = URL.createObjectURL(await response.blob());
+    const state = { page: 1, zoom: "page-width" };
+    const renderFrame = () => {
+      frameHost.innerHTML = `<iframe title="Document original de la facture" src="${objectUrl}#toolbar=0&navpanes=0&page=${state.page}&zoom=${state.zoom}"></iframe>`;
+      panel.querySelector("input[type=number]").value = state.page;
+    };
+    renderFrame();
+    panel.querySelectorAll("[data-source-step]").forEach(button => button.addEventListener("click", () => {
+      state.page = Math.max(1, Math.min(pageCount, state.page + Number(button.dataset.sourceStep)));
+      renderFrame();
+    }));
+    panel.querySelector("input[type=number]").addEventListener("change", event => {
+      state.page = Math.max(1, Math.min(pageCount, Number(event.target.value) || 1));
+      renderFrame();
+    });
+    panel.querySelectorAll("[data-source-zoom]").forEach(button => button.addEventListener("click", () => {
+      state.zoom = button.dataset.sourceZoom;
+      renderFrame();
+    }));
   } catch (error) {
-    showError(t("demo.failed_help", { message: error.message }));
-  } finally {
-    setLoading(false);
+    frameHost.innerHTML = `<p class="invoice-source-error">${escapeHtml(error.message)}</p><a href="${data.document_url}" target="_blank" rel="noopener">Ouvrir le document original</a>`;
   }
 }
 
