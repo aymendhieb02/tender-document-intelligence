@@ -6,6 +6,7 @@ import fitz
 from fastapi.testclient import TestClient
 
 from app.document_intelligence import DocumentProcessor
+from app.api.contracts_v2 import ErrorEnvelopeV1, TenderAnalysisResponseV2
 from app.main import app
 
 
@@ -33,6 +34,8 @@ def test_application_startup_and_workflow_routes():
     assert "/api/invoices/analyze" in routes
     assert "/api/cdc/analyze" in routes
     assert "/api/cdc/male/analyze" in routes
+    assert "/api/v2/cdc/analyze" in routes
+    assert "/api/v2/cdc/male/analyze" in routes
 
 
 def test_invalid_upload_has_stable_error_envelope():
@@ -42,6 +45,99 @@ def test_invalid_upload_has_stable_error_envelope():
     assert error["code"] == "invalid_upload"
     assert error["workflow"] == "cdc"
     assert "traceback" not in response.text.lower()
+
+
+def test_v2_cdc_envelope_is_typed_and_does_not_change_v1_payload():
+    source = REFERENCE_PDF.read_bytes()
+    v1 = client.post("/api/cdc/analyze", files={"file": (REFERENCE_PDF.name, source, "application/pdf")})
+    assert v1.status_code == 200, v1.text
+    assert "contract_version" not in v1.json()
+
+    response = client.post("/api/v2/cdc/analyze", files={"file": (REFERENCE_PDF.name, source, "application/pdf")})
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    contract = TenderAnalysisResponseV2.model_validate(payload)
+    assert contract.contract_version == "2.0"
+    assert contract.document.document_id == v1.json()["document_id"]
+    assert contract.document.page_count == 30
+    assert contract.tender_document.document_id == payload["document"]["document_id"]
+    assert contract.modules.summary.availability == "available"
+    assert contract.modules.summary.data["document_id"] == contract.tender_document.document_id
+    assert contract.modules.requirements_intelligence.availability == "available"
+    assert isinstance(contract.modules.requirements_intelligence.data, list)
+    assert all(item["review_status"] == "NEEDS_REVIEW"
+               for item in contract.modules.requirements_intelligence.data)
+    assert contract.modules.financial_deadline_intelligence.availability in {"available", "partial"}
+    assert isinstance(contract.modules.financial_deadline_intelligence.data, list)
+    assert all(item["id"].startswith("fin-") and item["evidence"]
+               for item in contract.modules.financial_deadline_intelligence.data)
+    assert contract.modules.dossier.availability == "partial"
+    assert contract.modules.dossier.data["grouping"]["status"] == "review"
+    assert len(contract.modules.dossier.data["documents"]) == 1
+    assert contract.modules.compliance.availability == "unavailable"
+    assert contract.modules.compliance.reason == "not_in_wave_1"
+    assert contract.modules.boq.availability == "not_run"
+
+    references = contract.modules.evidence.data
+    assert references
+    reference = references[0].model_dump(mode="json")
+    assert {"document_id", "page_number", "element_id", "evidence_id"}.issubset(reference)
+    assert "raw_text" not in reference
+    assert "pages" not in payload
+    assert "document_result" not in payload
+
+
+def test_v2_ministry_marks_unrecognized_boq_unavailable_without_fake_data(tmp_path):
+    data = make_pdf(tmp_path / "ordinary.pdf", ["Ordinary correspondence", "No price schedule here."])
+    response = client.post("/api/v2/cdc/male/analyze", files={"file": ("ordinary.pdf", data, "application/pdf")})
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    contract = TenderAnalysisResponseV2.model_validate(payload)
+    assert contract.modules.boq.availability == "unavailable"
+    assert contract.modules.boq.data is None
+    assert contract.modules.boq.reason == "supported_template_not_detected"
+    assert "cdc_did_not_detect_boq_handoff" in contract.diagnostics
+
+
+def test_v2_errors_validate_against_existing_structured_error_contract():
+    response = client.post("/api/v2/cdc/analyze", files={"file": ("notes.exe", b"bad", "application/octet-stream")})
+    assert response.status_code == 400
+    error = ErrorEnvelopeV1.model_validate(response.json()).error
+    assert error.code == "invalid_upload"
+    assert error.workflow == "cdc"
+    assert error.message
+    assert error.recoverable is True
+    assert isinstance(error.diagnostics, list)
+    assert "tender-document-intelligence-" not in response.text
+
+
+def test_v2_processes_document_once_and_uses_same_result_for_modules(tmp_path, monkeypatch):
+    from app.api import workflow_routes
+
+    data = make_pdf(tmp_path / "cdc.pdf", [
+        "Cahier des charges", "Le candidat doit fournir une offre valable 60 jours.",
+    ])
+    original = workflow_routes.DocumentProcessor
+    calls = 0
+
+    class CountingProcessor:
+        def __init__(self, *args, **kwargs):
+            self.delegate = original(*args, **kwargs)
+
+        def process(self, path):
+            nonlocal calls
+            calls += 1
+            return self.delegate.process(path)
+
+    monkeypatch.setattr(workflow_routes, "DocumentProcessor", CountingProcessor)
+    response = client.post("/api/v2/cdc/analyze", files={"file": ("CDC.pdf", data, "application/pdf")})
+    assert response.status_code == 200, response.text
+    payload = TenderAnalysisResponseV2.model_validate(response.json())
+    assert calls == 1
+    assert payload.modules.summary.availability == "available"
+    facts = payload.modules.financial_deadline_intelligence.data
+    assert any(fact["category"] == "offer_validity" and fact["normalized"] == {"value": "60", "unit": "DAY"}
+               for fact in facts)
 
 
 def test_cdc_api_processes_reference_and_serves_document():
@@ -65,7 +161,8 @@ def test_cdc_api_processes_reference_and_serves_document():
 
 
 def test_ministry_api_recognizes_empty_template_without_fabricating_amounts():
-    response = client.post("/api/cdc/male/analyze", files={"file": (REFERENCE_PDF.name, REFERENCE_PDF.read_bytes(), "application/pdf")})
+    source = REFERENCE_PDF.read_bytes()
+    response = client.post("/api/cdc/male/analyze", files={"file": (REFERENCE_PDF.name, source, "application/pdf")})
     assert response.status_code == 200, response.text
     payload = response.json()
     assert payload["template_detected"] is True
@@ -79,6 +176,13 @@ def test_ministry_api_recognizes_empty_template_without_fabricating_amounts():
             assert row[field]["normalized_value"] is None
         if row["article"]["value_origin"] == "TEMPLATE_INFERRED":
             assert row["article"]["evidence"] == []
+
+    v2 = client.post("/api/v2/cdc/male/analyze", files={"file": (REFERENCE_PDF.name, source, "application/pdf")})
+    assert v2.status_code == 200, v2.text
+    v2_contract = TenderAnalysisResponseV2.model_validate(v2.json())
+    assert v2_contract.modules.boq.availability == "available"
+    assert len(v2_contract.modules.boq.data) == 1
+    assert v2_contract.modules.boq.data[0]["result"]["rows"]
 
 
 def test_unrecognized_ministry_template_is_structured_not_server_error(tmp_path):

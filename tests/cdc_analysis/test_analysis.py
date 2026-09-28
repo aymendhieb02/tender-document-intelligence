@@ -212,9 +212,6 @@ def test_synthetic_fixture_and_benchmark_gate():
 def test_real_reference_document_result_integration():
     root = Path(__file__).resolve().parents[2]
     source = root / "dataset/cdc/document_results/MM_Cahier-des-charges-type-Entretien.document_result.json"
-    prediction_path = root / "dataset/cdc/predictions/MM_Cahier-des-charges-type-Entretien.prediction.json"
-    if not source.exists() or not prediction_path.exists():
-        pytest.skip("Run the real Document Intelligence producer fixture first")
     producer_result = json.loads(source.read_text(encoding="utf-8"))
     result = CDCAnalyzer().analyze(producer_result)
     assert len(producer_result["pages"]) == 30
@@ -244,21 +241,14 @@ def test_real_reference_document_result_integration():
     assert normalized["delay_penalty"]["denominator"] == 1000
     assert normalized["guarantee_period"]["value"] == 1
     assert normalized["order_volume_variation"]["value"] == 20
-    prediction = json.loads(prediction_path.read_text(encoding="utf-8"))
-    baseline_prediction = TenderDocument.model_validate(prediction)
-    # V2 adds explicit Lot records and no longer treats blank lot placeholders as
-    # candidate requirements. Stable section, annex, and BOQ behavior stays equal.
-    assert [(s.number, s.title, s.start_page, s.end_page) for s in baseline_prediction.sections] == [
-        (s.number, s.title, s.start_page, s.end_page) for s in result.sections]
-    assert [(a.number, a.page_start, a.page_end, a.annex_type) for a in baseline_prediction.annexes] == [
-        (a.number, a.page_start, a.page_end, a.annex_type) for a in result.annexes]
-    assert baseline_prediction.detected_special_documents == result.detected_special_documents
+    # The committed DocumentResult is the stable producer input. Assert the
+    # consumer contract directly above instead of depending on a generated,
+    # multi-megabyte prediction snapshot.
     assert len(result.lots) == 8
     assert all(lot.source_evidence and lot.source_evidence[0].raw_text.startswith("Lot ")
                for lot in result.lots)
     ground_truth_path = root / "dataset/cdc/ground_truth/MM_Cahier-des-charges-type-Entretien.structure.json"
     manifest = json.loads(ground_truth_path.read_text(encoding="utf-8"))
-    assert prediction_path.resolve() != ground_truth_path.resolve()
     assert manifest["verification_status"] == "human_review_required"
     assert evaluate(result, manifest)["status"] == "NOT YET MEASURABLE"
     assert result.sections[0].source_evidence[0].source_element_ids

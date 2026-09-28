@@ -25,6 +25,7 @@ datasets/cdc_real/raw/*
 !datasets/cdc_real/raw/README.md
 
 # Generated CDC pilot intermediates and prediction payloads (reproducible locally).
+/dataset/cdc/predictions/*.prediction.json
 /benchmarks/cdc_real_v1/predictions/
 /benchmarks/cdc_real_v1/predictions_v2/
 /benchmarks/cdc_real_v1/document_results/

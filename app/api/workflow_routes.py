@@ -9,6 +9,7 @@ from fastapi.responses import Response
 import fitz
 
 from app.api.document_store import document_store
+from app.api.contracts_v2 import TenderAnalysisResponseV2, build_tender_analysis_v2
 from app.core.config import settings
 from app.core.schemas import ProcessInvoiceResponse
 from app.cdc_analysis import CDCAnalyzer
@@ -105,8 +106,7 @@ def render_uploaded_document_page(document_id: str, page_number: int, width: int
     return Response(png, media_type="image/png", headers={"Cache-Control": "private, max-age=300"})
 
 
-@router.post("/cdc/analyze")
-async def analyze_cdc(file: UploadFile = File(...)) -> dict[str, Any]:
+async def _run_cdc_upload(file: UploadFile) -> tuple[dict[str, Any], Any, Any]:
     stored, document = await _process_upload(file, "cdc")
     try:
         tender = CDCAnalyzer().analyze(document)
@@ -115,7 +115,7 @@ async def analyze_cdc(file: UploadFile = File(...)) -> dict[str, Any]:
         raise WorkflowError("cdc_analysis_failed", "cdc", "Tender structure could not be analyzed.",
                             status_code=422, technical_detail=type(exc).__name__, recoverable=True,
                             diagnostics=["evidence_page_mismatch"] if isinstance(exc, ValueError) and "Element page does not match" in str(exc) else []) from exc
-    return {
+    payload = {
         "document_id": document.document_id,
         "document_url": _document_link(stored.document_id),
         "source_type": document.source_type,
@@ -124,10 +124,16 @@ async def analyze_cdc(file: UploadFile = File(...)) -> dict[str, Any]:
                    "coordinate_space": page.coordinate_space} for page in document.pages],
         "tender_document": tender.model_dump(mode="json"),
     }
+    return payload, stored, document
 
 
-@router.post("/cdc/male/analyze")
-async def analyze_ministry(file: UploadFile = File(...)) -> dict[str, Any]:
+@router.post("/cdc/analyze")
+async def analyze_cdc(file: UploadFile = File(...)) -> dict[str, Any]:
+    payload, _, _ = await _run_cdc_upload(file)
+    return payload
+
+
+async def _run_ministry_upload(file: UploadFile) -> tuple[dict[str, Any], Any, Any]:
     stored, document = await _process_upload(file, "ministry_boq")
     try:
         tender = CDCAnalyzer().analyze(document)
@@ -164,7 +170,7 @@ async def analyze_ministry(file: UploadFile = File(...)) -> dict[str, Any]:
     detected = bool(boq_results)
     if not handoffs:
         diagnostics.append("cdc_did_not_detect_boq_handoff")
-    return {
+    payload = {
         "document_id": document.document_id,
         "document_url": _document_link(stored.document_id),
         "source_type": document.source_type,
@@ -176,6 +182,29 @@ async def analyze_ministry(file: UploadFile = File(...)) -> dict[str, Any]:
         "boq_results": boq_results,
         "diagnostics": diagnostics,
     }
+    return payload, stored, document
+
+
+@router.post("/cdc/male/analyze")
+async def analyze_ministry(file: UploadFile = File(...)) -> dict[str, Any]:
+    payload, _, _ = await _run_ministry_upload(file)
+    return payload
+
+
+@router.post("/v2/cdc/analyze", response_model=TenderAnalysisResponseV2)
+async def analyze_cdc_v2(file: UploadFile = File(...)) -> TenderAnalysisResponseV2:
+    """Versioned envelope over the existing single-pass deterministic CDC workflow."""
+    payload, stored, document = await _run_cdc_upload(file)
+    return build_tender_analysis_v2(payload, workflow="cdc", document_result=document,
+                                    filename=stored.filename)
+
+
+@router.post("/v2/cdc/male/analyze", response_model=TenderAnalysisResponseV2)
+async def analyze_ministry_v2(file: UploadFile = File(...)) -> TenderAnalysisResponseV2:
+    """Versioned envelope over the existing Ministry/BOQ workflow."""
+    payload, stored, document = await _run_ministry_upload(file)
+    return build_tender_analysis_v2(payload, workflow="ministry_boq", document_result=document,
+                                    filename=stored.filename)
 
 
 @router.post("/invoices/analyze", response_model=ProcessInvoiceResponse)
