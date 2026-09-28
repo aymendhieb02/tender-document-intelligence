@@ -19,3 +19,7 @@ app/static/uploads/
 *.log
 .idea/
 .vscode/
+
+# Public tender acquisition payloads are reproducible and stay out of Git.
+datasets/cdc_real/raw/*
+!datasets/cdc_real/raw/README.md

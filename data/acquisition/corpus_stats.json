@@ -1,0 +1,12 @@
+{
+  "total_documents": 0,
+  "dimensions": {
+    "source_id": {},
+    "organization": {},
+    "organization_type": {},
+    "normalized_procurement_type": {},
+    "document_type": {},
+    "language_hint": {},
+    "quality_tier": {}
+  }
+}
