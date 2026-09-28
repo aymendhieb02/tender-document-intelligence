@@ -1,0 +1,7 @@
+{
+  "source_type": "synthetic",
+  "template_family": "MALE_MUNICIPAL_MAINTENANCE_BOQ_V1",
+  "scenario": "text-level OCR variant",
+  "observed_text": ["Annexe 05", "BORDERAU DES PRIX - DEVIS ESTIMATIF", "Prix H7VA", "Qte", "TotaI"],
+  "notes": "Controlled confusions only. The original PDF fixture remains fixture_a_clean.pdf."
+}
