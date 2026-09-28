@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import csv
+from io import StringIO
 from pathlib import Path
 
 import fitz
@@ -34,6 +36,7 @@ def test_application_startup_and_workflow_routes():
     assert "/api/invoices/analyze" in routes
     assert "/api/cdc/analyze" in routes
     assert "/api/cdc/male/analyze" in routes
+    assert "/api/cdc/male/export.csv" in routes
     assert "/api/v2/cdc/analyze" in routes
     assert "/api/v2/cdc/male/analyze" in routes
 
@@ -183,6 +186,20 @@ def test_ministry_api_recognizes_empty_template_without_fabricating_amounts():
     assert v2_contract.modules.boq.availability == "available"
     assert len(v2_contract.modules.boq.data) == 1
     assert v2_contract.modules.boq.data[0]["result"]["rows"]
+
+
+def test_ministry_csv_export_keeps_blank_amounts_empty_and_utf8():
+    source = REFERENCE_PDF.read_bytes()
+    response = client.post("/api/cdc/male/export.csv", files={"file": (REFERENCE_PDF.name, source, "application/pdf")})
+    assert response.status_code == 200, response.text
+    assert response.headers["content-type"].startswith("text/csv; charset=utf-8")
+    assert 'filename="boq-export.csv"' in response.headers["content-disposition"]
+    text = response.content.decode("utf-8")
+    assert "item_number,designation,unit,quantity,unit_price_ht,total_ht,unit_price_ttc,total_ttc,status,page" in text
+    rows = list(csv.DictReader(StringIO(text)))
+    assert len(rows) == 5
+    assert rows[0]["item_number"] == "01"
+    assert all(row["quantity"] == "" and row["unit_price_ht"] == "" for row in rows)
 
 
 def test_unrecognized_ministry_template_is_structured_not_server_error(tmp_path):

@@ -22,13 +22,15 @@ def test_primary_pages_share_the_modular_platform_shell():
     assert "affaires locales" in (ROOT / "app/static/app/pages/dashboard.js").read_text(encoding="utf-8").lower()
 
 
-def test_frontend_adapts_backend_v1_and_does_not_claim_false_pdf_highlights():
+def test_frontend_adapts_backend_v2_and_does_not_claim_false_pdf_highlights():
     api = (ROOT / "app/static/app/api.js").read_text(encoding="utf-8")
     viewer = (ROOT / "app/static/app/components/document-viewer.js").read_text(encoding="utf-8")
     invoice = (ROOT / "app/static/app.js").read_text(encoding="utf-8")
 
-    assert '"/api/cdc/analyze"' in api
-    assert '"/api/cdc/male/analyze"' in api
+    assert '"/api/v2/cdc/analyze"' in api
+    assert '"/api/v2/cdc/male/analyze"' in api
+    assert '${encodeURIComponent(documentId)}/ask' in api
+    assert 'document_store_id: storedDocumentId(payload.document.document_url)' in api
     assert "payload.boq_results?.[0]?.result" in api
     assert "/pages/${this.page}.png" in viewer
     assert "this.sourceUrl" in viewer and "physicalPageForEvidence(evidence)" in viewer
@@ -37,6 +39,35 @@ def test_frontend_adapts_backend_v1_and_does_not_claim_false_pdf_highlights():
     assert "this.setEvidence(this.evidence);" not in viewer.split("goToPage(page)", 1)[1].split("refreshSource()", 1)[0]
     assert "if (!normalized || this.sourceUrl || this.root.querySelector(\"iframe\"))" in viewer
     assert 'fetch("/api/invoices/analyze"' in invoice
+
+
+def test_tender_workspace_uses_real_v2_modules_and_truthful_empty_states():
+    api = (ROOT / "app/static/app/api.js").read_text(encoding="utf-8")
+    cdc = (ROOT / "app/static/app/pages/cdc-workspace.js").read_text(encoding="utf-8")
+    assert 'payload.contract_version === "2.0"' in api
+    assert 'payload.modules?.summary?.data' in cdc
+    assert 'payload.modules?.requirements_intelligence?.data' in cdc
+    assert 'payload.modules?.financial_deadline_intelligence' in cdc
+    assert 'payload.modules.boq?.data' in api
+    assert 'answer.unavailable' in cdc and 'answer.no_evidence' in cdc
+    assert 'display(item.normalized)' in cdc
+    assert 'item.raw ?? "—"' in cdc
+    assert 'Ask Tender' in cdc and 'Finances & échéances' in cdc
+    assert 'askTender(payload.document_store_id, question)' in cdc
+
+
+def test_important_tender_and_invoice_routes_remain_available():
+    for route in ("/", "/invoice", "/invoice/result/abc", "/cdc", "/cdc/result/abc",
+                  "/cdc/male", "/cdc/male/result/abc"):
+        assert client.get(route).status_code == 200
+
+
+def test_sidebar_uses_only_the_most_specific_tender_route():
+    shell = (ROOT / "app/static/app/components/shell.js").read_text(encoding="utf-8")
+    assert 'activePath === "/cdc" || activePath.startsWith("/cdc/result/")' in shell
+    assert 'activePath.startsWith(`${href}/`)' in shell
+    # The special handling for /cdc must avoid matching Ministry result routes.
+    assert 'href === "/cdc" ?' in shell
 
 
 def test_cdc_views_use_recursive_nodes_and_backend_handoffs_without_fixture_numbers():

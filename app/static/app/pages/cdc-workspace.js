@@ -4,8 +4,9 @@ import { createEvidenceController } from "../components/evidence-highlight.js?v=
 import { originBadge, statusBadge } from "../components/status-badge.js?v=platform-refactor-5";
 import { setActiveAnalysis } from "../state.js?v=platform-refactor-5";
 import { renderBoqWorkspace } from "./boq-workspace.js?v=platform-refactor-5";
+import { askTender } from "../api.js?v=platform-refactor-qa1";
 
-const viewLabels = ["Vue d’ensemble", "Structure", "Exigences", "Annexes", "Bordereau", "Preuves", "Diagnostics"];
+const viewLabels = ["Vue d’ensemble", "Structure", "Exigences", "Annexes", "Bordereau", "Preuves", "Diagnostics", "Finances & échéances", "Ask Tender"];
 
 export function renderCdcWorkspace(outlet, payload, file, workflow) {
   const cdc = payload.tender_document;
@@ -13,7 +14,8 @@ export function renderCdcWorkspace(outlet, payload, file, workflow) {
   const male = workflow === "male";
   const pageCount = documentResult.pages?.length || 0;
   const refs = [];
-  outlet.innerHTML = `<section class="analysis-page"><header class="analysis-document-header"><div class="document-heading"><a class="text-back" href="${male ? "/cdc/male" : "/cdc"}">‹ Retour</a><h1>${escapeHtml(file?.name || cdc.title || "Document analysé")}</h1><div class="document-meta"><span>${pageCount} pages</span><span>Mode ${escapeHtml(documentResult.mode || "—")}</span><span>ID ${escapeHtml(documentResult.document_id || "—")}</span></div></div><div class="document-status">${statusBadge(male ? (payload.boq_document?.detected ? "detected" : "needs_review") : "needs_review")}</div></header>${male && !payload.boq_document?.detected ? `<div class="notice notice-warning"><strong>Document du Ministère non reconnu.</strong><span>Aucune extraction spécialisée n’a été lancée pour ce document.</span></div>` : ""}<div class="analysis-layout"><aside class="document-tree-panel"><div class="panel-overline">DOCUMENT</div><h2>Structure</h2><div class="tree-scroll">${renderDocumentTree(cdc, refs)}</div></aside><section class="viewer-panel"><div class="viewer-heading"><strong>Document source</strong><span>Page physique et preuve</span></div><div id="documentViewer" class="document-viewer"></div><section class="evidence-panel"><div id="evidenceInspector"></div></section></section><section class="analysis-panel"><nav class="analysis-tabs" aria-label="Vues de l’analyse">${viewLabels.map((label, i) => `<button type="button" class="analysis-tab ${i === 0 ? "active" : ""}" data-analysis-view="${i}">${label}</button>`).join("")}</nav><div class="analysis-view" id="analysisView"></div></section></div></section>`;
+  const tenderTitle = summaryIdentity(payload, "title") || cdc.title || file?.name || "—";
+  outlet.innerHTML = `<section class="analysis-page"><header class="analysis-document-header"><div class="document-heading"><a class="text-back" href="${male ? "/cdc/male" : "/cdc"}">‹ Retour</a><h1>${escapeHtml(tenderTitle)}</h1><div class="document-meta"><span>Référence ${escapeHtml(summaryIdentity(payload, "reference"))}</span><span>Autorité ${escapeHtml(summaryIdentity(payload, "contracting_organization"))}</span><span>${pageCount || "—"} pages</span><span>${escapeHtml(documentResult.document_id || "—")}</span></div></div><div class="document-status">${statusBadge(male ? (payload.boq_document?.detected ? "detected" : "needs_review") : "needs_review")}</div></header>${male && !payload.boq_document?.detected ? `<div class="notice notice-warning"><strong>Document du Ministère non reconnu.</strong><span>Aucune extraction spécialisée n’a été lancée pour ce document.</span></div>` : ""}<div class="analysis-layout"><aside class="document-tree-panel"><div class="panel-overline">DOCUMENT</div><h2>Structure</h2><div class="tree-scroll">${renderDocumentTree(cdc, refs)}</div></aside><section class="viewer-panel"><div class="viewer-heading"><strong>Document source</strong><span>Page physique et preuve</span></div><div id="documentViewer" class="document-viewer"></div><section class="evidence-panel"><div id="evidenceInspector"></div></section></section><section class="analysis-panel"><nav class="analysis-tabs" aria-label="Vues de l’analyse">${viewLabels.map((label, i) => `<button type="button" class="analysis-tab ${i === 0 ? "active" : ""}" data-analysis-view="${i}">${label}</button>`).join("")}</nav><div class="analysis-view" id="analysisView"></div></section></div></section>`;
   const viewer = new DocumentViewer(outlet.querySelector("#documentViewer"), documentResult, file, payload.document_url);
   const evidenceController = createEvidenceController(viewer, outlet.querySelector("#evidenceInspector"));
   outlet.querySelectorAll("[data-evidence-ref]").forEach(button => button.addEventListener("click", () => selectReference(Number(button.dataset.evidenceRef))));
@@ -55,6 +57,26 @@ export function renderCdcWorkspace(outlet, payload, file, workflow) {
       if (target) target.textContent = error.message;
     }
   });
+  outlet.querySelector("#analysisView").addEventListener("submit", async event => {
+    const form = event.target.closest("[data-ask-tender]");
+    if (!form) return;
+    event.preventDefault();
+    const input = form.querySelector("[name=question]");
+    const button = form.querySelector("button[type=submit]");
+    const result = form.querySelector("[data-ask-result]");
+    const question = input.value.trim();
+    if (!question) return;
+    button.disabled = true;
+    result.innerHTML = `<p role="status">Recherche dans le dossier…</p>`;
+    try {
+      const answer = await askTender(payload.document_store_id, question);
+      if (answer.unavailable) result.innerHTML = `<div class="notice notice-neutral"><strong>Ask Tender indisponible</strong><span>Le service de questions n’est pas encore connecté.</span></div>`;
+      else if (answer.status === "insufficient_evidence" || answer.no_evidence || answer.status === "not_found" || answer.status === "no_evidence") result.innerHTML = `<div class="notice notice-warning"><strong>Aucune preuve trouvée</strong><span>Le dossier ne fournit pas de source suffisante pour répondre.</span></div>`;
+      else result.innerHTML = `<article class="ask-answer">${answer.status === "generation_unavailable" ? `<div class="notice notice-neutral"><strong>Génération locale indisponible</strong><span>Des passages correspondants sont présentés ci-dessous pour vérification.</span></div>` : ""}<h3>Réponse</h3><p>${escapeHtml(answer.answer || "—")}</p>${renderAskEvidence(answer.evidence || answer.sources || [])}</article>`;
+    } catch (error) {
+      result.innerHTML = `<div class="notice notice-warning"><strong>Impossible d’interroger le dossier</strong><span>${escapeHtml(error.message)}</span></div>`;
+    } finally { button.disabled = false; }
+  });
 }
 
 export function renderDocumentTree(document, refs = []) {
@@ -83,20 +105,41 @@ function renderTreeNode(node, kind, refs, depth = 0) {
 function renderAnalysisView(root, index, cdc, payload, documentResult, file, workflow, registerEvidence, selectEvidence, selectedEvidence = null) {
   if (index === 0) root.innerHTML = renderOverview(cdc, documentResult, payload, workflow);
   if (index === 1) root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">DOCUMENT</p><h2>Structure du document</h2><p>Hiérarchie extraite du cahier des charges.</p></div></div>${renderStructure(cdc, registerEvidence)}`;
-  if (index === 2) root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">CANDIDATS</p><h2>Exigences</h2><p>${cdc.requirements?.length || 0} éléments structurés avec leur état de revue.</p></div></div>${renderRequirements(cdc.requirements || [], registerEvidence)}`;
+  if (index === 2) { const items = payload.modules?.requirements_intelligence?.data || cdc.requirements || []; root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">CANDIDATS</p><h2>Exigences</h2><p>${items.length} éléments structurés avec leur état de revue.</p></div></div>${renderRequirements(items, registerEvidence)}`; }
   if (index === 3) root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">ANNEXES</p><h2>Annexes</h2><p>Classement et plages de pages détectées.</p></div></div>${renderAnnexes(cdc.annexes || [], workflow, payload)}`;
   if (index === 4) root.innerHTML = workflow === "male" ? renderBoqWorkspace(payload.boq_document) : renderBqHandoff(cdc, payload);
   if (index === 5) root.innerHTML = selectedEvidence ? `<div class="view-heading"><div><p class="eyebrow">PROVENANCE</p><h2>Élément source</h2></div></div>${renderEvidenceDetail(selectedEvidence)}` : `<div class="view-heading"><div><p class="eyebrow">PROVENANCE</p><h2>Preuves</h2><p>Sélectionnez une exigence, un article ou une annexe pour afficher sa preuve dans le panneau Document.</p></div></div><div class="empty-state"><strong>Aucune preuve sélectionnée</strong><span>Les identifiants et coordonnées sont issus du résultat d’analyse.</span></div>`;
   if (index === 6) root.innerHTML = renderDiagnostics(documentResult, cdc, payload);
+  if (index === 7) root.innerHTML = renderFinancial(payload, registerEvidence);
+  if (index === 8) root.innerHTML = renderAskTender();
   root.querySelectorAll("[data-ref-select]").forEach(button => button.addEventListener("click", () => selectEvidence(Number(button.dataset.refSelect))));
 }
 
 function renderOverview(cdc, result, payload, workflow) {
   const pages = result.pages || [];
+  const requirementItems = payload.modules?.requirements_intelligence?.data || cdc.requirements || [];
+  const financialItems = payload.modules?.financial_deadline_intelligence?.data || [];
   const warnings = pages.flatMap(page => page.diagnostics?.warnings || []);
   const cdcDiagnostics = (cdc.diagnostics || []).map(item => item.message || item.code);
-  return `<div class="view-heading"><div><p class="eyebrow">SYNTHÈSE</p><h2>Vue d’ensemble</h2><p>Résumé du dossier et état du traitement.</p></div></div><div class="overview-grid"><article class="overview-stat"><span>Pages physiques</span><strong>${pages.length || "—"}</strong></article><article class="overview-stat"><span>Sections</span><strong>${countNodes(cdc.sections)}</strong></article><article class="overview-stat"><span>Exigences</span><strong>${cdc.requirements?.length || 0}</strong></article><article class="overview-stat"><span>Annexes</span><strong>${cdc.annexes?.length || 0}</strong></article></div>${workflow === "male" ? `<div class="notice ${payload.boq_document?.detected ? "notice-positive" : "notice-warning"}"><strong>${payload.boq_document?.detected ? "Document du Ministère reconnu" : "Document du Ministère non reconnu"}</strong><span>${payload.boq_document?.detected ? `${payload.boq_document.rows?.length || 0} lignes structurelles détectées.` : "Aucune extraction du bordereau n’a été lancée."}</span></div>` : ""}<section class="diagnostic-summary"><div class="subsection-heading"><h3>Traitement</h3>${statusBadge("detected")}</div><dl class="metadata-list"><div><dt>Document ID</dt><dd>${escapeHtml(result.document_id || "—")}</dd></div><div><dt>Mode</dt><dd>${escapeHtml(result.mode || "—")}</dd></div><div><dt>Source</dt><dd>${escapeHtml(result.source_type || "—")}</dd></div><div><dt>Temps total</dt><dd>${formatMs(result.diagnostics?.processing_ms)}</dd></div><div><dt>Avertissements</dt><dd>${warnings.length + cdcDiagnostics.length}</dd></div></dl></section>`;
+  const summary = payload.modules?.summary?.data;
+  const identity = summary?.identity || {};
+  const fact = key => identity[key]?.value ?? identity[key]?.raw_text ?? "—";
+  return `<div class="view-heading"><div><p class="eyebrow">SYNTHÈSE</p><h2>Vue d’ensemble</h2><p>Résumé du dossier et état du traitement.</p></div></div>${summary ? `<section class="diagnostic-summary"><h3>Identité du marché</h3><dl class="metadata-list"><div><dt>Objet</dt><dd>${escapeHtml(fact("title") || fact("object"))}</dd></div><div><dt>Référence</dt><dd>${escapeHtml(fact("reference"))}</dd></div><div><dt>Autorité contractante</dt><dd>${escapeHtml(fact("contracting_organization"))}</dd></div></dl></section>` : ""}<div class="overview-grid"><article class="overview-stat"><span>Pages physiques</span><strong>${pages.length || "—"}</strong></article><article class="overview-stat"><span>Sections</span><strong>${countNodes(cdc.sections)}</strong></article><article class="overview-stat"><span>Exigences</span><strong>${requirementItems.length}</strong></article><article class="overview-stat"><span>Obligatoires</span><strong>${requirementItems.filter(item => item.mandatory_status === "MANDATORY").length}</strong></article><article class="overview-stat"><span>À vérifier</span><strong>${summary?.requirements?.review_required ?? "—"}</strong></article><article class="overview-stat"><span>Faits financiers</span><strong>${financialItems.length || "—"}</strong></article><article class="overview-stat"><span>Annexes</span><strong>${cdc.annexes?.length || 0}</strong></article><article class="overview-stat"><span>Lignes BOQ</span><strong>${payload.boq_document?.detected ? payload.boq_document.rows?.length ?? "—" : "—"}</strong></article></div>${workflow === "male" ? `<div class="notice ${payload.boq_document?.detected ? "notice-positive" : "notice-warning"}"><strong>${payload.boq_document?.detected ? "Document du Ministère reconnu" : "Document du Ministère non reconnu"}</strong><span>${payload.boq_document?.detected ? `${payload.boq_document.rows?.length || 0} lignes structurelles détectées.` : "Aucune extraction spécialisée n’a été lancée."}</span></div>` : ""}<section class="diagnostic-summary"><div class="subsection-heading"><h3>Traitement</h3>${statusBadge("detected")}</div><dl class="metadata-list"><div><dt>Document ID</dt><dd>${escapeHtml(result.document_id || "—")}</dd></div><div><dt>Mode</dt><dd>${escapeHtml(result.mode || "—")}</dd></div><div><dt>Source</dt><dd>${escapeHtml(result.source_type || "—")}</dd></div><div><dt>Temps total</dt><dd>${formatMs(result.diagnostics?.processing_ms)}</dd></div><div><dt>Avertissements</dt><dd>${warnings.length + cdcDiagnostics.length}</dd></div></dl></section>`;
 }
+
+function renderFinancial(payload, registerEvidence) {
+  const module = payload.modules?.financial_deadline_intelligence;
+  const facts = Array.isArray(module?.data) ? module.data : [];
+  if (!module || ["not_implemented", "not_run", "unavailable"].includes(module.availability)) return emptyBlock("Données financières indisponibles", "Aucune donnée financière et d’échéance n’a été produite par ce workflow.");
+  if (!facts.length) return emptyBlock("Aucun fait financier détecté", "Aucun fait financier ou délai n’a été retourné.");
+  return `<div class="view-heading"><div><p class="eyebrow">FAITS EXTRAITS · ${escapeHtml(module.availability)}</p><h2>Finances & échéances</h2><p>Valeurs brutes et normalisées avec leur état de revue.</p></div></div><div class="requirement-list">${facts.map((item, index) => {
+    const ev = item.evidence?.[0]; const ref = ev ? payloadEvidenceRef(ev, registerEvidence, item.category) : -1;
+    return `<article class="requirement-card"><div class="requirement-card-heading"><div><span class="requirement-type">${escapeHtml(item.category || "FAIT")}</span><h3>${escapeHtml(item.raw ?? "—")}</h3></div>${statusBadge(item.status || "needs_review")}</div><dl class="requirement-meta"><div><dt>Valeur source</dt><dd>${escapeHtml(item.raw ?? "—")}</dd></div><div><dt>Valeur normalisée</dt><dd>${escapeHtml(display(item.normalized))}</dd></div><div><dt>Revue</dt><dd>${escapeHtml(item.status || "—")}${item.conflict_group ? ` · Conflit ${escapeHtml(item.conflict_group)}` : ""}</dd></div><div><dt>Page</dt><dd>${ev?.page_number ?? ev?.page ?? "—"}</dd></div></dl>${ref >= 0 ? `<button class="button button-secondary" data-ref-select="${ref}">Voir la preuve</button>` : ""}</article>`;
+  }).join("")}</div>`;
+}
+function payloadEvidenceRef(evidence, registerEvidence, title) { return registerEvidence({ page: evidence.page_number ?? evidence.page, element_id: evidence.element_id, raw_text: evidence.raw_text, source_element_ids: [evidence.element_id], coordinate_space: evidence.coordinate_space }, title); }
+function renderAskTender() { return `<div class="view-heading"><div><p class="eyebrow">QUESTIONS AU DOSSIER</p><h2>Ask Tender</h2><p>Les réponses doivent être accompagnées de preuves du document.</p></div></div><form data-ask-tender class="ask-form"><label for="tenderQuestion">Votre question</label><textarea id="tenderQuestion" name="question" rows="3" placeholder="Posez une question sur cet appel d’offres…" required></textarea><button class="button button-primary" type="submit">Poser la question</button><div data-ask-result aria-live="polite"></div></form><p class="muted-note">Le service de questions est fourni séparément. Aucune réponse n’est générée lorsque le service est indisponible.</p>`; }
+function renderAskEvidence(items) { return items.length ? `<ul class="ask-evidence">${items.map(item => `<li>${escapeHtml(item.document || item.document_id || "Document source")} · ${item.page_number ?? item.page ?? "—"}${item.article ? ` · ${escapeHtml(item.article)}` : ""}</li>`).join("")}</ul>` : `<div class="notice notice-warning"><strong>Aucune preuve associée</strong><span>La réponse ne contient pas de références vérifiables.</span></div>`; }
 
 function renderStructure(cdc, registerEvidence) {
   const refs = [];
@@ -109,9 +152,10 @@ function renderStructure(cdc, registerEvidence) {
 function renderRequirements(requirements, registerEvidence) {
   if (!requirements.length) return emptyBlock("Aucune exigence candidate", "Aucune exigence structurée n’a été retournée par l’analyse.");
   return `<div class="requirement-list">${requirements.map((item, index) => {
-    const evidence = item.source_evidence?.[0];
-    const ref = evidence ? registerEvidence(evidence, item.text) : -1;
-    return `<article class="requirement-card"><div class="requirement-card-heading"><div><span class="requirement-type">${escapeHtml(item.type || "Exigence")}</span><h3>${escapeHtml(item.text)}</h3></div>${statusBadge(item.review_status || item.evidence_status)}</div><div class="requirement-value">${escapeHtml(display(item.normalized_value))}${item.unit ? ` <span>${escapeHtml(item.unit)}</span>` : ""}</div><dl class="requirement-meta"><div><dt>Source</dt><dd>${escapeHtml(item.source_article || item.source_section || item.source_annex || "—")}</dd></div><div><dt>Page</dt><dd>${item.source_page ?? "—"}</dd></div><div><dt>Extraction</dt><dd>${escapeHtml(item.extraction_status || "candidate_only")}</dd></div></dl>${ref >= 0 ? `<button class="button button-secondary" data-ref-select="${ref}">Voir la preuve <span>→</span></button>` : `<span class="muted-note">Aucune référence de preuve fournie</span>`}</article>`;
+    const evidence = item.source_evidence?.[0] || item.evidence?.[0];
+    const text = item.text || item.description || item.title || "—";
+    const ref = evidence ? registerEvidence(evidence.page_number ? { page: evidence.page_number, element_id: evidence.element_id, raw_text: evidence.raw_text, source_element_ids: [evidence.element_id], coordinate_space: evidence.coordinate_space } : evidence, text) : -1;
+    return `<article class="requirement-card"><div class="requirement-card-heading"><div><span class="requirement-type">${escapeHtml(item.category || item.type || "Exigence")}</span><h3>${escapeHtml(text)}</h3></div>${statusBadge(item.review_status || item.evidence_status || item.mandatory_status)}</div>${item.action ? `<p>${escapeHtml(item.action)}</p>` : ""}<dl class="requirement-meta"><div><dt>Modalité</dt><dd>${escapeHtml(item.mandatory_status || "—")}</dd></div><div><dt>Source</dt><dd>${escapeHtml(item.source_article || item.source_article_id || item.source_section || item.source_annex || "—")}</dd></div><div><dt>Page</dt><dd>${item.source_page ?? item.page ?? evidence?.page ?? "—"}</dd></div><div><dt>Revue</dt><dd>${escapeHtml(item.review_status || item.extraction_status || "needs_review")}</dd></div></dl>${ref >= 0 ? `<button class="button button-secondary" data-ref-select="${ref}">Voir la preuve <span>→</span></button>` : `<span class="muted-note">Aucune référence de preuve fournie</span>`}</article>`;
   }).join("")}</div>`;
 }
 
@@ -152,6 +196,7 @@ function flattenNodes(nodes, result = [], kind = "section") {
   return result;
 }
 function display(value) { return value == null ? "—" : typeof value === "object" ? JSON.stringify(value) : String(value); }
+function summaryIdentity(payload, key) { const fact = payload.modules?.summary?.data?.identity?.[key]; return fact?.value ?? fact?.raw_text ?? "—"; }
 function countNodes(nodes = []) { return nodes.reduce((sum, node) => sum + 1 + countNodes(node.subsections || []) + (node.articles || []).length, 0); }
 function kindLabel(kind) { return ({ section: "Section", article: "Article", annex: "Annexe", paragraph: "Clause" })[kind] || "Élément"; }
 function formatMs(value) { return Number.isFinite(value) ? `${Math.round(value)} ms` : "—"; }
