@@ -15,7 +15,7 @@ from app.core.schemas import ProcessInvoiceResponse
 from app.cdc_analysis import CDCAnalyzer
 from app.document_intelligence import DocumentProcessor
 from app.document_intelligence.schemas import DocumentResult
-from app.boq import extract_male_municipal_from_document
+from app.boq import BOQDocument, export_boq_csv, extract_male_municipal_from_document
 from app.invoice.document_result_adapter import DocumentResultInvoiceAdapter
 from app.services.pipeline_runner import process_document_file
 
@@ -189,6 +189,15 @@ async def _run_ministry_upload(file: UploadFile) -> tuple[dict[str, Any], Any, A
 async def analyze_ministry(file: UploadFile = File(...)) -> dict[str, Any]:
     payload, _, _ = await _run_ministry_upload(file)
     return payload
+
+
+@router.post("/cdc/male/export.csv", name="export_ministry_boq_csv")
+async def export_ministry_boq_csv(file: UploadFile = File(...)) -> Response:
+    """Analyze a Ministry tender and download any recognized BOQ rows as UTF-8 CSV."""
+    payload, _, _ = await _run_ministry_upload(file)
+    documents = [BOQDocument.model_validate(item["result"]) for item in payload["boq_results"]]
+    return Response(content=export_boq_csv(documents), media_type="text/csv; charset=utf-8",
+                    headers={"Content-Disposition": 'attachment; filename="boq-export.csv"'})
 
 
 @router.post("/v2/cdc/analyze", response_model=TenderAnalysisResponseV2)
