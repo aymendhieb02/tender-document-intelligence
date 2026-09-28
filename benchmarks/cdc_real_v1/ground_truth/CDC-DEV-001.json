@@ -8,49 +8,873 @@
   "status": "VERIFIED",
   "reviewer": "Codex source-PDF curator",
   "verified_at": "2026-09-28",
-  "verified_fields": ["document_role", "major_sections", "selected_articles", "requirements", "annexes", "boq"],
+  "verified_fields": [
+    "document_role",
+    "major_sections",
+    "selected_articles",
+    "requirements",
+    "annexes",
+    "boq",
+    "complete_article_inventory",
+    "financial_deadline_subset",
+    "reviewed_negative_candidates"
+  ],
   "document_metadata": {
     "page_count": 30,
     "organization": null,
-    "named_content_responsibility": {"physical_page": 1, "raw_text": "Le contenu est sous la responsabilité du Ministère des Affaires Locales et de l'Environnement (MALE)"},
+    "named_content_responsibility": {
+      "physical_page": 1,
+      "raw_text": "Le contenu est sous la responsabilité du Ministère des Affaires Locales et de l'Environnement (MALE)"
+    },
     "language": "FRENCH",
     "text_profile": "native",
     "document_role": "CDC",
-    "document_role_evidence": {"physical_page": 1, "raw_text": "Cahiers de charge type"},
+    "document_role_evidence": {
+      "physical_page": 1,
+      "raw_text": "Cahiers de charge type"
+    },
     "procurement_type": "WORKS",
     "year": null,
     "tender_reference": null,
     "dossier_id": null
   },
   "expected_major_sections": [
-    {"number": "A", "title": "CONDITIONS DE LA CONSULTATION / A.O", "physical_page_start": 3, "physical_page_end": 9, "evidence": {"physical_page": 3, "raw_text": "A – CONDITIONS DE LA CONSULTATION / A.O"}},
-    {"number": "B", "title": "CLAUSES TECHNIQUES PARTICULIERES", "physical_page_start": 10, "physical_page_end": 11, "evidence": {"physical_page": 10, "raw_text": "B – CLAUSES TECHNIQUES PARTICULIERES"}},
-    {"number": "C", "title": "SPECIFICATIONS TECHNIQUES", "physical_page_start": 12, "physical_page_end": 19, "evidence": {"physical_page": 12, "raw_text": "C – SPECIFICATIONS TECHNIQUES"}},
-    {"number": "D", "title": "ANNEXES : Modèles à suivre", "physical_page_start": 20, "physical_page_end": 28, "evidence": {"physical_page": 20, "raw_text": "D- ANNEXES : Modèles à suivre"}},
-    {"number": "E", "title": "DESSINS ET PLANS", "physical_page_start": 29, "physical_page_end": 30, "evidence": {"physical_page": 29, "raw_text": "E – DESSINS ET PLANS"}}
+    {
+      "number": "A",
+      "title": "CONDITIONS DE LA CONSULTATION / A.O",
+      "physical_page_start": 3,
+      "physical_page_end": 9,
+      "evidence": {
+        "physical_page": 3,
+        "raw_text": "A – CONDITIONS DE LA CONSULTATION / A.O"
+      }
+    },
+    {
+      "number": "B",
+      "title": "CLAUSES TECHNIQUES PARTICULIERES",
+      "physical_page_start": 10,
+      "physical_page_end": 11,
+      "evidence": {
+        "physical_page": 10,
+        "raw_text": "B – CLAUSES TECHNIQUES PARTICULIERES"
+      }
+    },
+    {
+      "number": "C",
+      "title": "SPECIFICATIONS TECHNIQUES",
+      "physical_page_start": 12,
+      "physical_page_end": 19,
+      "evidence": {
+        "physical_page": 12,
+        "raw_text": "C – SPECIFICATIONS TECHNIQUES"
+      }
+    },
+    {
+      "number": "D",
+      "title": "ANNEXES : Modèles à suivre",
+      "physical_page_start": 20,
+      "physical_page_end": 28,
+      "evidence": {
+        "physical_page": 20,
+        "raw_text": "D- ANNEXES : Modèles à suivre"
+      }
+    },
+    {
+      "number": "E",
+      "title": "DESSINS ET PLANS",
+      "physical_page_start": 29,
+      "physical_page_end": 30,
+      "evidence": {
+        "physical_page": 29,
+        "raw_text": "E – DESSINS ET PLANS"
+      }
+    }
   ],
   "article_heading_examples": [
-    {"number": "16", "title": "La validité des offres", "physical_page": 7, "evidence": {"physical_page": 7, "raw_text": "Article 16. La validité des offres"}},
-    {"number": "21", "title": "Modalités de paiement et retenue de garantie", "physical_page": 8, "evidence": {"physical_page": 8, "raw_text": "Article 21. Modalités de paiement et retenue de garantie"}},
-    {"number": "22", "title": "Délai d’exécution et pénalités de retard", "physical_page": 8, "evidence": {"physical_page": 8, "raw_text": "Article 22. Délai d’exécution et pénalités de retard"}}
+    {
+      "number": "16",
+      "title": "La validité des offres",
+      "physical_page": 7,
+      "evidence": {
+        "physical_page": 7,
+        "raw_text": "Article 16. La validité des offres"
+      }
+    },
+    {
+      "number": "21",
+      "title": "Modalités de paiement et retenue de garantie",
+      "physical_page": 8,
+      "evidence": {
+        "physical_page": 8,
+        "raw_text": "Article 21. Modalités de paiement et retenue de garantie"
+      }
+    },
+    {
+      "number": "22",
+      "title": "Délai d’exécution et pénalités de retard",
+      "physical_page": 8,
+      "evidence": {
+        "physical_page": 8,
+        "raw_text": "Article 22. Délai d’exécution et pénalités de retard"
+      }
+    }
   ],
   "article_annotation_scope": "Representative source-verified article headings; not a complete article inventory for this template.",
   "expected_annexes": [
-    {"number": "01", "title": "Déclarations sur l'honneur", "physical_page_start": 21, "physical_page_end": 21, "evidence": {"physical_page": 20, "raw_text": "Annexe 01 : Déclarations sur l'honneur"}},
-    {"number": "02", "title": "Fiche de renseignement", "physical_page_start": 22, "physical_page_end": 22, "evidence": {"physical_page": 20, "raw_text": "Annexe 02 : Fiche de renseignement"}},
-    {"number": "03", "title": "Engagement pour la capacité technique", "physical_page_start": 23, "physical_page_end": 23, "evidence": {"physical_page": 20, "raw_text": "Annexe 03 : Engagement pour la capacité technique"}},
-    {"number": "04", "title": "Soumission", "physical_page_start": 24, "physical_page_end": 24, "evidence": {"physical_page": 20, "raw_text": "Annexe 04 : Soumission"}},
-    {"number": "05", "title": "Bordereau des prix - devis estimatif", "physical_page_start": 25, "physical_page_end": 25, "evidence": {"physical_page": 20, "raw_text": "Annexe 05 : Bordereau des prix - devis estimatif"}},
-    {"number": "06", "title": "Engagements de cautions personnelles et solidaires", "physical_page_start": 26, "physical_page_end": 28, "evidence": {"physical_page": 20, "raw_text": "Annexes 06 Engagements de cautions personnelles et solidaires"}}
+    {
+      "number": "01",
+      "title": "Déclarations sur l'honneur",
+      "physical_page_start": 21,
+      "physical_page_end": 21,
+      "evidence": {
+        "physical_page": 20,
+        "raw_text": "Annexe 01 : Déclarations sur l'honneur"
+      }
+    },
+    {
+      "number": "02",
+      "title": "Fiche de renseignement",
+      "physical_page_start": 22,
+      "physical_page_end": 22,
+      "evidence": {
+        "physical_page": 20,
+        "raw_text": "Annexe 02 : Fiche de renseignement"
+      }
+    },
+    {
+      "number": "03",
+      "title": "Engagement pour la capacité technique",
+      "physical_page_start": 23,
+      "physical_page_end": 23,
+      "evidence": {
+        "physical_page": 20,
+        "raw_text": "Annexe 03 : Engagement pour la capacité technique"
+      }
+    },
+    {
+      "number": "04",
+      "title": "Soumission",
+      "physical_page_start": 24,
+      "physical_page_end": 24,
+      "evidence": {
+        "physical_page": 20,
+        "raw_text": "Annexe 04 : Soumission"
+      }
+    },
+    {
+      "number": "05",
+      "title": "Bordereau des prix - devis estimatif",
+      "physical_page_start": 25,
+      "physical_page_end": 25,
+      "evidence": {
+        "physical_page": 20,
+        "raw_text": "Annexe 05 : Bordereau des prix - devis estimatif"
+      }
+    },
+    {
+      "number": "06",
+      "title": "Engagements de cautions personnelles et solidaires",
+      "physical_page_start": 26,
+      "physical_page_end": 28,
+      "evidence": {
+        "physical_page": 20,
+        "raw_text": "Annexes 06 Engagements de cautions personnelles et solidaires"
+      }
+    }
   ],
   "important_requirements": [
-    {"requirement_type": "offer_validity", "raw_text": "reste liée par cette offre pendant 60 jours à compter du jour suivant la date limite fixée pour la réception des offres", "normalized_value": 60, "unit": "days", "physical_page": 7, "section": "A", "article": "16", "mandatory": true, "notes": null},
-    {"requirement_type": "final_guarantee", "raw_text": "dans les vingt (20) jours qui suivent la notification du marché, un cautionnement définitif ... fixé à 3% du montant du marché", "normalized_value": 3, "unit": "percent", "physical_page": 7, "section": "A", "article": "20", "mandatory": true, "notes": "20-day submission period also present in the cited raw evidence."},
-    {"requirement_type": "retention_guarantee", "raw_text": "10% en tant que retenue de garantie", "normalized_value": 10, "unit": "percent", "physical_page": 8, "section": "A", "article": "21", "mandatory": true, "notes": null},
-    {"requirement_type": "payment_deadline", "raw_text": "Tous les paiements se feront au plus tard dans un délai de 45 jours", "normalized_value": 45, "unit": "days", "physical_page": 8, "section": "A", "article": "21", "mandatory": true, "notes": null},
-    {"requirement_type": "penalty_cap", "raw_text": "Les pénalités de retard sont plafonnées à 5 % du montant définitif des travaux augmenté du montant des avenants éventuels", "normalized_value": 5, "unit": "percent", "physical_page": 8, "section": "A", "article": "22", "mandatory": true, "notes": null}
+    {
+      "requirement_type": "offer_validity",
+      "raw_text": "reste liée par cette offre pendant 60 jours à compter du jour suivant la date limite fixée pour la réception des offres",
+      "normalized_value": 60,
+      "unit": "days",
+      "physical_page": 7,
+      "section": "A",
+      "article": "16",
+      "mandatory": true,
+      "notes": null
+    },
+    {
+      "requirement_type": "final_guarantee",
+      "raw_text": "dans les vingt (20) jours qui suivent la notification du marché, un cautionnement définitif ... fixé à 3% du montant du marché",
+      "normalized_value": 3,
+      "unit": "percent",
+      "physical_page": 7,
+      "section": "A",
+      "article": "20",
+      "mandatory": true,
+      "notes": "20-day submission period also present in the cited raw evidence."
+    },
+    {
+      "requirement_type": "retention_guarantee",
+      "raw_text": "10% en tant que retenue de garantie",
+      "normalized_value": 10,
+      "unit": "percent",
+      "physical_page": 8,
+      "section": "A",
+      "article": "21",
+      "mandatory": true,
+      "notes": null
+    },
+    {
+      "requirement_type": "payment_deadline",
+      "raw_text": "Tous les paiements se feront au plus tard dans un délai de 45 jours",
+      "normalized_value": 45,
+      "unit": "days",
+      "physical_page": 8,
+      "section": "A",
+      "article": "21",
+      "mandatory": true,
+      "notes": null
+    },
+    {
+      "requirement_type": "penalty_cap",
+      "raw_text": "Les pénalités de retard sont plafonnées à 5 % du montant définitif des travaux augmenté du montant des avenants éventuels",
+      "normalized_value": 5,
+      "unit": "percent",
+      "physical_page": 8,
+      "section": "A",
+      "article": "22",
+      "mandatory": true,
+      "notes": null
+    }
   ],
-  "boq": {"boq_present": true, "pages": [25, 26], "document_role": "DEVIS_ESTIMATIF", "table_structure": "Blank tender price schedule; item values are not filled in", "row_count": null, "blank_or_completed": "blank_template", "evidence": {"physical_page": 20, "raw_text": "Annexe 05 : Bordereau des prix - devis estimatif"}},
+  "boq": {
+    "boq_present": true,
+    "pages": [
+      25,
+      26
+    ],
+    "document_role": "DEVIS_ESTIMATIF",
+    "table_structure": "Blank tender price schedule; item values are not filled in",
+    "row_count": null,
+    "blank_or_completed": "blank_template",
+    "evidence": {
+      "physical_page": 20,
+      "raw_text": "Annexe 05 : Bordereau des prix - devis estimatif"
+    }
+  },
   "document_structure_notes": "The title page and section headings identify a reusable template with blank municipal and lot fields. It is a CDC template, not an independently identifiable live procurement.",
-  "annotator_notes": "No blank value was normalized. Physical pages refer to 1-based PDF page positions."
+  "annotator_notes": "No blank value was normalized. Physical pages refer to 1-based PDF page positions.",
+  "complete_article_inventory": {
+    "status": "VERIFIED",
+    "scope": "All article headings in the document. Sections A (pp. 3-9) and B (pp. 10-11) are enumerated in the printed table of contents on p. 2; source headings and page locations were checked against pp. 3-11. Sections C-E have no article entries in the printed contents or article headings in source text.",
+    "source_pages_reviewed": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "expected_articles": [
+      {
+        "section": "A",
+        "number": "1",
+        "title": "Objet de la consultation / A.O",
+        "physical_page": 3,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 1. Objet de la consultation / A.O"
+        }
+      },
+      {
+        "section": "A",
+        "number": "2",
+        "title": "Financement",
+        "physical_page": 3,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 2. Financement"
+        }
+      },
+      {
+        "section": "A",
+        "number": "3",
+        "title": "Cahier des charges",
+        "physical_page": 3,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 3. Cahier des charges"
+        }
+      },
+      {
+        "section": "A",
+        "number": "4",
+        "title": "Obligations générales des parties contractantes",
+        "physical_page": 3,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 4. Obligations générales des parties contractantes"
+        }
+      },
+      {
+        "section": "A",
+        "number": "5",
+        "title": "Conditions de la consultation / A.O",
+        "physical_page": 3,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 5. Conditions de la consultation / A.O"
+        }
+      },
+      {
+        "section": "A",
+        "number": "6",
+        "title": "Allotissement",
+        "physical_page": 4,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 6. Allotissement"
+        }
+      },
+      {
+        "section": "A",
+        "number": "7",
+        "title": "Visite des lieux",
+        "physical_page": 4,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 7. Visite des lieux"
+        }
+      },
+      {
+        "section": "A",
+        "number": "8",
+        "title": "Présentation des offres",
+        "physical_page": 4,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 8. Présentation des offres"
+        }
+      },
+      {
+        "section": "A",
+        "number": "9",
+        "title": "Caution provisoire",
+        "physical_page": 5,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 9. Caution provisoire"
+        }
+      },
+      {
+        "section": "A",
+        "number": "10",
+        "title": "Pièces contractuelles",
+        "physical_page": 5,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 10. Pièces contractuelles"
+        }
+      },
+      {
+        "section": "A",
+        "number": "11",
+        "title": "Demandes d’éclaircissement",
+        "physical_page": 6,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 11. Demandes d’éclaircissement"
+        }
+      },
+      {
+        "section": "A",
+        "number": "12",
+        "title": "Montant de l'offre",
+        "physical_page": 6,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 12. Montant de l'offre"
+        }
+      },
+      {
+        "section": "A",
+        "number": "13",
+        "title": "Conditions des prix",
+        "physical_page": 6,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 13. Conditions des prix"
+        }
+      },
+      {
+        "section": "A",
+        "number": "14",
+        "title": "Réception des offres",
+        "physical_page": 6,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 14. Réception des offres"
+        }
+      },
+      {
+        "section": "A",
+        "number": "15",
+        "title": "Date limite de réception des offres",
+        "physical_page": 6,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 15. Date limite de réception des offres"
+        }
+      },
+      {
+        "section": "A",
+        "number": "16",
+        "title": "La validité des offres",
+        "physical_page": 7,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 16. La validité des offres"
+        }
+      },
+      {
+        "section": "A",
+        "number": "17",
+        "title": "Ouverture des plis",
+        "physical_page": 7,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 17. Ouverture des plis"
+        }
+      },
+      {
+        "section": "A",
+        "number": "18",
+        "title": "Méthodologie de dépouillement",
+        "physical_page": 7,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 18. Méthodologie de dépouillement"
+        }
+      },
+      {
+        "section": "A",
+        "number": "19",
+        "title": "Attribution de la prestation",
+        "physical_page": 7,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 19. Attribution de la prestation"
+        }
+      },
+      {
+        "section": "A",
+        "number": "20",
+        "title": "Caution définitive",
+        "physical_page": 7,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 20. Caution définitive"
+        }
+      },
+      {
+        "section": "A",
+        "number": "21",
+        "title": "Modalités de paiement et retenue de garantie",
+        "physical_page": 8,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 21. Modalités de paiement et retenue de garantie"
+        }
+      },
+      {
+        "section": "A",
+        "number": "22",
+        "title": "Délai d’exécution et pénalités de retard",
+        "physical_page": 8,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 22. Délai d’exécution et pénalités de retard"
+        }
+      },
+      {
+        "section": "A",
+        "number": "23",
+        "title": "Réception provisoire",
+        "physical_page": 8,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 23. Réception provisoire"
+        }
+      },
+      {
+        "section": "A",
+        "number": "24",
+        "title": "Délai de garantie et réception définitive",
+        "physical_page": 8,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 24. Délai de garantie et réception définitive"
+        }
+      },
+      {
+        "section": "A",
+        "number": "25",
+        "title": "Variation du volume de la commande",
+        "physical_page": 9,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 25. Variation du volume de la commande"
+        }
+      },
+      {
+        "section": "A",
+        "number": "26",
+        "title": "Litige ou différend",
+        "physical_page": 9,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 26. Litige ou différend"
+        }
+      },
+      {
+        "section": "A",
+        "number": "27",
+        "title": "Réglementation",
+        "physical_page": 9,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 27. Réglementation"
+        }
+      },
+      {
+        "section": "B",
+        "number": "1",
+        "title": "Objet des travaux",
+        "physical_page": 10,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 1. Objet des travaux"
+        }
+      },
+      {
+        "section": "B",
+        "number": "2",
+        "title": "Capacité technique",
+        "physical_page": 10,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 2. Capacité technique"
+        }
+      },
+      {
+        "section": "B",
+        "number": "3",
+        "title": "Conformité aux règles de l’art",
+        "physical_page": 10,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 3. Conformité aux règles de l’art"
+        }
+      },
+      {
+        "section": "B",
+        "number": "4",
+        "title": "Signalisation de chantier et Echafaudages",
+        "physical_page": 10,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 4. Signalisation de chantier et Echafaudages"
+        }
+      },
+      {
+        "section": "B",
+        "number": "5",
+        "title": "Travaux préparatoires",
+        "physical_page": 10,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 5. Travaux préparatoires"
+        }
+      },
+      {
+        "section": "B",
+        "number": "6",
+        "title": "Règles d’exécution",
+        "physical_page": 10,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 6. Règles d’exécution"
+        }
+      },
+      {
+        "section": "B",
+        "number": "7",
+        "title": "Précautions à prendre",
+        "physical_page": 11,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 7. Précautions à prendre"
+        }
+      },
+      {
+        "section": "B",
+        "number": "8",
+        "title": "Prescriptions techniques",
+        "physical_page": 11,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 8. Prescriptions techniques"
+        }
+      },
+      {
+        "section": "B",
+        "number": "9",
+        "title": "Nettoyage en fin de chantier",
+        "physical_page": 11,
+        "evidence": {
+          "physical_page": 2,
+          "raw_text": "Article 9. Nettoyage en fin de chantier"
+        }
+      }
+    ],
+    "count": 36
+  },
+  "reviewed_negative_candidates": [
+    {
+      "candidate_type": "major_section",
+      "label": "NEGATIVE",
+      "physical_page": 3,
+      "raw_text": "Lot 1 : ..................................................................................................................",
+      "reason": "A Lot heading within Section A, not a major section."
+    },
+    {
+      "candidate_type": "major_section",
+      "label": "NEGATIVE",
+      "physical_page": 3,
+      "raw_text": "Lot 2 : …………………………………………………………………………………..",
+      "reason": "A Lot heading within Section A, not a major section."
+    },
+    {
+      "candidate_type": "major_section",
+      "label": "NEGATIVE",
+      "physical_page": 3,
+      "raw_text": "Lot 3 : ……………………………………………………………………………………",
+      "reason": "A Lot heading within Section A, not a major section."
+    },
+    {
+      "candidate_type": "major_section",
+      "label": "NEGATIVE",
+      "physical_page": 3,
+      "raw_text": "Lot 4 : …………………………………………………………………………………etc.",
+      "reason": "A Lot heading within Section A, not a major section."
+    },
+    {
+      "candidate_type": "major_section",
+      "label": "NEGATIVE",
+      "physical_page": 5,
+      "raw_text": "Lot 1 : …………………………………………….. : …………….. DT",
+      "reason": "A Lot price row, not a major section."
+    },
+    {
+      "candidate_type": "major_section",
+      "label": "NEGATIVE",
+      "physical_page": 5,
+      "raw_text": "Lot 2 : …………………………………………….. : …………….. DT",
+      "reason": "A Lot price row, not a major section."
+    },
+    {
+      "candidate_type": "major_section",
+      "label": "NEGATIVE",
+      "physical_page": 5,
+      "raw_text": "Lot 3 : …………………………………………….. : …………….. DT",
+      "reason": "A Lot price row, not a major section."
+    },
+    {
+      "candidate_type": "major_section",
+      "label": "NEGATIVE",
+      "physical_page": 5,
+      "raw_text": "Lot 4 : …………………………………………….. : …………….. DT",
+      "reason": "A Lot price row, not a major section."
+    },
+    {
+      "candidate_type": "annex_heading",
+      "label": "NEGATIVE",
+      "physical_page": 5,
+      "raw_text": "annexe 01",
+      "reason": "In-text reference to the corresponding annex, not an annex heading on this page."
+    },
+    {
+      "candidate_type": "annex_heading",
+      "label": "NEGATIVE",
+      "physical_page": 5,
+      "raw_text": "annexe 02",
+      "reason": "In-text reference to the corresponding annex, not an annex heading on this page."
+    },
+    {
+      "candidate_type": "annex_heading",
+      "label": "NEGATIVE",
+      "physical_page": 5,
+      "raw_text": "annexe 03",
+      "reason": "In-text reference to the corresponding annex, not an annex heading on this page."
+    },
+    {
+      "candidate_type": "annex_heading",
+      "label": "NEGATIVE",
+      "physical_page": 5,
+      "raw_text": "annexe 04",
+      "reason": "In-text reference to the corresponding annex, not an annex heading on this page."
+    },
+    {
+      "candidate_type": "annex_heading",
+      "label": "NEGATIVE",
+      "physical_page": 5,
+      "raw_text": "annexe 05",
+      "reason": "In-text reference to the corresponding annex, not an annex heading on this page."
+    },
+    {
+      "candidate_type": "annex_heading",
+      "label": "NEGATIVE",
+      "physical_page": 5,
+      "raw_text": "annexe 06",
+      "reason": "In-text reference to the corresponding annex, not an annex heading on this page."
+    },
+    {
+      "candidate_type": "guarantee_or_penalty_fact",
+      "label": "NEGATIVE",
+      "physical_page": 9,
+      "raw_text": "augmenter ou diminuer d’un maximum de 20% (vingt pour cent) des prestations",
+      "reason": "Order-volume variation threshold; not a guarantee, deadline, or penalty."
+    }
+  ],
+  "financial_deadline_subset": {
+    "status": "VERIFIED",
+    "scope": "Numeric financial, guarantee, deadline, penalty, warranty and operational-period facts explicitly stated in Articles 16, 19-22, 24-25 (printed pages 7-9). Blank template fields remain unresolved and are not scored.",
+    "source_pages_reviewed": [
+      7,
+      8,
+      9
+    ],
+    "facts": [
+      {
+        "fact_type": "offer_validity",
+        "raw_text": "reste liée par cette offre pendant 60 jours à compter du jour suivant la date limite fixée pour la réception des offres",
+        "normalized_value": 60,
+        "unit": "days",
+        "physical_page": 7,
+        "article": "16"
+      },
+      {
+        "fact_type": "award_notification_deadline",
+        "raw_text": "La notification du ou des soumissionnaire(s) retenu(s) interviendra dans un délai de 3 jours après la publication officielle des résultats",
+        "normalized_value": 3,
+        "unit": "days",
+        "physical_page": 7,
+        "article": "19"
+      },
+      {
+        "fact_type": "final_guarantee_submission_deadline",
+        "raw_text": "dans les vingt (20) jours qui suivent la notification du marché",
+        "normalized_value": 20,
+        "unit": "days",
+        "physical_page": 7,
+        "article": "20"
+      },
+      {
+        "fact_type": "final_guarantee",
+        "raw_text": "fixé à 3% du montant du marché",
+        "normalized_value": 3,
+        "unit": "percent",
+        "physical_page": 7,
+        "article": "20"
+      },
+      {
+        "fact_type": "payment_schedule",
+        "raw_text": "90% de la somme due à l’achèvement des travaux",
+        "normalized_value": 90,
+        "unit": "percent",
+        "physical_page": 8,
+        "article": "21"
+      },
+      {
+        "fact_type": "retention_guarantee",
+        "raw_text": "10% en tant que retenue de garantie",
+        "normalized_value": 10,
+        "unit": "percent",
+        "physical_page": 8,
+        "article": "21"
+      },
+      {
+        "fact_type": "retention_release_deadline",
+        "raw_text": "dans un délai ne dépassant pas les quatre mois, après la réception définitive des travaux",
+        "normalized_value": 4,
+        "unit": "months",
+        "physical_page": 8,
+        "article": "21"
+      },
+      {
+        "fact_type": "payment_deadline",
+        "raw_text": "Tous les paiements se feront au plus tard dans un délai de 45 jours",
+        "normalized_value": 45,
+        "unit": "days",
+        "physical_page": 8,
+        "article": "21"
+      },
+      {
+        "fact_type": "execution_deadline",
+        "raw_text": "dans un délai de ……. (….) JOURS",
+        "normalized_value": null,
+        "unit": "days",
+        "physical_page": 8,
+        "article": "22",
+        "label_status": "UNRESOLVED_TEMPLATE_BLANK"
+      },
+      {
+        "fact_type": "penalty_rate",
+        "raw_text": "égale à 2/1000 du montant définitif des travaux augmenté du montant des avenants éventuels",
+        "normalized_value": {
+          "numerator": 2,
+          "denominator": 1000
+        },
+        "unit": "per_day",
+        "physical_page": 8,
+        "article": "22"
+      },
+      {
+        "fact_type": "penalty_cap",
+        "raw_text": "plafonnées à 5 % du montant définitif des travaux augmenté du montant des avenants éventuels",
+        "normalized_value": 5,
+        "unit": "percent",
+        "physical_page": 8,
+        "article": "22"
+      },
+      {
+        "fact_type": "remediation_deadline",
+        "raw_text": "dans un délai de quinze (15) jours",
+        "normalized_value": 15,
+        "unit": "days",
+        "physical_page": 8,
+        "article": "22"
+      },
+      {
+        "fact_type": "warranty_period",
+        "raw_text": "Le délai de garantie est fixé à un (01) an",
+        "normalized_value": 1,
+        "unit": "year",
+        "physical_page": 8,
+        "article": "24"
+      },
+      {
+        "fact_type": "order_volume_variation",
+        "raw_text": "augmenter ou diminuer d’un maximum de 20% (vingt pour cent) des prestations",
+        "normalized_value": 20,
+        "unit": "percent",
+        "physical_page": 9,
+        "article": "25"
+      },
+      {
+        "fact_type": "variation_notice_deadline",
+        "raw_text": "dans un délai de 45 jours à compter de la réception de l’acte entraînant ladite augmentation",
+        "normalized_value": 45,
+        "unit": "days",
+        "physical_page": 9,
+        "article": "25"
+      }
+    ]
+  }
 }

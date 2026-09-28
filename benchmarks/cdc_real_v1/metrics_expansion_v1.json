@@ -1,0 +1,53 @@
+{
+  "schema_version": "cdc_benchmark_expansion_metrics_v1",
+  "source_document": "CDC-DEV-001",
+  "prediction": "predictions_v2/CDC-DEV-001.prediction.json",
+  "article_inventory": {
+    "status": "EXHAUSTIVE_SOURCE_REVIEWED_INVENTORY",
+    "expected": 36,
+    "predicted": 36,
+    "tp": 36,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0
+  },
+  "negative_candidate_measurements": {
+    "status": "REVIEWED_CANDIDATE_NEGATIVES_ONLY",
+    "lot_as_major_section": {
+      "reviewed_negatives": 8,
+      "incorrect_major_section_matches": 0,
+      "candidate_rejection_rate": 1.0
+    },
+    "annex_reference_as_heading": {
+      "reviewed_negatives": 6,
+      "incorrect_heading_matches": 0,
+      "candidate_rejection_rate": 1.0
+    },
+    "volume_variation_as_guarantee_or_penalty": {
+      "reviewed_negatives": 1,
+      "incorrect_fact_matches": 0,
+      "candidate_rejection_rate": 1.0
+    }
+  },
+  "financial_deadline_subset": {
+    "status": "EXHAUSTIVE_WITHIN_DECLARED_FACT_SCOPE; NOT A CORPUS_WIDE_REQUIREMENT_SCORE",
+    "scope": "Numeric financial, guarantee, deadline, penalty, warranty and operational-period facts explicitly stated in Articles 16, 19-22, 24-25 (printed pages 7-9). Blank template fields remain unresolved and are not scored.",
+    "expected_nonblank_facts": 14,
+    "unresolved_blank_template_facts": 1,
+    "facts_with_type_and_article_candidate": 10,
+    "candidate_coverage_within_scope": 0.7142857142857143,
+    "candidate_page_provenance_correct": 1.0,
+    "normalized_value_correct_on_located_candidates": 0.9,
+    "exact_normalized_fact_recall_within_scope": 0.6428571428571429
+  },
+  "boq_negative_examples": {
+    "status": "NOT_MEASURED",
+    "reason": "No locally available source-reviewed document without a BOQ was identified."
+  },
+  "scanned_arabic": {
+    "document_id": "CDC-DEV-009",
+    "ground_truth_status": "DRAFT",
+    "scored": false
+  }
+}
