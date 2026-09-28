@@ -1,4 +1,6 @@
 from decimal import Decimal
+import csv
+from io import StringIO
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -11,6 +13,8 @@ from app.boq.extractor import extract_male_municipal_from_document, extract_male
 from app.boq.normalize import normalize_header, parse_french_decimal
 from app.boq.detect import normalize_male_municipal_header
 from app.boq.models import BoundingBox
+from app.boq.export import CSV_COLUMNS, export_boq_csv
+from app.boq.validate import validate_document, validate_row
 try:
     from app.document_intelligence.schemas import DocumentDiagnostics, DocumentResult, EvidenceElement, PageResult
 except ModuleNotFoundError:
@@ -136,9 +140,10 @@ def test_empty_template_recognized_without_inventing_financial_values():
 def test_missing_cell_is_not_fabricated_and_arithmetic_error_is_detected():
     missing = extract_male_municipal_v1(filled(missing=True))
     assert missing.rows[0].quantity.parse_status == "MISSING"
-    assert missing.rows[0].validation_status == "NOT_CHECKABLE"
+    assert missing.rows[0].validation_status == "NEEDS_REVIEW"
     wrong = extract_male_municipal_v1(filled(bad_total=True))
-    assert wrong.rows[0].validation[0].status == "INVALID"
+    arithmetic = {check.rule: check for check in wrong.rows[0].validation}
+    assert arithmetic["quantity_x_unit_price_ht"].status == "INVALID"
 
 
 def test_missing_article_anchor_keeps_row_geometry_and_requests_review():
@@ -147,6 +152,34 @@ def test_missing_article_anchor_keeps_row_geometry_and_requests_review():
     assert result.rows[0].article.normalized_value is None
     assert result.rows[0].quantity.normalized_value == Decimal("2")
     assert result.rows[0].validation_status == "NEEDS_REVIEW"
+
+
+def test_populated_rows_report_missing_fields_and_document_slot_duplicate_checks():
+    result = extract_male_municipal_v1(filled())
+    result.rows[0].designation = result.rows[0].designation.model_copy(update={
+        "normalized_value": None, "raw_value": None, "parse_status": "MISSING", "value_origin": "MISSING"})
+    validate_row(result.rows[0])
+    assert "designation_present" in {check.rule for check in result.rows[0].validation}
+    result.rows[1].article = result.rows[0].article.model_copy(deep=True)
+    validate_document(result)
+    checks = {check.rule: check for check in result.validation}
+    assert checks["expected_row_slots"].status == "VALID"
+    assert checks["duplicate_item_numbers"].status == "NEEDS_REVIEW"
+
+
+def test_csv_export_preserves_french_utf8_and_nulls_as_empty_cells():
+    result = extract_male_municipal_v1(filled())
+    result.rows[0].designation.normalized_value = "Réfection réseau – façade"
+    result.rows[0].quantity.normalized_value = None
+    text = export_boq_csv([result])
+    encoded = text.encode("utf-8")
+    decoded = encoded.decode("utf-8")
+    rows = list(csv.DictReader(StringIO(decoded)))
+    assert tuple(rows[0]) == CSV_COLUMNS
+    assert rows[0]["designation"] == "Réfection réseau – façade"
+    assert rows[0]["quantity"] == ""
+    assert rows[0]["page"] == "1"
+    assert "0.0" not in rows[0]["quantity"]
 
 
 def test_ocr_aliases_and_shifted_geometry():
@@ -190,7 +223,7 @@ def test_all_pdf_fixture_variants_extract_the_controlled_rows():
     root = Path(__file__).resolve().parents[2] / "datasets/boq/male_municipal_maintenance_v1/synthetic"
     cases = {"fixture_a_clean.pdf": ("VALID", Decimal("350.000")),
              "fixture_b_french_numbers.pdf": ("VALID", Decimal("350.100")),
-             "fixture_d_missing_quantity.pdf": ("NOT_CHECKABLE", Decimal("350.000")),
+             "fixture_d_missing_quantity.pdf": ("NEEDS_REVIEW", Decimal("350.000")),
              "fixture_e_arithmetic_error.pdf": ("INVALID", Decimal("350.100")),
              "fixture_f_shifted_geometry.pdf": ("VALID", Decimal("350.000"))}
     for name, (expected_row_state, expected_total) in cases.items():
