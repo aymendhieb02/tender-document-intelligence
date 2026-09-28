@@ -44,6 +44,7 @@ def test_frontend_adapts_backend_v2_and_does_not_claim_false_pdf_highlights():
 def test_tender_workspace_uses_real_v2_modules_and_truthful_empty_states():
     api = (ROOT / "app/static/app/api.js").read_text(encoding="utf-8")
     cdc = (ROOT / "app/static/app/pages/cdc-workspace.js").read_text(encoding="utf-8")
+    boq = (ROOT / "app/static/app/pages/boq-workspace.js").read_text(encoding="utf-8")
     assert 'payload.contract_version === "2.0"' in api
     assert 'payload.modules?.summary?.data' in cdc
     assert 'payload.modules?.requirements_intelligence?.data' in cdc
@@ -54,6 +55,9 @@ def test_tender_workspace_uses_real_v2_modules_and_truthful_empty_states():
     assert 'item.raw ?? "—"' in cdc
     assert 'Ask Tender' in cdc and 'Finances & échéances' in cdc
     assert 'askTender(payload.document_store_id, question)' in cdc
+    assert 'exportBoqCsv(file)' in cdc
+    assert 'data-boq-export' in boq
+    assert 'fetch("/api/cdc/male/export.csv"' in api
 
 
 def test_important_tender_and_invoice_routes_remain_available():
