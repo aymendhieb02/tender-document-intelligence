@@ -7,6 +7,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from app.cdc_analysis.schema import TenderDocument
+from app.tender_intelligence_v2 import compose_tender_modules
 
 
 ModuleAvailability = Literal[
@@ -62,6 +63,19 @@ class ModuleResultV2(BaseModel):
 
 class EvidenceModuleResultV2(ModuleResultV2):
     data: list[EvidenceReferenceV2] | None = None
+
+
+class FinancialFactV2(BaseModel):
+    id: str
+    category: str
+    raw: str
+    normalized: dict[str, Any] | None = None
+    status: str
+    conflict_group: str | None = None
+    evidence: list[EvidenceReferenceV2] = Field(default_factory=list)
+    evidence_scope: Literal["matched_source_element", "candidate_context"]
+    source_requirement_id: str | None = None
+    source_article_id: str | None = None
 
 
 class TenderModulesV2(BaseModel):
@@ -121,9 +135,17 @@ def _evidence_references(value: Any) -> list[EvidenceReferenceV2]:
     return list(references.values())
 
 
-def build_tender_analysis_v2(payload: dict[str, Any], *, workflow: str) -> TenderAnalysisResponseV2:
-    """Wrap a successful existing workflow payload without rerunning extraction."""
+def build_tender_analysis_v2(
+    payload: dict[str, Any], *, workflow: str, document_result: Any | None = None,
+    filename: str | None = None,
+) -> TenderAnalysisResponseV2:
+    """Compose V2 modules from the existing single-pass producer/analyzer result."""
     tender = TenderDocument.model_validate(payload["tender_document"])
+    integrated = compose_tender_modules(
+        tender,
+        document_result=document_result if document_result is not None else tender,
+        filename=filename or str(tender.metadata.get("filename") or ""),
+    )
     references = _evidence_references(payload["tender_document"])
     workflow_diagnostics = list(payload.get("diagnostics") or [])
     workflow_diagnostics.extend(
@@ -145,6 +167,37 @@ def build_tender_analysis_v2(payload: dict[str, Any], *, workflow: str) -> Tende
     else:
         boq = ModuleResultV2(availability="not_run", reason="boq_workflow_not_invoked")
 
+    requirement_items = integrated["requirements"]
+    financial_items = integrated["financial_facts"]
+    financial_data = [
+        FinancialFactV2(
+            id=item.id,
+            category=item.fact.category,
+            raw=item.fact.raw,
+            normalized=item.fact.as_dict()["normalized"],
+            status=item.fact.status,
+            conflict_group=item.fact.conflict_group,
+            evidence=[
+                EvidenceReferenceV2(
+                    evidence_id=f"{ev.document_id}:{ev.page}:{ev.element_id}",
+                    document_id=ev.document_id,
+                    page_number=ev.page,
+                    element_id=ev.element_id,
+                    bbox=ev.bbox,
+                    coordinate_space=ev.coordinate_space,
+                    source=next((source for source in ev.source_element_types if source), None),
+                )
+                for ev in item.evidence
+            ],
+            evidence_scope=item.evidence_scope,
+            source_requirement_id=item.source_requirement_id,
+            source_article_id=item.source_article_id,
+        ) for item in financial_items
+    ]
+    requirements_data = [item.model_dump(mode="json") for item in requirement_items]
+    module_diagnostics = integrated["financial_diagnostics"]
+    financial_availability: ModuleAvailability = "partial" if module_diagnostics else "available"
+
     return TenderAnalysisResponseV2(
         document=DocumentIdentityV2(
             document_id=payload["document_id"],
@@ -154,16 +207,21 @@ def build_tender_analysis_v2(payload: dict[str, Any], *, workflow: str) -> Tende
         ),
         tender_document=tender,
         modules=TenderModulesV2(
-            summary=ModuleResultV2(availability="not_implemented", reason="summary_producer_not_implemented"),
+            summary=ModuleResultV2(
+                availability="available", data=integrated["summary"].model_dump(mode="json")
+            ),
             requirements_intelligence=ModuleResultV2(
-                availability="not_implemented",
-                reason="candidate_requirements_remain_in_tender_document",
+                availability="available", data=requirements_data,
+                diagnostics=["machine_interpretations_require_review"] if requirements_data else [],
             ),
             financial_deadline_intelligence=ModuleResultV2(
-                availability="not_implemented", reason="financial_deadline_producer_not_implemented"
+                availability=financial_availability, data=[item.model_dump(mode="json") for item in financial_data],
+                diagnostics=module_diagnostics,
             ),
-            dossier=ModuleResultV2(availability="not_run", reason="dossier_workflow_not_invoked"),
-            compliance=ModuleResultV2(availability="not_implemented", reason="compliance_producer_not_implemented"),
+            dossier=ModuleResultV2(
+                availability="partial", data=integrated["dossier"], reason=integrated["dossier_reason"],
+            ),
+            compliance=ModuleResultV2(availability="unavailable", reason="not_in_wave_1"),
             boq=boq,
             evidence=EvidenceModuleResultV2(
                 availability="available" if references else "unavailable",

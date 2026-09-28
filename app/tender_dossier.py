@@ -36,6 +36,7 @@ class Evidence:
     page: int|None=None
     bbox: Any=None
     confidence: float|None=None
+    element_id: str|None=None
 @dataclass(frozen=True)
 class FactObservation:
     key: str

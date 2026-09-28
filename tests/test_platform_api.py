@@ -61,12 +61,21 @@ def test_v2_cdc_envelope_is_typed_and_does_not_change_v1_payload():
     assert contract.document.document_id == v1.json()["document_id"]
     assert contract.document.page_count == 30
     assert contract.tender_document.document_id == payload["document"]["document_id"]
-    assert contract.modules.summary.availability == "not_implemented"
-    assert contract.modules.summary.data is None
-    assert contract.modules.requirements_intelligence.availability == "not_implemented"
-    assert contract.modules.financial_deadline_intelligence.data is None
-    assert contract.modules.compliance.availability == "not_implemented"
-    assert contract.modules.dossier.availability == "not_run"
+    assert contract.modules.summary.availability == "available"
+    assert contract.modules.summary.data["document_id"] == contract.tender_document.document_id
+    assert contract.modules.requirements_intelligence.availability == "available"
+    assert isinstance(contract.modules.requirements_intelligence.data, list)
+    assert all(item["review_status"] == "NEEDS_REVIEW"
+               for item in contract.modules.requirements_intelligence.data)
+    assert contract.modules.financial_deadline_intelligence.availability in {"available", "partial"}
+    assert isinstance(contract.modules.financial_deadline_intelligence.data, list)
+    assert all(item["id"].startswith("fin-") and item["evidence"]
+               for item in contract.modules.financial_deadline_intelligence.data)
+    assert contract.modules.dossier.availability == "partial"
+    assert contract.modules.dossier.data["grouping"]["status"] == "review"
+    assert len(contract.modules.dossier.data["documents"]) == 1
+    assert contract.modules.compliance.availability == "unavailable"
+    assert contract.modules.compliance.reason == "not_in_wave_1"
     assert contract.modules.boq.availability == "not_run"
 
     references = contract.modules.evidence.data
@@ -100,6 +109,35 @@ def test_v2_errors_validate_against_existing_structured_error_contract():
     assert error.recoverable is True
     assert isinstance(error.diagnostics, list)
     assert "tender-document-intelligence-" not in response.text
+
+
+def test_v2_processes_document_once_and_uses_same_result_for_modules(tmp_path, monkeypatch):
+    from app.api import workflow_routes
+
+    data = make_pdf(tmp_path / "cdc.pdf", [
+        "Cahier des charges", "Le candidat doit fournir une offre valable 60 jours.",
+    ])
+    original = workflow_routes.DocumentProcessor
+    calls = 0
+
+    class CountingProcessor:
+        def __init__(self, *args, **kwargs):
+            self.delegate = original(*args, **kwargs)
+
+        def process(self, path):
+            nonlocal calls
+            calls += 1
+            return self.delegate.process(path)
+
+    monkeypatch.setattr(workflow_routes, "DocumentProcessor", CountingProcessor)
+    response = client.post("/api/v2/cdc/analyze", files={"file": ("CDC.pdf", data, "application/pdf")})
+    assert response.status_code == 200, response.text
+    payload = TenderAnalysisResponseV2.model_validate(response.json())
+    assert calls == 1
+    assert payload.modules.summary.availability == "available"
+    facts = payload.modules.financial_deadline_intelligence.data
+    assert any(fact["category"] == "offer_validity" and fact["normalized"] == {"value": "60", "unit": "DAY"}
+               for fact in facts)
 
 
 def test_cdc_api_processes_reference_and_serves_document():

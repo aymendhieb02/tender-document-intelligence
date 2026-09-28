@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from collections import Counter
 import json
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from app.cdc_analysis.schema import Evidence, Requirement, TenderDocument
@@ -164,11 +165,174 @@ def _total_pages(metadata: Mapping[str, Any]) -> int | None:
     return None
 
 
-def build_tender_summary(tender_document: TenderDocument | Mapping[str, Any]) -> TenderSummary:
-    """Build a stable summary from CDC structure, metadata and requirements.
+def _apply_financial_facts(
+    dates: dict[str, KeyFact],
+    financial: dict[str, KeyFact],
+    facts: Iterable[Mapping[str, Any]],
+) -> None:
+    date_targets = {
+        "submission_deadline": "submission_deadline",
+        "clarification_deadline": "clarification_deadline",
+        "offer_validity": "offer_validity",
+        "execution_period": "execution_duration",
+        "payment_deadline": "payment_deadline",
+    }
+    financial_targets = {
+        "provisional_guarantee": "provisional_guarantee",
+        "guarantee_amount": "guarantee_amount",
+        "retention": "retention",
+        "penalty_rate": "penalties",
+        "penalty_cap": "penalties",
+        "vat_rate": "vat_rate",
+        "payment_schedule": "payment_terms",
+        "payment_component": "payment_terms",
+        "warranty_period": "warranty_period",
+        "money": "amounts",
+    }
+    grouped: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
+    for item in facts:
+        category = str(item.get("category", ""))
+        if category in date_targets:
+            target = ("dates", date_targets[category])
+        else:
+            target = ("financial", financial_targets.get(category, category or "other"))
+        grouped.setdefault(target, []).append(item)
 
-    No document text is interpreted here. Absent values stay null; uncertain
-    extracted candidates retain their states, IDs and source references.
+    for (group, name), items in grouped.items():
+        values = [item.get("normalized") for item in items]
+        distinct = {json.dumps(value, ensure_ascii=False, sort_keys=True) for value in values}
+        categories = {str(item.get("category", "")) for item in items}
+        values_by_category: dict[str, set[str]] = {}
+        for item, value in zip(items, values):
+            values_by_category.setdefault(str(item.get("category", "")), set()).add(
+                json.dumps(value, ensure_ascii=False, sort_keys=True)
+            )
+        same_category_conflict = any(len(category_values) > 1 for category_values in values_by_category.values())
+        has_unresolved = any(
+            item.get("normalized") is None or item.get("status") in {"ambiguous", "conflict"}
+            for item in items
+        )
+        if (same_category_conflict
+                or any(item.get("status") in {"ambiguous", "conflict"} for item in items)):
+            state = FactState.AMBIGUOUS
+        elif has_unresolved:
+            state = FactState.NEEDS_REVIEW
+        else:
+            state = FactState.PRESENT
+        evidence_items = [
+            _evidence_ref(evidence)
+            for item in items for evidence in item.get("evidence", [])
+        ]
+        unique_evidence = {
+            (item.document_id, item.page, item.element_id): item for item in evidence_items
+        }
+        refs = sorted(unique_evidence.values(), key=lambda item: (item.page, item.element_id))
+        raw_text = "\n".join(dict.fromkeys(str(item.get("raw", "")) for item in items if item.get("raw"))) or None
+        candidate_ids = list(dict.fromkeys(str(item["id"]) for item in items if item.get("id")))
+        value: Any
+        if len(distinct) == 1 and len(categories) == 1:
+            value = values[0]
+        else:
+            value = [
+                {"id": item.get("id"), "raw": item.get("raw"), "normalized": item.get("normalized"),
+                 "status": item.get("status")}
+                for item in items
+            ]
+        projected = KeyFact(
+            state=state, value=value, raw_text=raw_text, evidence=refs,
+            candidate_ids=candidate_ids,
+            reason=("Conflicting or ambiguous normalized facts require review."
+                    if state == FactState.AMBIGUOUS else
+                    "Normalized fact is incomplete and requires review."
+                    if state == FactState.NEEDS_REVIEW else None),
+        )
+        target = dates if group == "dates" else financial
+        existing = target.get(name)
+        if existing is None or existing.state == FactState.MISSING:
+            target[name] = projected
+            continue
+
+        existing_locations = {
+            (ref.document_id, ref.page, identifier)
+            for ref in existing.evidence for identifier in (ref.element_ids or [ref.element_id])
+        }
+        projected_locations = {
+            (ref.document_id, ref.page, identifier)
+            for ref in projected.evidence for identifier in (ref.element_ids or [ref.element_id])
+        }
+        shares_evidence = bool(existing_locations & projected_locations)
+
+        def numeric(value: Any) -> str | None:
+            if isinstance(value, bool) or value is None or isinstance(value, (dict, list)):
+                return None
+            try:
+                return format(Decimal(str(value)).normalize(), "f")
+            except (InvalidOperation, ValueError):
+                return None
+
+        def equivalent(left: Any, right: Any) -> bool:
+            if json.dumps(left, ensure_ascii=False, sort_keys=True) == json.dumps(
+                right, ensure_ascii=False, sort_keys=True
+            ):
+                return True
+            if shares_evidence:
+                if isinstance(left, dict) and not isinstance(right, dict):
+                    return "value" in left and numeric(left.get("value")) == numeric(right)
+                if isinstance(right, dict) and not isinstance(left, dict):
+                    return "value" in right and numeric(right.get("value")) == numeric(left)
+            return False
+
+        matches = existing.value is None or equivalent(existing.value, projected.value)
+        if existing.state == FactState.NOT_APPLICABLE and projected.value is not None:
+            matches = False
+        combined_evidence = {
+            (ref.document_id, ref.page, ref.element_id): ref
+            for ref in [*existing.evidence, *projected.evidence]
+        }
+        combined_ids = list(dict.fromkeys([*existing.candidate_ids, *projected.candidate_ids]))
+        combined_raw = "\n".join(dict.fromkeys(
+            value for value in (existing.raw_text, projected.raw_text) if value
+        )) or None
+        if not matches:
+            target[name] = KeyFact(
+                state=FactState.AMBIGUOUS,
+                value=[
+                    {"source": "cdc_candidate", "value": existing.value,
+                     "candidate_ids": existing.candidate_ids},
+                    {"source": "financial_deadline", "value": projected.value,
+                     "candidate_ids": projected.candidate_ids},
+                ],
+                raw_text=combined_raw,
+                evidence=sorted(combined_evidence.values(), key=lambda ref: (ref.page, ref.element_id)),
+                candidate_ids=combined_ids,
+                reason="CDC candidate and financial/deadline normalization disagree; review both.",
+            )
+        else:
+            conservative_state = (
+                FactState.AMBIGUOUS
+                if FactState.AMBIGUOUS in {existing.state, projected.state}
+                else FactState.NEEDS_REVIEW
+                if FactState.NEEDS_REVIEW in {existing.state, projected.state}
+                else FactState.PRESENT
+            )
+            target[name] = KeyFact(
+                state=conservative_state, value=projected.value, raw_text=combined_raw,
+                evidence=sorted(combined_evidence.values(), key=lambda ref: (ref.page, ref.element_id)),
+                candidate_ids=combined_ids,
+                reason=("One or more matching source candidates still require review."
+                        if conservative_state == FactState.NEEDS_REVIEW else projected.reason),
+            )
+
+
+def build_tender_summary(
+    tender_document: TenderDocument | Mapping[str, Any], *,
+    classified_requirements: Iterable[Mapping[str, Any]] | None = None,
+    financial_deadline_facts: Iterable[Mapping[str, Any]] = (),
+) -> TenderSummary:
+    """Project CDC structure and explicitly supplied module outputs.
+
+    This function does not parse source text. Absent values stay null;
+    uncertain candidates retain their states, IDs and source references.
     """
     document = (tender_document if isinstance(tender_document, TenderDocument)
                 else TenderDocument.model_validate(tender_document))
@@ -194,6 +358,8 @@ def build_tender_summary(tender_document: TenderDocument | Mapping[str, Any]) ->
         else:
             financial[name] = fact
 
+    _apply_financial_facts(dates, financial, financial_deadline_facts)
+
     boq_docs = [item for item in document.detected_special_documents if item.document_type.casefold() == "boq"]
     boq_annexes = [item for item in document.annexes if item.annex_type.casefold() in {"boq", "price_schedule"}]
     boq_pages = sorted({page for item in boq_docs for page in range(item.page_start, item.page_end + 1)} |
@@ -209,10 +375,18 @@ def build_tender_summary(tender_document: TenderDocument | Mapping[str, Any]) ->
         pages=boq_pages if boq_found else None,
     )
 
-    category_counts = dict(sorted(Counter(item.type for item in requirements).items()))
+    classification_supplied = classified_requirements is not None
+    classified = list(classified_requirements or [])
+    category_counts = (
+        dict(sorted(Counter(str(item.get("category", "OTHER")) for item in classified).items()))
+        if classification_supplied else dict(sorted(Counter(item.type for item in requirements).items()))
+    )
     requirement_counts = RequirementCounts(
         by_category=category_counts,
-        review_required=sum(item.review_status == "needs_review" for item in requirements),
+        review_required=(
+            sum(str(item.get("review_status", "")).upper() == "NEEDS_REVIEW" for item in classified)
+            if classification_supplied else sum(item.review_status == "needs_review" for item in requirements)
+        ),
     )
     structure = {
         "section_count": CountFact(state=FactState.PRESENT, value=_count_sections(document)),
@@ -244,6 +418,15 @@ def build_tender_summary(tender_document: TenderDocument | Mapping[str, Any]) ->
                           evidence=[_evidence_ref(ev) for ev in item.source_evidence])
         for item in requirements if item.review_status == "needs_review"
     ]
+    if classified:
+        review_items.extend(
+            SummaryDiagnostic(
+                code="requirement_needs_review",
+                message=f"Requirement {item.get('id', 'unknown')} requires human review.",
+                evidence=[_evidence_ref(ev) for ev in item.get("evidence", [])],
+            )
+            for item in classified if str(item.get("review_status", "")).upper() == "NEEDS_REVIEW"
+        )
     review_items.extend(
         SummaryDiagnostic(code=item.code, message=item.message,
                           evidence=[_evidence_ref(ev) for ev in item.source_evidence])
