@@ -1,3 +1,9 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.venv/
+.cache/
+outputs/
+app/static/previews/
+app/static/uploads/
+*.log

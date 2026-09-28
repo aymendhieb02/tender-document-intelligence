@@ -1,0 +1,35 @@
+{
+  "synthetic_fixture": true,
+  "cache_enabled": false,
+  "fallback_used": false,
+  "models": [
+    "PP-OCRv4_mobile_det",
+    "en_PP-OCRv4_mobile_rec"
+  ],
+  "versions": {
+    "paddleocr": "3.7.0",
+    "paddlepaddle": "3.3.1",
+    "paddlex": "3.7.1",
+    "opencv-contrib-python": "4.10.0.84",
+    "PyMuPDF": "1.27.2.3",
+    "Pillow": "12.2.0",
+    "pytesseract": "0.3.13",
+    "fastapi": "0.137.2",
+    "pydantic": "2.13.4"
+  },
+  "legacy_count": 9,
+  "generic_count": 9,
+  "text_confidence_identical": true,
+  "observed_text": [
+    "BORDEREAU DES PRIX",
+    "Article",
+    "Designation",
+    "Qte",
+    "Prix Unitaire.",
+    "001",
+    "Test article.",
+    "10",
+    "25,500"
+  ],
+  "preprocessing_byte_identical_cases": 15
+}
