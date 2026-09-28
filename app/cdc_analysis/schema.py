@@ -53,11 +53,22 @@ class Article(BaseModel):
     evidence_status: EvidenceStatus = "detected"
 
 
+class Lot(BaseModel):
+    id: str
+    number: str | None = None
+    title: str | None = None
+    page_start: int
+    page_end: int
+    source_section: str | None = None
+    source_evidence: list[Evidence]
+
+
 class Section(BaseModel):
     id: str
     number: str | None = None
     title: str | None = None
     normalized_title: str | None = None
+    structural_type: Literal["section", "part"] = "section"
     start_page: int
     end_page: int
     source_evidence: list[Evidence]
@@ -137,6 +148,7 @@ class TenderDocument(BaseModel):
     title_evidence: list[Evidence] = Field(default_factory=list)
     sections: list[Section] = Field(default_factory=list)
     articles: list[Article] = Field(default_factory=list)
+    lots: list[Lot] = Field(default_factory=list)
     annexes: list[Annex] = Field(default_factory=list)
     paragraphs: list[Paragraph] = Field(default_factory=list)
     tables: list[TableReference] = Field(default_factory=list)
