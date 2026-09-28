@@ -1,19 +1,58 @@
 {
-  "status": "NO_VERIFIED_FAILURES_ASSERTED",
-  "reason": "The pending labels cannot establish correct or incorrect analyzer behavior.",
-  "failures": [],
-  "evaluation_blockers": [
+  "status": "VERIFIED_SUBSET_FAILURES",
+  "scope_note": "Examples below are grounded in reviewed source pages and current saved predictions from the end-to-end pilot. They are concrete observations in this development sample, not population-level statistical claims. CDC-DEV-009 is explicitly exploratory because its annotations remain DRAFT.",
+  "failures": [
     {
-      "category": "MISSING_SOURCE_CORPUS",
-      "detail": "24 of 25 unique seed PDFs are unavailable in this checkout."
+      "category": "ARTICLE_NUMBERING",
+      "document_id": "CDC-DEV-006",
+      "source_evidence": [{"physical_page": 2, "raw_text": "الفصل األول : تقديم طلب العروض"}, {"physical_page": 2, "raw_text": "الفصل2: املؤس سات الصغرى املعنية بطلب العروض وشروط مشاركتها"}],
+      "observed_prediction": "0 top-level articles; 0 of 3 manually selected article heading examples matched.",
+      "interpretation": "Arabic chapter/article labels using الفصل and Arabic/Arabic-Indic numbering were not represented as article records in this prediction."
     },
     {
-      "category": "HUMAN_REVIEW_REQUIRED",
-      "detail": "Available structure annotation requires page-by-page visual verification."
+      "category": "LANGUAGE",
+      "document_id": "CDC-DEV-011",
+      "source_evidence": [{"physical_page": 4, "raw_text": "الفصل2 : شروط املشاركة وطريقة إرسال العروض"}, {"physical_page": 6, "raw_text": "الفصل6: مقاييس ومنهجية فحص وتقييم العروض"}],
+      "observed_prediction": "0 top-level articles; 0 of 2 selected Arabic heading examples matched.",
+      "interpretation": "Arabic headings in a bilingual native-text specification were missed by the current article extraction path."
     },
     {
-      "category": "INCOMPLETE_PIPELINE_RUN",
-      "detail": "Document Intelligence/OCR was not rerun from source PDF."
+      "category": "ARTICLE_NUMBERING",
+      "document_id": "CDC-DEV-022",
+      "source_evidence": [{"physical_page": 3, "raw_text": "الفصل1: تقديم موضوع طلب العروض"}, {"physical_page": 5, "raw_text": "الفصل5: مدّة صلوحيّة العروض"}],
+      "observed_prediction": "0 top-level articles; 0 of 2 selected Arabic heading examples matched.",
+      "interpretation": "Arabic chapter headings were consistently absent from article predictions in this second bilingual tender."
+    },
+    {
+      "category": "SECTION_BOUNDARY",
+      "document_id": "CDC-DEV-007",
+      "source_evidence": [{"physical_page": 3, "raw_text": "Partie I Cahier des Clauses Administratives Particulières"}, {"physical_page": 11, "raw_text": "Partie II"}],
+      "observed_prediction": "Expected major sections I and II at pages 3 and 11; prediction instead returned sections II – Lot 2 and III – Lot 3, starting on pages 14 and 16. Exact section scoring: TP 0, FP 2, FN 2.",
+      "interpretation": "Lot headings appear to have been selected as top-level sections while the source's two major parts were missed."
+    },
+    {
+      "category": "SECTION_BOUNDARY",
+      "document_id": "CDC-DEV-017",
+      "source_evidence": [{"physical_page": 2, "raw_text": "Partie I Cahier des Clauses Administratives Particulières"}, {"physical_page": 9, "raw_text": "Partie II"}],
+      "observed_prediction": "Expected two reviewed major sections; prediction returned 0 sections. Exact section scoring: TP 0, FP 0, FN 2.",
+      "interpretation": "The current top-level section extractor missed both explicitly labeled administrative and technical parts in this native-text document."
+    },
+    {
+      "category": "SCANNED_DOCUMENT",
+      "document_id": "CDC-DEV-009",
+      "label_status": "DRAFT_EXPLORATORY_NOT_SCORED",
+      "source_evidence": [{"physical_page": 1, "raw_text": "كراس الشروط الاستشارة عدد 06/2026"}, {"physical_page": 2, "raw_text": "الجزء الأول"}],
+      "observed_prediction": "After OCR of all 37 pages (1,192 evidence elements), prediction returned 0 sections and 0 top-level articles.",
+      "interpretation": "Useful scan/OCR investigation lead; not counted as verified failure until the relevant source structure receives human page review."
     }
+  ],
+  "recurring_patterns": [
+    {"pattern": "Article extraction misses Arabic الفصل headings", "evidence_documents": ["CDC-DEV-006", "CDC-DEV-011", "CDC-DEV-022"], "strength": "repeated in three source-reviewed documents; article annotations are representative examples, not exhaustive recall inventories"},
+    {"pattern": "Top-level section extraction misses or misidentifies Partie I/II boundaries", "evidence_documents": ["CDC-DEV-007", "CDC-DEV-017"], "strength": "verified in two complete major-section inventories"}
+  ],
+  "evaluation_blockers": [
+    {"category": "INCOMPLETE_GROUND_TRUTH", "detail": "Only three documents have complete reviewed major-section inventories; article and requirement labels are positive samples, so their precision and exhaustive recall are not measurable."},
+    {"category": "SCANNED_GROUND_TRUTH_DRAFT", "detail": "The scanned 37-page Arabic CDC-DEV-009 was processed end-to-end, but its structure labels remain DRAFT and are excluded from accuracy scoring."},
+    {"category": "LIMITED_DIVERSITY", "detail": "Known issuing organizations are heavily concentrated: 20 documents belong to the Presidency of the Government; other source-reviewed organizations are sparse."}
   ]
 }

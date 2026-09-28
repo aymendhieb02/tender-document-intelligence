@@ -1,0 +1,39 @@
+{
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "files_found": 26,
+  "valid_pdfs": 26,
+  "unique_valid_pdfs": 25,
+  "exact_duplicate_files": 1,
+  "invalid_pdfs": 0,
+  "matched_agent6_unique": 25,
+  "new_local_unique": 0,
+  "missing_from_agent6_local": 0,
+  "missing_agent6_hashes": [],
+  "duplicates": [
+    {
+      "sha256": "c489949ecb3f71c9e2327cb7d72fdeb898c318d31c43bc32e909f17cc3d3b4a8",
+      "kept_document_id": "CDC-DEV-018",
+      "files": [
+        "Présidence du Gouvernement — Maintenance des photocopieurs/cahier-des-charges-appel-offres-10-2025-pg-2025 (1).pdf",
+        "Présidence du Gouvernement — Maintenance des photocopieurs/cahier-des-charges-appel-offres-10-2025-pg-2025.pdf"
+      ]
+    }
+  ],
+  "invalid_files": [],
+  "seed_inventory_rows": 26,
+  "note": "File paths are relative to the user-provided corpus root. Role and language fields await content review.",
+  "curated_role_counts": {
+    "CDC": 3,
+    "UNKNOWN": 2,
+    "OTHER": 1,
+    "NOTICE": 5,
+    "DAO": 14
+  },
+  "review_status_counts": {
+    "HUMAN_REVIEW_REQUIRED": 1,
+    "OCR_PENDING": 2,
+    "REVIEWED_OCR": 1,
+    "REVIEWED_SOURCE_TEXT": 20,
+    "REVIEWED_VISUAL_SOURCE": 1
+  }
+}

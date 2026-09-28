@@ -66,3 +66,60 @@ The corpus is explicitly a **development corpus**. After failure-driven iteratio
 - Full project suite: 214 passed, 2 skipped, 2 failed. Both failures are `tests/document_intelligence/test_recognizer.py::test_tesseract_fallback_maps_geometry_or_reports_missing` variants; the environment lacks the `pytesseract` Python package. No test was changed to mask this environment issue.
 - `git diff --check`: clean before staging; staged diff check repeated before commit.
 - Source PDFs are not added or modified by this change. The only PDF inspected was read-only.
+
+## LOCAL CORPUS BASELINE — continuation on `agent/cdc-benchmark`
+
+This section supersedes the old availability blocker for the continued run above. The earlier one-document consumer-only pilot remains preserved in the history above; the figures below are from the user-provided local corpus and a new PDF-to-Document Intelligence-to-Analyzer run. Raw files remain outside the repository.
+
+### Inventory, reconciliation, and curation
+
+Recursive inventory found 26 PDF files: all 26 are valid, representing 25 unique SHA-256 hashes, with one exact duplicate and no invalid PDFs. All 25 unique hashes match Agent 6's seed inventory; there are zero new local unique documents and zero missing seed hashes. Classification was based on source content and reviewed evidence, not Agent 6's role hints. Curation counts over 25 unique documents: DAO 14, NOTICE 5, CDC 3, OTHER 1, UNKNOWN 2; CCAP, CCTP, REGLEMENT, BOQ, DEVIS_ESTIMATIF, SOUMISSION, and ANNEX do not occur as primary curated document roles. Some DAO PDFs contain annexes and BOQ content. These roles are mutually exclusive primary document labels, not an inventory of embedded components.
+
+The inventory profiles are 20 native-text PDFs, 4 scanned PDFs, and 1 mixed PDF. Language counts: French 11, bilingual 10, Arabic 2, unknown 2. Issuing-organization evidence is concentrated: Presidency of the Government 20, Al Karama Holding 1, Ministry of Communication Technologies 1, unknown 2, and one template with no issuing organization asserted. One cross-file group is evidenced: `DOSSIER-10-2025` contains the standalone CDC and a composite notice-plus-CDC DAO for tender 10/2025. Other dossier links remain null unless source evidence supports them. See `benchmarks/cdc_real_v1/corpus_manifest.csv` and `reconciliation.json` for file-level audit fields and counts.
+
+### Pilot, frozen pipeline, and annotation coverage
+
+Seven documents were selected: CDC-DEV-001, 006, 007, 009, 011, 017, and 022. They cover 18–51 pages, French/Arabic/bilingual content, native and scanned inputs, works/goods/IT/services, and generic template plus live-dossier structures. Organization diversity is limited; five selected documents are from the Presidency of the Government, one is from the Ministry of Communication Technologies, and the reusable template has no asserted issuer. Six selected documents have VERIFIED source-grounded annotations; CDC-DEV-009 has useful cover/scan notes but remains DRAFT and is excluded from scoring. The seven selected documents provide 26 source-verified requirement examples, 19 selected article-heading examples, three complete major-section inventories, three complete annex inventories (27 annexes), and three verified BOQ-positive documents. Article and requirement annotations are samples, not exhaustive inventories. Each fact includes source text and 1-based physical page evidence.
+
+The frozen baseline is tested commit `cc6e4566d62954f0bc4d0820f833dbd39e9b5994`, Document Intelligence contract `1.0`, and `CDC_ANALYZER_BASELINE_V1`. The production analyzer was not changed. Native inputs were run with `DocumentProcessor(mode=auto,use_cache=False,allow_fallback=True)`. The scanned CDC-DEV-009 was processed end-to-end through the existing Document Intelligence pipeline for all 37 pages (37 OCR pages, 0 fallback pages, 1,192 evidence elements); that fresh `DocumentResult` from the full source-PDF run was then passed into the Analyzer. Its evidence source was PaddleOCR. Other pilot documents used native PDF text only, except CDC-DEV-007 and CDC-DEV-017, which include PaddleOCR evidence on one page each. No old sidecar was used as a substitute for PDF processing. Per-document evidence sources, predictions, and run metadata are in `results.json`, `predictions/`, and local ignored `document_results/`.
+
+| Document | Pages / OCR pages | Predicted sections / top-level articles / annexes / requirements | Label status |
+|---|---:|---:|---|
+| CDC-DEV-001 | 30 / 0 | 5 / 0 / 6 / 62 | VERIFIED |
+| CDC-DEV-006 | 51 / 0 | 3 / 0 / 0 / 0 | VERIFIED |
+| CDC-DEV-007 | 48 / 1 | 2 / 22 / 14 / 87 | VERIFIED |
+| CDC-DEV-009 | 37 / 37 | 0 / 0 / 0 / 5 | DRAFT; not scored |
+| CDC-DEV-011 | 21 / 0 | 0 / 0 / 0 / 6 | VERIFIED |
+| CDC-DEV-017 | 30 / 1 | 0 / 24 / 7 / 45 | VERIFIED |
+| CDC-DEV-022 | 18 / 0 | 0 / 0 / 0 / 1 | VERIFIED |
+
+### Baseline scores
+
+These are category-specific subset measurements, not an overall accuracy score. Section and annex precision/recall use complete manually reviewed inventories only (sections: three documents; annexes: three documents). Article labels are selected positives, so article precision/recall are **not measurable**; the source-verified example hit rate is 12/19 (63.2%). Requirement labels are also positive examples, so precision and exhaustive recall are **not measurable**; 14/26 reviewed facts were matched (53.8% sample hit rate). Of the 14 matched facts, 5 normalized values were correct (35.7%) and all 14 predicted physical-page attributions matched source pages (100%). BOQ presence was found for all three verified BOQ-positive documents (3/3); the prediction page ranges overlapped source pages in all three (3/3). This small positive-only sample does not estimate BOQ specificity.
+
+| Metric | Result | Scope |
+|---|---:|---|
+| Section precision / recall | 71.4% / 55.6% (TP 5, FP 2, FN 4) | 3 complete section inventories |
+| Article precision / recall | Not measurable | Selected positive examples only |
+| Article heading sample hit rate | 63.2% (12/19) | 6 source-reviewed documents |
+| Annex precision / recall | 100% / 100% (TP 27, FP 0, FN 0) | 3 complete annex inventories |
+| Requirement precision / exhaustive recall | Not measurable | Positive facts only |
+| Requirement fact sample hit rate | 53.8% (14/26) | 6 verified documents |
+| Normalized-value correctness | 35.7% (5/14) | Matched fact examples with a value comparison |
+| Physical-page provenance | 100% (14/14) | Matched fact examples |
+| BOQ presence / page detection | 100% / 100% (3/3 / 3/3) | Verified BOQ-positive docs; page metric is overlap |
+| Scanned-document accuracy | Not measurable | 1 processed scan, labels DRAFT |
+
+Per-document TP/FP/FN and sample-level results are captured in `results.json`; the canonical aggregate is `metrics.json`. A prediction count is not a score. Null metrics mean unavailable due annotation scope, not zero analyzer performance.
+
+### Failure evidence and V2 decision
+
+The source-linked cases in `failures.json` identify two repeated signals: Arabic `الفصل` article headings were absent from predictions in three source-reviewed documents (006, 011, 022), and top-level `Partie I/II` boundaries were missed or replaced by lot headings in two complete section inventories (007 and 017). These are repeated in this sample, not proof of corpus-wide systematic behavior. The 37-page scanned Arabic document also produced no sections/articles after OCR, but remains an unscored investigation lead because its labels are DRAFT. **Decision gate: YES, there is enough verified failure evidence to design a targeted CDC Analyzer V2 investigation.** Five selected documents are real tender dossiers with verified source annotations and end-to-end predictions; the reusable CDC template provides a sixth verified structure. The repeated, page-grounded Arabic article-heading failures across three tender documents and the two section-boundary failures provide concrete engineering targets. This is a design signal only: article/requirement labels are samples, only three documents have complete major-section/annex inventories, and scanned structure labels remain draft. Do not use these partial scores as broad V2 acceptance criteria; expand structural annotation and use a separate held-out corpus for final evaluation. The development corpus must not later be represented as an unseen V2 test set.
+
+### OCR dependency and verification
+
+`pytesseract==0.3.13` is pinned in `requirements.txt`, so it is a required Python project dependency for the Tesseract fallback path. The fallback also requires the external Tesseract executable and language data. The project virtual environment imports pytesseract 0.3.13 and the Tesseract executable is installed; the module's default executable lookup is `tesseract`, so the test environment PATH must expose that executable. No OCR production behavior or skip policy was changed for this baseline.
+
+Raw PDFs are not committed. `document_results/` contains only ignored local intermediates; tracked outputs are hashes, relative filenames, reviewed metadata/evidence, predictions, metrics, and reports. The source corpus may guide future V2 development, but a newly acquired held-out corpus is required for final evaluation.
+
+Continuation verification: benchmark artifact tests **4 passed**; CDC Analyzer tests **28 passed**; Document Intelligence tests **42 passed, 1 skipped**; full project suite **221 passed, 1 skipped**. The full suite emitted one upstream Starlette deprecation warning. `pytesseract` 0.3.13 imported from the project virtual environment; the Tesseract executable was added to PATH for these runs. No OCR-related test failed or was changed. `git diff --check` was run before commit.

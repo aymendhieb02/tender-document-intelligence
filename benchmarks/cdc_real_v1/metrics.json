@@ -1,17 +1,39 @@
 {
-  "status": "NOT_MEASURABLE",
-  "reason": "No source-linked ground truth has passed human visual verification; do not treat pending labels as negatives.",
-  "section_precision": null,
-  "section_recall": null,
+  "status": "MEASURED_ON_VERIFIED_SUBSETS",
+  "coverage_note": "Section/annex metrics use only categories with complete source-reviewed labels. Article and requirement records are curated positive examples, so precision is not measurable; their recall/sample hit rate is reported only as an evidence count.",
+  "section_precision": 0.7142857142857143,
+  "section_recall": 0.5555555555555556,
+  "section_counts": {
+    "tp": 5,
+    "fp": 2,
+    "fn": 4
+  },
   "article_precision": null,
   "article_recall": null,
-  "annex_precision": null,
-  "annex_recall": null,
+  "article_heading_sample_recall": 0.631578947368421,
+  "article_heading_sample_counts": {
+    "matched": 12,
+    "expected": 19
+  },
+  "annex_precision": 1.0,
+  "annex_recall": 1.0,
+  "annex_counts": {
+    "tp": 27,
+    "fp": 0,
+    "fn": 0
+  },
   "requirement_precision": null,
-  "requirement_recall": null,
-  "normalized_value_correctness": null,
-  "page_provenance_accuracy": null,
-  "boq_detection": null,
-  "native_performance": null,
-  "scanned_performance": null
+  "requirement_recall_on_verified_fact_samples": 0.5384615384615384,
+  "requirement_counts": {
+    "detected": 14,
+    "expected": 26,
+    "values_correct": 5,
+    "pages_correct": 14
+  },
+  "normalized_value_correctness_on_detected": 0.35714285714285715,
+  "page_provenance_accuracy_on_detected": 1.0,
+  "boq_presence_recall": 1.0,
+  "boq_page_detection_recall": 1.0,
+  "native_performance": "reported via per-document source profile; no aggregate modality accuracy claim",
+  "scanned_performance": "1 full 37-page exploratory run; ground truth remains draft, so accuracy is not measurable"
 }
