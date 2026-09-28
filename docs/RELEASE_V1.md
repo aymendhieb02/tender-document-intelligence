@@ -24,7 +24,7 @@ This is a **development corpus, not held-out evaluation**. Article and requireme
 - Requirement extraction is incomplete; financial value normalization remains partial.
 - The scanned Arabic example is DRAFT and unscored; OCR and Arabic extraction need further work.
 - BOQ results are limited to the reviewed development examples, not final BOQ generalization.
-- The release changes add no raw tender PDFs, generated prediction payloads, or DocumentResult intermediates. The pre-existing main branch still contains its reference PDF and baseline DocumentResult fixtures; those files are unchanged by this release and remain available for the current regression tests.
+- The release changes add no raw tender PDFs, generated prediction payloads, or DocumentResult intermediates. The pre-existing main branch still contains reference and synthetic BOQ test PDFs plus baseline DocumentResult fixtures; those files are unchanged by this release and remain available for the current regression tests. The local development-corpus archive and generated V2 intermediates remain ignored and uncommitted.
 
 ## Test status
 
