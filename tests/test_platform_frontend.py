@@ -30,8 +30,12 @@ def test_frontend_adapts_backend_v1_and_does_not_claim_false_pdf_highlights():
     assert '"/api/cdc/analyze"' in api
     assert '"/api/cdc/male/analyze"' in api
     assert "payload.boq_results?.[0]?.result" in api
-    assert "fetch(url)" in viewer
-    assert "if (!normalized || this.root.querySelector(\"iframe\"))" in viewer
+    assert "/pages/${this.page}.png" in viewer
+    assert "this.sourceUrl" in viewer and "physicalPageForEvidence(evidence)" in viewer
+    assert 'this.page = Math.max(1, Math.min(maximum, page || 1));' in viewer
+    assert "renderWidth()" in viewer and "sizeSourceImage(image)" in viewer
+    assert "this.setEvidence(this.evidence);" not in viewer.split("goToPage(page)", 1)[1].split("refreshSource()", 1)[0]
+    assert "if (!normalized || this.sourceUrl || this.root.querySelector(\"iframe\"))" in viewer
     assert 'fetch("/api/invoices/analyze"' in invoice
 
 
