@@ -9,6 +9,7 @@ from fastapi.responses import Response
 import fitz
 
 from app.api.document_store import document_store
+from app.api.contracts_v2 import TenderAnalysisResponseV2, build_tender_analysis_v2
 from app.core.config import settings
 from app.core.schemas import ProcessInvoiceResponse
 from app.cdc_analysis import CDCAnalyzer
@@ -176,6 +177,20 @@ async def analyze_ministry(file: UploadFile = File(...)) -> dict[str, Any]:
         "boq_results": boq_results,
         "diagnostics": diagnostics,
     }
+
+
+@router.post("/v2/cdc/analyze", response_model=TenderAnalysisResponseV2)
+async def analyze_cdc_v2(file: UploadFile = File(...)) -> TenderAnalysisResponseV2:
+    """Versioned envelope over the existing deterministic CDC workflow."""
+    payload = await analyze_cdc(file)
+    return build_tender_analysis_v2(payload, workflow="cdc")
+
+
+@router.post("/v2/cdc/male/analyze", response_model=TenderAnalysisResponseV2)
+async def analyze_ministry_v2(file: UploadFile = File(...)) -> TenderAnalysisResponseV2:
+    """Versioned envelope over the existing Ministry/BOQ workflow."""
+    payload = await analyze_ministry(file)
+    return build_tender_analysis_v2(payload, workflow="ministry_boq")
 
 
 @router.post("/invoices/analyze", response_model=ProcessInvoiceResponse)
