@@ -1,4 +1,4 @@
-import { analyzeTenderDocument } from "../api.js?v=platform-refactor-5";
+import { analyzeTenderDocument } from "../api.js?v=platform-refactor-qa1";
 import { DocumentViewer } from "../components/document-viewer.js?v=platform-refactor-5";
 import { createEvidenceController } from "../components/evidence-highlight.js?v=platform-refactor-5";
 import { originBadge, statusBadge } from "../components/status-badge.js?v=platform-refactor-5";

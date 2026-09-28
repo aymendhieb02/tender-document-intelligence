@@ -1,4 +1,4 @@
-import { analyzeTenderDocument } from "../api.js?v=platform-refactor-5";
+import { analyzeTenderDocument } from "../api.js?v=platform-refactor-qa1";
 import { setActiveAnalysis } from "../state.js?v=platform-refactor-5";
 
 const workflowCopy = {

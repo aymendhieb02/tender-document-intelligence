@@ -313,12 +313,20 @@ async function renderSourceDocument(data) {
   const frameHost = panel.querySelector(".invoice-source-frame");
   let objectUrl;
   try {
-    const response = await fetch(data.document_url);
-    if (!response.ok) throw new Error("Le document original n’est pas disponible.");
-    objectUrl = URL.createObjectURL(await response.blob());
+    const previews = pages
+      .filter(page => page.url)
+      .sort((a, b) => Number(a.page || a.page_number || 0) - Number(b.page || b.page_number || 0));
+    if (!previews.length) {
+      const response = await fetch(data.document_url);
+      if (!response.ok) throw new Error("Le document original n’est pas disponible.");
+      objectUrl = URL.createObjectURL(await response.blob());
+    }
     const state = { page: 1, zoom: "page-width" };
     const renderFrame = () => {
-      frameHost.innerHTML = `<iframe title="Document original de la facture" src="${objectUrl}#toolbar=0&navpanes=0&page=${state.page}&zoom=${state.zoom}"></iframe>`;
+      const preview = previews.find(item => Number(item.page || item.page_number) === state.page);
+      frameHost.innerHTML = preview
+        ? `<img class="invoice-source-preview" src="${escapeHtml(preview.url)}" alt="Page ${state.page} du document original">`
+        : `<iframe title="Document original de la facture" src="${objectUrl}#toolbar=0&navpanes=0&page=${state.page}&zoom=${state.zoom}"></iframe>`;
       panel.querySelector("input[type=number]").value = state.page;
     };
     renderFrame();
@@ -2565,7 +2573,6 @@ function setLoading(isLoading, message = t("processing.default")) {
   if (loadingText) loadingText.textContent = message;
   loading.classList.toggle("hidden", !isLoading);
   processBtn.disabled = isLoading;
-  demoButtons.forEach((button) => { button.disabled = isLoading; });
 }
 
 function showError(message) {

@@ -1,6 +1,6 @@
 import { mountShell } from "./components/shell.js?v=platform-refactor-5";
 import { renderDashboard } from "./pages/dashboard.js?v=platform-refactor-5";
-import { renderCdcUpload } from "./pages/cdc-upload.js?v=platform-refactor-5";
+import { renderCdcUpload } from "./pages/cdc-upload.js?v=platform-refactor-qa1";
 import { renderInvoicePage } from "./pages/invoice.js?v=platform-refactor-5";
 
 const path = window.location.pathname.replace(/\/$/, "") || "/";
@@ -21,7 +21,7 @@ if (invoiceContent || path === "/invoice" || path.startsWith("/invoice/result/")
 }
 
 async function renderCdcRoute(outlet, route) {
-  const { renderCdcWorkspace } = await import("./pages/cdc-workspace.js");
+  const { renderCdcWorkspace } = await import("./pages/cdc-workspace.js?v=platform-refactor-qa1");
   renderCdcUpload(outlet, {
     workflow: route.startsWith("/cdc/male") ? "male" : "cdc",
     showUnavailable: route.includes("/result/"),

@@ -15,9 +15,15 @@ export async function analyzeTenderDocument(file, workflow) {
     error.diagnostics = detail.diagnostics || [];
     throw error;
   }
-  if (!payload.tender_document || !Array.isArray(payload.pages)) {
+  if (!payload.tender_document || (!Array.isArray(payload.pages) && !Number.isInteger(payload.page_count))) {
     throw new Error("La réponse ne respecte pas le contrat d’analyse attendu.");
   }
+  // The general CDC endpoint returns page metadata while the specialized
+  // Ministry endpoint returns only page_count. Normalize both API V1 shapes
+  // for the shared document workspace without changing either contract.
+  const pages = Array.isArray(payload.pages)
+    ? payload.pages
+    : Array.from({ length: payload.page_count }, (_, index) => ({ page_number: index + 1 }));
   const firstBoq = payload.boq_results?.[0]?.result;
   return {
     ...payload,
@@ -25,7 +31,7 @@ export async function analyzeTenderDocument(file, workflow) {
       document_id: payload.document_id,
       source_type: payload.source_type,
       mode: "Document Intelligence",
-      pages: payload.pages,
+      pages,
       diagnostics: { processing_ms: null },
     },
     boq_document: firstBoq || { detected: false, rows: [], diagnostics: payload.diagnostics || [] },
