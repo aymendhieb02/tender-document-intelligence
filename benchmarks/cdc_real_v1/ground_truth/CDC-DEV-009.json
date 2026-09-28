@@ -1,0 +1,21 @@
+{
+  "schema_version": "cdc_ground_truth_v1",
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "document_id": "49c608e88db3608085b8723d8a46711ac38ed80d037f502da31b390b887d7d81",
+  "corpus_document_id": "CDC-DEV-009",
+  "source_sha256": "49c608e88db3608085b8723d8a46711ac38ed80d037f502da31b390b887d7d81",
+  "filename": "C.C._Consultaion_06-2026-26022026142257.pdf",
+  "status": "DRAFT",
+  "reviewer": null,
+  "verified_at": null,
+  "verified_fields": ["title_page_role", "tender_reference", "organization", "submission_deadline"],
+  "document_metadata": {"page_count": 37, "organization": "Ministry of Communication Technologies", "language": "ARABIC", "text_profile": "scanned", "document_role": "CDC", "procurement_type": "GOODS", "year": 2026, "tender_reference": "06/2026", "dossier_id": null, "document_role_evidence": [{"physical_page": 1, "raw_text": "كراس الشروط الاستشارة عدد 06/2026"}, {"physical_page": 1, "raw_text": "لاقتناء معدات إعلامية"}]},
+  "expected_major_sections": [{"number": "I", "title": "الجزء الأول - كراس الشروط الإدارية الخاصة", "physical_page_start": 2, "physical_page_end": null, "evidence": {"physical_page": 2, "raw_text": "الجزء الأول"}}],
+  "article_heading_examples": [{"number": "1", "title": "تقديم موضوع الاستشارة", "physical_page": 2, "evidence": {"physical_page": 2, "raw_text": "الفصل الأول"}}],
+  "article_annotation_scope": "Draft examples from OCR/source-page review only; the complete structure and requirements have not been manually annotated.",
+  "expected_annexes": [],
+  "important_requirements": [{"requirement_type": "submission_deadline", "raw_text": "آخر أجل لقبول العروض يوم الخميس 12 مارس 2026 على الساعة منتصف النهار (12:00)", "normalized_value": "2026-03-12 12:00", "unit": "local time", "physical_page": 1, "section": null, "article": null, "mandatory": true, "notes": "Transcribed from visual inspection of the scanned cover. Remaining facts require source review."}],
+  "boq": {"boq_present": null, "pages": [], "document_role": null, "table_structure": null, "row_count": null, "blank_or_completed": null},
+  "document_structure_notes": "Entire 37-page source was processed through Document Intelligence/PaddleOCR. Arabic OCR evidence exists, but remaining pages and analyzer omissions require manual page-by-page review before scoring.",
+  "annotator_notes": "This annotation is intentionally DRAFT and is not included in verified accuracy metrics."
+}

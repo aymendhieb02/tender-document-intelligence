@@ -19,3 +19,14 @@ app/static/uploads/
 *.log
 .idea/
 .vscode/
+
+# Public tender acquisition payloads are reproducible and stay out of Git.
+datasets/cdc_real/raw/*
+!datasets/cdc_real/raw/README.md
+
+# Generated CDC pilot intermediates and prediction payloads (reproducible locally).
+/benchmarks/cdc_real_v1/predictions/
+/benchmarks/cdc_real_v1/predictions_v2/
+/benchmarks/cdc_real_v1/document_results/
+/benchmarks/cdc_real_v1/document_results_v2/
+/benchmarks/cdc_real_v1/*.rar

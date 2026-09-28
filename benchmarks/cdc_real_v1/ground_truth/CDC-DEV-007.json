@@ -1,0 +1,50 @@
+{
+  "schema_version": "cdc_ground_truth_v1",
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "document_id": "2c8b7c22f3407aac5c2ada9ff17367bdd79e058d13fd5dfd3aec7b7ebc664f52",
+  "corpus_document_id": "CDC-DEV-007",
+  "source_sha256": "2c8b7c22f3407aac5c2ada9ff17367bdd79e058d13fd5dfd3aec7b7ebc664f52",
+  "filename": "avis-fr (1).pdf",
+  "status": "VERIFIED",
+  "reviewer": "Codex source-PDF curator",
+  "verified_at": "2026-09-28",
+  "verified_fields": ["document_role", "major_sections", "selected_articles", "requirements", "annex_presence"],
+  "document_metadata": {"page_count": 48, "organization": "Presidency of the Government", "language": "BILINGUAL", "text_profile": "native", "document_role": "DAO", "procurement_type": "IT", "year": 2024, "tender_reference": "06/2024", "dossier_id": null, "document_role_evidence": [{"physical_page": 1, "raw_text": "Avis d’Appel d’Offres n° 06/2024"}, {"physical_page": 2, "raw_text": "Cahier des Charges Administratives et Techniques Particulières"}]},
+  "expected_major_sections": [
+    {"number": "I", "title": "Cahier des Clauses Administratives Particulières", "physical_page_start": 3, "physical_page_end": 10, "evidence": {"physical_page": 3, "raw_text": "Partie I Cahier des Clauses Administratives Particulières"}},
+    {"number": "II", "title": "Cahier des Clauses Techniques Particulières", "physical_page_start": 11, "physical_page_end": 21, "evidence": {"physical_page": 11, "raw_text": "Partie II"}}
+  ],
+  "article_heading_examples": [
+    {"number": "5", "title": "Délai de validité des offres", "physical_page": 5, "evidence": {"physical_page": 5, "raw_text": "ARTICLE 5 – DELAI DE VALIDITE DES OFFRES"}},
+    {"number": "9", "title": "Durée du contrat", "physical_page": 6, "evidence": {"physical_page": 6, "raw_text": "ARTICLE 9 - DUREE DU CONTRAT"}},
+    {"number": "12", "title": "Pénalité de retard", "physical_page": 8, "evidence": {"physical_page": 8, "raw_text": "ARTICLE 12- PENALITE DE RETARD"}},
+    {"number": "17", "title": "Modalité de paiement", "physical_page": 9, "evidence": {"physical_page": 9, "raw_text": "ARTICLE 17 – MODALITE DE PAIEMENT"}}
+  ],
+  "article_annotation_scope": "Representative source-verified article headings; complete article set spans the administrative and technical sections plus annexed contract models.",
+  "expected_annexes": [
+    {"number": "01", "physical_page_start": 22, "physical_page_end": 23, "evidence": {"physical_page": 22, "raw_text": "Annexe 01"}},
+    {"number": "02", "physical_page_start": 23, "physical_page_end": 27, "evidence": {"physical_page": 23, "raw_text": "Annexe 02"}},
+    {"number": "03", "physical_page_start": 28, "physical_page_end": 32, "evidence": {"physical_page": 28, "raw_text": "Annexe 03"}},
+    {"number": "04", "physical_page_start": 33, "physical_page_end": 37, "evidence": {"physical_page": 33, "raw_text": "Annexe 04"}},
+    {"number": "05", "physical_page_start": 38, "physical_page_end": 38, "evidence": {"physical_page": 38, "raw_text": "Annexe 05"}},
+    {"number": "06", "physical_page_start": 39, "physical_page_end": 39, "evidence": {"physical_page": 39, "raw_text": "Annexe 06"}},
+    {"number": "07", "physical_page_start": 40, "physical_page_end": 40, "evidence": {"physical_page": 40, "raw_text": "Annexe 07"}},
+    {"number": "08", "physical_page_start": 41, "physical_page_end": 42, "evidence": {"physical_page": 41, "raw_text": "Annexe 08"}},
+    {"number": "09", "physical_page_start": 43, "physical_page_end": 43, "evidence": {"physical_page": 43, "raw_text": "Annexe 09"}},
+    {"number": "10", "physical_page_start": 44, "physical_page_end": 44, "evidence": {"physical_page": 44, "raw_text": "Annexe 10"}},
+    {"number": "11", "physical_page_start": 45, "physical_page_end": 45, "evidence": {"physical_page": 45, "raw_text": "Annexe 11"}},
+    {"number": "12", "physical_page_start": 46, "physical_page_end": 46, "evidence": {"physical_page": 46, "raw_text": "Annexe 12"}},
+    {"number": "13", "physical_page_start": 47, "physical_page_end": 47, "evidence": {"physical_page": 47, "raw_text": "Annexe 13"}},
+    {"number": "14", "physical_page_start": 48, "physical_page_end": 48, "evidence": {"physical_page": 48, "raw_text": "Annexe 14"}}
+  ],
+  "important_requirements": [
+    {"requirement_type": "offer_validity", "raw_text": "Les offres doivent être valables pendant un délai de 120 jours à compter du jour suivant de la date limite de remise des offres fixée par l’administration", "normalized_value": 120, "unit": "days", "physical_page": 5, "section": "I", "article": "5", "mandatory": true, "notes": null},
+    {"requirement_type": "annual_contract_duration", "raw_text": "pour une période d’une année renouvelable deux fois", "normalized_value": 1, "unit": "year_initial_term", "physical_page": 6, "section": "I", "article": "9", "mandatory": true, "notes": "Renewal count remains in raw evidence; no inference about automatic renewal beyond its wording."},
+    {"requirement_type": "penalty_rate", "raw_text": "Montant de la Pénalité = Montant annuel du contrat x Nombre de jours/heure de retard x 0.001", "normalized_value": 0.001, "unit": "per_day_or_hour_as_stated", "physical_page": 8, "section": "I", "article": "12", "mandatory": true, "notes": "The source gives separate day/hour formulas; raw wording retained."},
+    {"requirement_type": "penalty_cap", "raw_text": "Le montant de la pénalité de retard dépasserait 5% du montant annuel total TTC du contrat de maintenance", "normalized_value": 5, "unit": "percent", "physical_page": 9, "section": "I", "article": "15", "mandatory": true, "notes": "Termination trigger at 5% cap."},
+    {"requirement_type": "payment_schedule", "raw_text": "Le paiement du montant de la maintenance préventive et curative sera effectué trimestriellement et à terme échu", "normalized_value": null, "unit": null, "physical_page": 9, "section": "I", "article": "17", "mandatory": true, "notes": null}
+  ],
+  "boq": {"boq_present": true, "pages": [46, 47, 48], "document_role": "BOQ", "table_structure": "Three financial annexes headed Bordereau des prix, one per lot", "row_count": null, "blank_or_completed": "blank_template", "evidence": {"physical_page": 5, "raw_text": "le bordereau des prix pour le lot 01 conforme à l’annexe N°12 ... le lot 02 ... annexe N°13 ... lot 03 ... annexe N°14"}},
+  "document_structure_notes": "A 1-page notice is followed by a substantial administrative and technical specification and 14 annexes in one PDF; classified as a combined DAO dossier rather than a notice-only document.",
+  "annotator_notes": "Article examples and requirements cite source pages, not prediction evidence. Annex page list reviewed from annex title pages."
+}

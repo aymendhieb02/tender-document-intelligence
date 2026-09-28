@@ -1,0 +1,56 @@
+{
+  "schema_version": "cdc_ground_truth_v1",
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "document_id": "f3b99c74d7d1fad9cd438869be1aa8e19d2329d99e28900c444cc3f0b3b8545d",
+  "corpus_document_id": "CDC-DEV-001",
+  "source_sha256": "f3b99c74d7d1fad9cd438869be1aa8e19d2329d99e28900c444cc3f0b3b8545d",
+  "filename": "MM_Cahier-des-charges-type-Entretien.pdf",
+  "status": "VERIFIED",
+  "reviewer": "Codex source-PDF curator",
+  "verified_at": "2026-09-28",
+  "verified_fields": ["document_role", "major_sections", "selected_articles", "requirements", "annexes", "boq"],
+  "document_metadata": {
+    "page_count": 30,
+    "organization": null,
+    "named_content_responsibility": {"physical_page": 1, "raw_text": "Le contenu est sous la responsabilité du Ministère des Affaires Locales et de l'Environnement (MALE)"},
+    "language": "FRENCH",
+    "text_profile": "native",
+    "document_role": "CDC",
+    "document_role_evidence": {"physical_page": 1, "raw_text": "Cahiers de charge type"},
+    "procurement_type": "WORKS",
+    "year": null,
+    "tender_reference": null,
+    "dossier_id": null
+  },
+  "expected_major_sections": [
+    {"number": "A", "title": "CONDITIONS DE LA CONSULTATION / A.O", "physical_page_start": 3, "physical_page_end": 9, "evidence": {"physical_page": 3, "raw_text": "A – CONDITIONS DE LA CONSULTATION / A.O"}},
+    {"number": "B", "title": "CLAUSES TECHNIQUES PARTICULIERES", "physical_page_start": 10, "physical_page_end": 11, "evidence": {"physical_page": 10, "raw_text": "B – CLAUSES TECHNIQUES PARTICULIERES"}},
+    {"number": "C", "title": "SPECIFICATIONS TECHNIQUES", "physical_page_start": 12, "physical_page_end": 19, "evidence": {"physical_page": 12, "raw_text": "C – SPECIFICATIONS TECHNIQUES"}},
+    {"number": "D", "title": "ANNEXES : Modèles à suivre", "physical_page_start": 20, "physical_page_end": 28, "evidence": {"physical_page": 20, "raw_text": "D- ANNEXES : Modèles à suivre"}},
+    {"number": "E", "title": "DESSINS ET PLANS", "physical_page_start": 29, "physical_page_end": 30, "evidence": {"physical_page": 29, "raw_text": "E – DESSINS ET PLANS"}}
+  ],
+  "article_heading_examples": [
+    {"number": "16", "title": "La validité des offres", "physical_page": 7, "evidence": {"physical_page": 7, "raw_text": "Article 16. La validité des offres"}},
+    {"number": "21", "title": "Modalités de paiement et retenue de garantie", "physical_page": 8, "evidence": {"physical_page": 8, "raw_text": "Article 21. Modalités de paiement et retenue de garantie"}},
+    {"number": "22", "title": "Délai d’exécution et pénalités de retard", "physical_page": 8, "evidence": {"physical_page": 8, "raw_text": "Article 22. Délai d’exécution et pénalités de retard"}}
+  ],
+  "article_annotation_scope": "Representative source-verified article headings; not a complete article inventory for this template.",
+  "expected_annexes": [
+    {"number": "01", "title": "Déclarations sur l'honneur", "physical_page_start": 21, "physical_page_end": 21, "evidence": {"physical_page": 20, "raw_text": "Annexe 01 : Déclarations sur l'honneur"}},
+    {"number": "02", "title": "Fiche de renseignement", "physical_page_start": 22, "physical_page_end": 22, "evidence": {"physical_page": 20, "raw_text": "Annexe 02 : Fiche de renseignement"}},
+    {"number": "03", "title": "Engagement pour la capacité technique", "physical_page_start": 23, "physical_page_end": 23, "evidence": {"physical_page": 20, "raw_text": "Annexe 03 : Engagement pour la capacité technique"}},
+    {"number": "04", "title": "Soumission", "physical_page_start": 24, "physical_page_end": 24, "evidence": {"physical_page": 20, "raw_text": "Annexe 04 : Soumission"}},
+    {"number": "05", "title": "Bordereau des prix - devis estimatif", "physical_page_start": 25, "physical_page_end": 25, "evidence": {"physical_page": 20, "raw_text": "Annexe 05 : Bordereau des prix - devis estimatif"}},
+    {"number": "06", "title": "Engagements de cautions personnelles et solidaires", "physical_page_start": 26, "physical_page_end": 28, "evidence": {"physical_page": 20, "raw_text": "Annexes 06 Engagements de cautions personnelles et solidaires"}}
+  ],
+  "important_requirements": [
+    {"requirement_type": "offer_validity", "raw_text": "reste liée par cette offre pendant 60 jours à compter du jour suivant la date limite fixée pour la réception des offres", "normalized_value": 60, "unit": "days", "physical_page": 7, "section": "A", "article": "16", "mandatory": true, "notes": null},
+    {"requirement_type": "final_guarantee", "raw_text": "dans les vingt (20) jours qui suivent la notification du marché, un cautionnement définitif ... fixé à 3% du montant du marché", "normalized_value": 3, "unit": "percent", "physical_page": 7, "section": "A", "article": "20", "mandatory": true, "notes": "20-day submission period also present in the cited raw evidence."},
+    {"requirement_type": "retention_guarantee", "raw_text": "10% en tant que retenue de garantie", "normalized_value": 10, "unit": "percent", "physical_page": 8, "section": "A", "article": "21", "mandatory": true, "notes": null},
+    {"requirement_type": "payment_deadline", "raw_text": "Tous les paiements se feront au plus tard dans un délai de 45 jours", "normalized_value": 45, "unit": "days", "physical_page": 8, "section": "A", "article": "21", "mandatory": true, "notes": null},
+    {"requirement_type": "penalty_cap", "raw_text": "Les pénalités de retard sont plafonnées à 5 % du montant définitif des travaux augmenté du montant des avenants éventuels", "normalized_value": 5, "unit": "percent", "physical_page": 8, "section": "A", "article": "22", "mandatory": true, "notes": null}
+  ],
+  "boq": {"boq_present": true, "pages": [25, 26], "document_role": "DEVIS_ESTIMATIF", "table_structure": "Blank tender price schedule; item values are not filled in", "row_count": null, "blank_or_completed": "blank_template", "evidence": {"physical_page": 20, "raw_text": "Annexe 05 : Bordereau des prix - devis estimatif"}},
+  "document_structure_notes": "The title page and section headings identify a reusable template with blank municipal and lot fields. It is a CDC template, not an independently identifiable live procurement.",
+  "annotator_notes": "No blank value was normalized. Physical pages refer to 1-based PDF page positions."
+}

@@ -5,6 +5,8 @@ from typing import Any
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
+from fastapi.responses import Response
+import fitz
 
 from app.api.document_store import document_store
 from app.core.config import settings
@@ -71,7 +73,36 @@ def get_uploaded_document(document_id: str) -> FileResponse:
     if stored is None:
         raise WorkflowError("document_not_found", "documents", "The document is unavailable or expired.",
                             status_code=404, recoverable=True)
-    return FileResponse(stored.path, media_type=stored.media_type, filename=stored.filename)
+    # Source documents are embedded in the CDC workspace and must be renderable
+    # by the browser PDF viewer. `attachment` forces downloads and prevents this.
+    return FileResponse(stored.path, media_type=stored.media_type,
+                        filename=stored.filename, content_disposition_type="inline")
+
+
+@router.get("/documents/{document_id}/pages/{page_number}.png", name="render_uploaded_document_page")
+def render_uploaded_document_page(document_id: str, page_number: int, width: int = 1200) -> Response:
+    stored = document_store.get(document_id)
+    if stored is None:
+        raise WorkflowError("document_not_found", "documents", "The document is unavailable or expired.",
+                            status_code=404, recoverable=True)
+    if stored.media_type != "application/pdf":
+        raise WorkflowError("unsupported_document", "documents", "Page rendering is available for PDF documents.",
+                            status_code=415)
+    try:
+        with fitz.open(stored.path) as source:
+            if page_number < 1 or page_number > source.page_count:
+                raise WorkflowError("page_not_found", "documents", "The requested page is unavailable.",
+                                    status_code=404)
+            page = source[page_number - 1]
+            scale = max(0.5, min(3.0, max(1, min(width, 2400)) / page.rect.width))
+            png = page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=False).tobytes("png")
+    except WorkflowError:
+        raise
+    except Exception as exc:
+        logger.exception("Source PDF page rendering failed")
+        raise WorkflowError("document_render_failed", "documents", "The source page could not be rendered.",
+                            status_code=422, recoverable=True) from exc
+    return Response(png, media_type="image/png", headers={"Cache-Control": "private, max-age=300"})
 
 
 @router.post("/cdc/analyze")

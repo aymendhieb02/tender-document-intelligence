@@ -4,4 +4,6 @@ from .contract import DocumentInput, ElementInput, PageInput
 from .pipeline import CDCAnalyzer
 from .schema import TenderDocument
 
-__all__ = ["CDCAnalyzer", "DocumentInput", "ElementInput", "PageInput", "TenderDocument"]
+CDC_ANALYZER_VERSION = "CDC_ANALYZER_V2"
+
+__all__ = ["CDC_ANALYZER_VERSION", "CDCAnalyzer", "DocumentInput", "ElementInput", "PageInput", "TenderDocument"]

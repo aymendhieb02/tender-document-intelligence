@@ -1,0 +1,379 @@
+{
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "baseline": "CDC_ANALYZER_REAL_BASELINE_V1",
+  "tested_commit": "1a62803",
+  "document_intelligence_contract_version": "1.0",
+  "cdc_analyzer_version": "CDC_ANALYZER_V2",
+  "execution_scope": "End-to-end PDF -> Document Intelligence DocumentResult -> CDC Analyzer TenderDocument.",
+  "documents": [
+    {
+      "document_id": "CDC-DEV-001",
+      "sha256": "f3b99c74d7d1fad9cd438869be1aa8e19d2329d99e28900c444cc3f0b3b8545d",
+      "relative_path": "MM_Cahier-des-charges-type-Entretien.pdf",
+      "selection_reason": "30-page French native-text generic works specification template; distinct format and procurement category.",
+      "processing": "DocumentProcessor(mode=auto,use_cache=False,allow_fallback=True)",
+      "document_intelligence_contract_version": "1.0",
+      "document_intelligence_mode": "auto",
+      "evidence_sources": [
+        "native_pdf"
+      ],
+      "page_count": 30,
+      "ocr_pages": 0,
+      "fallback_pages": 0,
+      "evidence_elements": 10451,
+      "prediction_file": "predictions_v2/CDC-DEV-001.prediction.json",
+      "document_result_file": "document_results_v2/CDC-DEV-001.document_result.json",
+      "prediction_counts": {
+        "sections": 5,
+        "articles_top_level": 0,
+        "annexes": 6,
+        "requirements": 54,
+        "detected_special_documents": 7
+      },
+      "ground_truth_status": "VERIFIED",
+      "scored": true
+    },
+    {
+      "document_id": "CDC-DEV-006",
+      "sha256": "2b0fe4062ee1ebe9da807c35fc2910d275fd49016d45f35ff2c7dcf8cb6833f1",
+      "relative_path": "Présidence du Gouvernement — Maintenance des photocopieurs/كراس الشروط الإدارية والفنية الخاصة.pdf",
+      "selection_reason": "51-page Arabic native-text goods tender specification; language and structure diversity.",
+      "processing": "DocumentProcessor(mode=auto,use_cache=False,allow_fallback=True)",
+      "document_intelligence_contract_version": "1.0",
+      "document_intelligence_mode": "auto",
+      "evidence_sources": [
+        "native_pdf"
+      ],
+      "page_count": 51,
+      "ocr_pages": 0,
+      "fallback_pages": 0,
+      "evidence_elements": 11526,
+      "prediction_file": "predictions_v2/CDC-DEV-006.prediction.json",
+      "document_result_file": "document_results_v2/CDC-DEV-006.document_result.json",
+      "prediction_counts": {
+        "sections": 0,
+        "articles_top_level": 22,
+        "annexes": 0,
+        "requirements": 0,
+        "detected_special_documents": 0
+      },
+      "ground_truth_status": "VERIFIED",
+      "scored": true
+    },
+    {
+      "document_id": "CDC-DEV-007",
+      "sha256": "2c8b7c22f3407aac5c2ada9ff17367bdd79e058d13fd5dfd3aec7b7ebc664f52",
+      "relative_path": "Présidence du Gouvernement — Maintenance des photocopieurs/avis-fr (1).pdf",
+      "selection_reason": "48-page French/Arabic platform maintenance tender pack with substantive clauses and annexes.",
+      "processing": "DocumentProcessor(mode=auto,use_cache=False,allow_fallback=True)",
+      "document_intelligence_contract_version": "1.0",
+      "document_intelligence_mode": "auto",
+      "evidence_sources": [
+        "native_pdf",
+        "paddleocr"
+      ],
+      "page_count": 48,
+      "ocr_pages": 1,
+      "fallback_pages": 0,
+      "evidence_elements": 14657,
+      "prediction_file": "predictions_v2/CDC-DEV-007.prediction.json",
+      "document_result_file": "document_results_v2/CDC-DEV-007.document_result.json",
+      "prediction_counts": {
+        "sections": 2,
+        "articles_top_level": 0,
+        "annexes": 14,
+        "requirements": 93,
+        "detected_special_documents": 7
+      },
+      "ground_truth_status": "VERIFIED",
+      "scored": true
+    },
+    {
+      "document_id": "CDC-DEV-009",
+      "sha256": "49c608e88db3608085b8723d8a46711ac38ed80d037f502da31b390b887d7d81",
+      "relative_path": "C.C._Consultaion_06-2026-26022026142257.pdf",
+      "selection_reason": "37-page scanned Arabic specification; distinct issuing organization and OCR profile.",
+      "processing": "DocumentProcessor(mode=auto,use_cache=False,allow_fallback=True)",
+      "document_intelligence_contract_version": "1.0",
+      "document_intelligence_mode": "auto",
+      "evidence_sources": [
+        "paddleocr"
+      ],
+      "page_count": 37,
+      "ocr_pages": 37,
+      "fallback_pages": 0,
+      "evidence_elements": 1192,
+      "prediction_file": "predictions_v2/CDC-DEV-009.prediction.json",
+      "document_result_file": "document_results_v2/CDC-DEV-009.document_result.json",
+      "prediction_counts": {
+        "sections": 0,
+        "articles_top_level": 0,
+        "annexes": 0,
+        "requirements": 2,
+        "detected_special_documents": 0
+      },
+      "ground_truth_status": "DRAFT",
+      "scored": false
+    },
+    {
+      "document_id": "CDC-DEV-011",
+      "sha256": "80916e3dbad17bad48ea2976819a3781d2a9f1bcd5e1ea9a34b81652fb27502f",
+      "relative_path": "Présidence du Gouvernement — Maintenance des photocopieurs/avis-fr-18102025.pdf",
+      "selection_reason": "21-page French/Arabic substantive 2025 goods tender specification.",
+      "processing": "DocumentProcessor(mode=auto,use_cache=False,allow_fallback=True)",
+      "document_intelligence_contract_version": "1.0",
+      "document_intelligence_mode": "auto",
+      "evidence_sources": [
+        "native_pdf"
+      ],
+      "page_count": 21,
+      "ocr_pages": 0,
+      "fallback_pages": 0,
+      "evidence_elements": 4247,
+      "prediction_file": "predictions_v2/CDC-DEV-011.prediction.json",
+      "document_result_file": "document_results_v2/CDC-DEV-011.document_result.json",
+      "prediction_counts": {
+        "sections": 0,
+        "articles_top_level": 17,
+        "annexes": 0,
+        "requirements": 2,
+        "detected_special_documents": 0
+      },
+      "ground_truth_status": "VERIFIED",
+      "scored": true
+    },
+    {
+      "document_id": "CDC-DEV-017",
+      "sha256": "c33db281111342a6fd80b118bb7658b964c10584933cf4a51d6e8b5c3400c831",
+      "relative_path": "Présidence du Gouvernement — Maintenance des photocopieurs/VISIOCONFERENCE.pdf",
+      "selection_reason": "30-page French/Arabic IT procurement specification with technical equipment requirements.",
+      "processing": "DocumentProcessor(mode=auto,use_cache=False,allow_fallback=True)",
+      "document_intelligence_contract_version": "1.0",
+      "document_intelligence_mode": "auto",
+      "evidence_sources": [
+        "native_pdf",
+        "paddleocr"
+      ],
+      "page_count": 30,
+      "ocr_pages": 1,
+      "fallback_pages": 0,
+      "evidence_elements": 6951,
+      "prediction_file": "predictions_v2/CDC-DEV-017.prediction.json",
+      "document_result_file": "document_results_v2/CDC-DEV-017.document_result.json",
+      "prediction_counts": {
+        "sections": 2,
+        "articles_top_level": 0,
+        "annexes": 7,
+        "requirements": 51,
+        "detected_special_documents": 4
+      },
+      "ground_truth_status": "VERIFIED",
+      "scored": true
+    },
+    {
+      "document_id": "CDC-DEV-022",
+      "sha256": "e920382499e837baf81aca362fd3984ea1e68d5b8c9e939e0e5043c14616bf5b",
+      "relative_path": "Présidence du Gouvernement — Maintenance des photocopieurs/cdc-fr-16102026.pdf",
+      "selection_reason": "18-page French/Arabic service tender specification, providing a shorter structure.",
+      "processing": "DocumentProcessor(mode=auto,use_cache=False,allow_fallback=True)",
+      "document_intelligence_contract_version": "1.0",
+      "document_intelligence_mode": "auto",
+      "evidence_sources": [
+        "native_pdf"
+      ],
+      "page_count": 18,
+      "ocr_pages": 0,
+      "fallback_pages": 0,
+      "evidence_elements": 4188,
+      "prediction_file": "predictions_v2/CDC-DEV-022.prediction.json",
+      "document_result_file": "document_results_v2/CDC-DEV-022.document_result.json",
+      "prediction_counts": {
+        "sections": 0,
+        "articles_top_level": 17,
+        "annexes": 0,
+        "requirements": 1,
+        "detected_special_documents": 0
+      },
+      "ground_truth_status": "VERIFIED",
+      "scored": true
+    }
+  ],
+  "gate_result": "PARTIALLY MEASURABLE: section, annex and targeted fact-sample scores only; full article/requirement accuracy not claimed.",
+  "ground_truth": {
+    "verified_documents": 6,
+    "draft_documents": 1,
+    "section_documents_scored": [
+      {
+        "document_id": "CDC-DEV-001",
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "expected": 5,
+        "predicted": 5
+      },
+      {
+        "document_id": "CDC-DEV-007",
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "expected": 2,
+        "predicted": 2
+      },
+      {
+        "document_id": "CDC-DEV-017",
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "expected": 2,
+        "predicted": 2
+      }
+    ],
+    "annex_documents_scored": [
+      {
+        "document_id": "CDC-DEV-001",
+        "tp": 6,
+        "fp": 0,
+        "fn": 0,
+        "expected": 6,
+        "predicted": 6
+      },
+      {
+        "document_id": "CDC-DEV-007",
+        "tp": 14,
+        "fp": 0,
+        "fn": 0,
+        "expected": 14,
+        "predicted": 14
+      },
+      {
+        "document_id": "CDC-DEV-017",
+        "tp": 7,
+        "fp": 0,
+        "fn": 0,
+        "expected": 7,
+        "predicted": 7
+      }
+    ],
+    "article_heading_examples": [
+      {
+        "document_id": "CDC-DEV-001",
+        "matched_examples": 3,
+        "expected_examples": 3
+      },
+      {
+        "document_id": "CDC-DEV-006",
+        "matched_examples": 3,
+        "expected_examples": 3
+      },
+      {
+        "document_id": "CDC-DEV-007",
+        "matched_examples": 4,
+        "expected_examples": 4
+      },
+      {
+        "document_id": "CDC-DEV-011",
+        "matched_examples": 2,
+        "expected_examples": 2
+      },
+      {
+        "document_id": "CDC-DEV-017",
+        "matched_examples": 5,
+        "expected_examples": 5
+      },
+      {
+        "document_id": "CDC-DEV-022",
+        "matched_examples": 2,
+        "expected_examples": 2
+      }
+    ],
+    "requirement_fact_samples": [
+      {
+        "document_id": "CDC-DEV-001",
+        "detected": 5,
+        "expected": 5,
+        "normalized_values_correct": 5,
+        "page_attributions_correct": 5
+      },
+      {
+        "document_id": "CDC-DEV-006",
+        "detected": 0,
+        "expected": 6,
+        "normalized_values_correct": 0,
+        "page_attributions_correct": 0
+      },
+      {
+        "document_id": "CDC-DEV-007",
+        "detected": 3,
+        "expected": 5,
+        "normalized_values_correct": 1,
+        "page_attributions_correct": 3
+      },
+      {
+        "document_id": "CDC-DEV-011",
+        "detected": 1,
+        "expected": 1,
+        "normalized_values_correct": 0,
+        "page_attributions_correct": 1
+      },
+      {
+        "document_id": "CDC-DEV-017",
+        "detected": 4,
+        "expected": 5,
+        "normalized_values_correct": 1,
+        "page_attributions_correct": 4
+      },
+      {
+        "document_id": "CDC-DEV-022",
+        "detected": 1,
+        "expected": 4,
+        "normalized_values_correct": 0,
+        "page_attributions_correct": 1
+      }
+    ],
+    "boq_documents_scored": [
+      {
+        "document_id": "CDC-DEV-001",
+        "expected_present": true,
+        "predicted_present": true,
+        "page_overlap": true,
+        "expected_pages": [
+          25,
+          26
+        ],
+        "predicted_pages": [
+          25
+        ]
+      },
+      {
+        "document_id": "CDC-DEV-007",
+        "expected_present": true,
+        "predicted_present": true,
+        "page_overlap": true,
+        "expected_pages": [
+          46,
+          47,
+          48
+        ],
+        "predicted_pages": [
+          46,
+          47,
+          48
+        ]
+      },
+      {
+        "document_id": "CDC-DEV-017",
+        "expected_present": true,
+        "predicted_present": true,
+        "page_overlap": true,
+        "expected_pages": [
+          24,
+          25
+        ],
+        "predicted_pages": [
+          24,
+          25
+        ]
+      }
+    ]
+  }
+}\n

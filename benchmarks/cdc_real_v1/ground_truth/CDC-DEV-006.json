@@ -1,0 +1,32 @@
+{
+  "schema_version": "cdc_ground_truth_v1",
+  "corpus": "CDC_DEVELOPMENT_CORPUS_V1",
+  "document_id": "2b0fe4062ee1ebe9da807c35fc2910d275fd49016d45f35ff2c7dcf8cb6833f1",
+  "corpus_document_id": "CDC-DEV-006",
+  "source_sha256": "2b0fe4062ee1ebe9da807c35fc2910d275fd49016d45f35ff2c7dcf8cb6833f1",
+  "filename": "كراس الشروط الإدارية والفنية الخاصة.pdf",
+  "status": "VERIFIED",
+  "reviewer": "Codex source-PDF curator",
+  "verified_at": "2026-09-28",
+  "verified_fields": ["document_role", "selected_articles", "requirements"],
+  "document_metadata": {"page_count": 51, "organization": "Presidency of the Government", "language": "ARABIC", "text_profile": "native", "document_role": "DAO", "procurement_type": "GOODS", "year": 2025, "tender_reference": "04/2025", "dossier_id": null, "document_role_evidence": [{"physical_page": 1, "raw_text": "طلب عروض عدد 04 / 2025"}, {"physical_page": 1, "raw_text": "كراس الشروط الإداريّة والفنية الخاصة"}]},
+  "expected_major_sections": [],
+  "article_heading_examples": [
+    {"number": "1", "title": "تقديم طلب العروض", "physical_page": 2, "evidence": {"physical_page": 2, "raw_text": "الفصل األول : تقديم طلب العروض"}},
+    {"number": "2", "title": "المؤسسات الصغرى المعنية بطلب العروض وشروط مشاركتها", "physical_page": 2, "evidence": {"physical_page": 2, "raw_text": "الفصل2: املؤس سات الصغرى املعنية بطلب العروض وشروط مشاركتها"}},
+    {"number": "3", "title": "شروط المشاركة وطريقة إرسال العروض", "physical_page": 3, "evidence": {"physical_page": 3, "raw_text": "الفصل3: شروط املشاركة وطريقة إرسال العروض"}}
+  ],
+  "article_annotation_scope": "Three verified article-heading examples only; the complete Arabic chapter sequence was not exhaustively transcribed for scoring.",
+  "expected_annexes": [],
+  "important_requirements": [
+    {"requirement_type": "submission_deadline", "raw_text": "05 ماي 2025 على الساعة الحاديّة عشرة صباحا", "normalized_value": "2025-05-05 11:00", "unit": "local time", "physical_page": 1, "section": null, "article": null, "mandatory": true, "notes": "Date and time printed on title page."},
+    {"requirement_type": "delivery_deadline", "raw_text": "يتم تسليم المواد المطلوبة في أجل عشرون (20) يوما بداية من اليوم الموالي لتاريخ تبليغ الإذن الإداري", "normalized_value": 20, "unit": "days", "physical_page": 8, "section": null, "article": "17", "mandatory": true, "notes": null},
+    {"requirement_type": "late_penalty_rate", "raw_text": "مبلغ غرامة التأخير = (ق × عدد أيام التأخير × 3 ‰)", "normalized_value": 3, "unit": "per_thousand_per_day", "physical_page": 8, "section": null, "article": "13", "mandatory": true, "notes": "Raw Arabic formula retained."},
+    {"requirement_type": "penalty_cap", "raw_text": "لا يمكن أن تتجاوز جملة غرامات التأخير سقف (خمسة بالمائة 05 %) من المبلغ الجملي للصفقة", "normalized_value": 5, "unit": "percent", "physical_page": 8, "section": null, "article": "13", "mandatory": true, "notes": null},
+    {"requirement_type": "warranty", "raw_text": "لمدة ستّة (06) أشهر بداية من تاريخ الاستلام الوقتي", "normalized_value": 6, "unit": "months", "physical_page": 8, "section": null, "article": "15", "mandatory": true, "notes": null},
+    {"requirement_type": "payment_deadline", "raw_text": "في أجل لا يتجاوز (30) يوما من تاريخ إيداع فاتورة", "normalized_value": 30, "unit": "days", "physical_page": 9, "section": null, "article": "21", "mandatory": true, "notes": null}
+  ],
+  "boq": {"boq_present": null, "pages": [], "document_role": null, "table_structure": "The file contains lot and quantity tables; detailed BOQ page review remains incomplete.", "row_count": null, "blank_or_completed": null},
+  "document_structure_notes": "Arabic administrative and technical tender dossier; this annotation does not claim exhaustive article or annex coverage.",
+  "annotator_notes": "Facts are quoted from source PDF text and pages are physical 1-based PDF positions."
+}

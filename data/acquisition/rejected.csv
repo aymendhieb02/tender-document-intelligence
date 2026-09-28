@@ -1,0 +1,8 @@
+﻿candidate_id,source_id,url,reason_code,reason_detail,timestamp
+SEED-9e25ea3e3210,UNKNOWN,,NOTICE_ONLY,Présidence du Gouvernement — Maintenance des photocopieurs/annoncejuin2024-fr.pdf: notice retained in history but excluded from CDC corpus,2026-09-28T03:54:39.878348+00:00
+SEED-afcc050ae95f,UNKNOWN,,NOTICE_ONLY,Présidence du Gouvernement — Maintenance des photocopieurs/avis-francais-12-2024-habillent-pg.pdf: notice retained in history but excluded from CDC corpus,2026-09-28T03:54:39.878348+00:00
+SEED-3aa04c16670c,UNKNOWN,,NOTICE_ONLY,Présidence du Gouvernement — Maintenance des photocopieurs/avis-francais-2025.pdf: notice retained in history but excluded from CDC corpus,2026-09-28T03:54:39.878348+00:00
+SEED-770c5578474f,UNKNOWN,,NOTICE_ONLY,Présidence du Gouvernement — Maintenance des photocopieurs/avis-francais-a-o-02-2024-consommables-informatiques.pdf: notice retained in history but excluded from CDC corpus,2026-09-28T03:54:39.878348+00:00
+SEED-c489949ecb3f,UNKNOWN,,EXACT_DUPLICATE,Présidence du Gouvernement — Maintenance des photocopieurs/cahier-des-charges-appel-offres-10-2025-pg-2025 (1).pdf: duplicate seed file; canonical=Présidence du Gouvernement — Maintenance des photocopieurs/cahier-des-charges-appel-offres-10-2025-pg-2025.pdf,2026-09-28T03:54:39.878348+00:00
+SEED-0952df3971ab,UNKNOWN,,NOT_PROCUREMENT,Présidence du Gouvernement — Maintenance des photocopieurs/Upcar_AMI_Mai-2024_Fr.pdf: seed document is not a procurement dossier,2026-09-28T03:54:39.878348+00:00
+SEED-b828b73c7bd5,UNKNOWN,,NOTICE_ONLY,Présidence du Gouvernement — Maintenance des photocopieurs/نصّ الإعلان باللغة الفرنسية.pdf: notice retained in history but excluded from CDC corpus,2026-09-28T03:54:39.878348+00:00

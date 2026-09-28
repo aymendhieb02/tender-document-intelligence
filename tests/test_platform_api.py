@@ -55,6 +55,12 @@ def test_cdc_api_processes_reference_and_serves_document():
     retrieved = client.get(payload["document_url"])
     assert retrieved.status_code == 200
     assert retrieved.content == source
+    assert retrieved.headers["content-type"] == "application/pdf"
+    assert retrieved.headers["content-disposition"].startswith("inline;")
+    page = client.get(f"{payload['document_url']}/pages/3.png")
+    assert page.status_code == 200
+    assert page.headers["content-type"] == "image/png"
+    assert page.content.startswith(b"\x89PNG\r\n\x1a\n")
     assert "D:\\" not in response.text
 
 
