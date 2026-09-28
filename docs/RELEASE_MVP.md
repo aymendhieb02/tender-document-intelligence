@@ -12,7 +12,7 @@ The integration starts from `tender-intelligence-v2` at `a69be4b6ff3ea95033a7bdf
 
 - Overview and recursive tender structure, with evidence references to physical source pages.
 - Requirements and financial/deadline facts from deterministic V2 modules, with truthful empty states.
-- Specialized five-row Ministry maintenance BOQ extraction, validation, and CSV export. The family identifier is internal. Unavailable commercial values stay null in the API, display as an em dash, and export as blank CSV cells. Physical units and unit-price wording are separate fields.
+- Specialized five-row Ministry maintenance BOQ extraction, validation, and a workspace CSV export control. The family identifier is internal. Unavailable commercial values stay null in the API, display as an em dash, and export as blank CSV cells. Physical units and unit-price wording are separate fields.
 - Ask Tender retrieves matching evidence and reports insufficient evidence without inventing an answer. Ollama is optional; when available, set `ASK_TENDER_OLLAMA_URL` (default `http://127.0.0.1:11434`) and `ASK_TENDER_OLLAMA_MODEL` (default `llama3.2:3b`).
 - The BOQ export is UTF-8 CSV and retains French and Arabic text.
 

@@ -79,3 +79,23 @@ export async function askTender(documentId, question) {
   }
   return payload;
 }
+
+export async function exportBoqCsv(file) {
+  if (!file) throw new Error("Le document source n’est plus disponible.");
+  const form = new FormData();
+  form.append("file", file);
+  const response = await fetch("/api/cdc/male/export.csv", { method: "POST", body: form });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    const detail = payload.error || payload.detail || {};
+    throw new Error(typeof detail === "string" ? detail : detail.message || "L’export CSV a échoué.");
+  }
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "boq-export.csv";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}

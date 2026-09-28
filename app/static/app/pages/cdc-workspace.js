@@ -1,4 +1,4 @@
-import { analyzeTenderDocument } from "../api.js?v=platform-refactor-qa1";
+import { analyzeTenderDocument, exportBoqCsv } from "../api.js?v=platform-refactor-qa1";
 import { DocumentViewer } from "../components/document-viewer.js?v=platform-refactor-qa4";
 import { createEvidenceController } from "../components/evidence-highlight.js?v=platform-refactor-5";
 import { originBadge, statusBadge } from "../components/status-badge.js?v=platform-refactor-5";
@@ -36,6 +36,19 @@ export function renderCdcWorkspace(outlet, payload, file, workflow) {
     renderAnalysisView(view, 5, cdc, payload, documentResult, file, workflow, registerEvidence, selectReference, ref.evidence);
   }
   outlet.querySelector("#analysisView").addEventListener("click", async event => {
+    const exportButton = event.target.closest("[data-boq-export]");
+    if (exportButton) {
+      const status = outlet.querySelector("[data-boq-export-status]");
+      exportButton.disabled = true;
+      status.textContent = "Préparation du fichier CSV…";
+      try {
+        await exportBoqCsv(file);
+        status.textContent = "Le fichier CSV a été téléchargé.";
+      } catch (error) {
+        status.textContent = error.message;
+      } finally { exportButton.disabled = false; }
+      return;
+    }
     const evidenceButton = event.target.closest("[data-boq-evidence]");
     if (evidenceButton) {
       const [rowIndex, fieldName] = evidenceButton.dataset.boqEvidence.split(":");
@@ -107,7 +120,7 @@ function renderAnalysisView(root, index, cdc, payload, documentResult, file, wor
   if (index === 1) root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">DOCUMENT</p><h2>Structure du document</h2><p>Hiérarchie extraite du cahier des charges.</p></div></div>${renderStructure(cdc, registerEvidence)}`;
   if (index === 2) { const items = payload.modules?.requirements_intelligence?.data || cdc.requirements || []; root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">CANDIDATS</p><h2>Exigences</h2><p>${items.length} éléments structurés avec leur état de revue.</p></div></div>${renderRequirements(items, registerEvidence)}`; }
   if (index === 3) root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">ANNEXES</p><h2>Annexes</h2><p>Classement et plages de pages détectées.</p></div></div>${renderAnnexes(cdc.annexes || [], workflow, payload)}`;
-  if (index === 4) root.innerHTML = workflow === "male" ? renderBoqWorkspace(payload.boq_document) : renderBqHandoff(cdc, payload);
+  if (index === 4) root.innerHTML = workflow === "male" ? renderBoqWorkspace(payload.boq_document, { canExport: Boolean(file) }) : renderBqHandoff(cdc, payload);
   if (index === 5) root.innerHTML = selectedEvidence ? `<div class="view-heading"><div><p class="eyebrow">PROVENANCE</p><h2>Élément source</h2></div></div>${renderEvidenceDetail(selectedEvidence)}` : `<div class="view-heading"><div><p class="eyebrow">PROVENANCE</p><h2>Preuves</h2><p>Sélectionnez une exigence, un article ou une annexe pour afficher sa preuve dans le panneau Document.</p></div></div><div class="empty-state"><strong>Aucune preuve sélectionnée</strong><span>Les identifiants et coordonnées sont issus du résultat d’analyse.</span></div>`;
   if (index === 6) root.innerHTML = renderDiagnostics(documentResult, cdc, payload);
   if (index === 7) root.innerHTML = renderFinancial(payload, registerEvidence);
