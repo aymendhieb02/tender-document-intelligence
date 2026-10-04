@@ -14,6 +14,7 @@ from app.boq.normalize import normalize_header, parse_french_decimal
 from app.boq.detect import normalize_male_municipal_header
 from app.boq.models import BOQDocument, BOQRow, BoundingBox, ParsedValue
 from app.boq.export import CSV_COLUMNS, export_boq_csv
+from app.boq.generic import FAMILY as GENERIC_FAMILY, extract_boq_candidates, extract_generic_boq
 from app.boq.validate import validate_document, validate_row
 try:
     from app.document_intelligence.schemas import DocumentDiagnostics, DocumentResult, EvidenceElement, PageResult
@@ -59,6 +60,37 @@ def page(items, *, shift=0):
     for i, (text, x, y, confidence) in enumerate(items):
         elements.append(make_evidence(id=f"e{i}",text=text,page_number=1,bbox=BoundingBox(x1=x-15+shift,y1=y-8,x2=x+15+shift,y2=y+8),confidence=confidence,source="paddleocr",source_coordinate_space="ocr_inference_pixels"))
     return make_page(page_number=1,width=1000,height=1400,elements=elements)
+
+
+def test_generic_boq_reconstructs_observed_cells_without_filling_missing_values():
+    # Synthetic positioned evidence: a different header and geometry from the Ministry template.
+    items = [("Bordereau des prix unitaires", 280, 100, .99),
+             ("N°", 100, 220, .99), ("Désignation", 310, 220, .99),
+             ("Unité", 470, 220, .99), ("Quantité", 580, 220, .99),
+             ("Prix unitaire", 720, 220, .99), ("Montant", 880, 220, .99),
+             ("A1", 100, 310, .99), ("Terrassement", 310, 310, .99),
+             ("m3", 470, 310, .99), ("2", 580, 310, .99),
+             ("100,000", 720, 310, .99), ("200,000", 880, 310, .99),
+             ("A2", 100, 400, .99), ("Drainage", 310, 400, .99),
+             ("m", 470, 400, .99), ("50,000", 720, 400, .99)]
+    source = make_document(document_id="synthetic-generic", pages=[page(items)])
+    results = extract_boq_candidates(source)
+    assert len(results) == 1
+    result = results[0]
+    assert result.extractor_family == GENERIC_FAMILY
+    assert result.column_mapping["quantity"] == "quantity"
+    assert len(result.rows) == 2
+    assert result.rows[0].quantity.normalized_value == Decimal("2")
+    assert result.rows[0].total_ht.normalized_value == Decimal("200.000")
+    assert result.rows[0].quantity.evidence[0].source_page == 1
+    assert result.rows[1].quantity.normalized_value is None
+    assert result.rows[1].quantity.parse_status == "MISSING"
+    assert any(check.status == "NOT_CHECKABLE" for check in result.rows[1].validation)
+
+
+def test_generic_boq_rejects_heading_without_positioned_column_evidence():
+    source = page([("Devis estimatif", 200, 100, .99), ("Le devis sera remis plus tard", 200, 200, .99)])
+    assert not extract_generic_boq(source).detected
 
 
 ANCHORS = [("Annexe 05", 80, 80, .99), ("BORDEREAU DES PRIX", 300, 130, .99),

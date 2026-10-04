@@ -20,7 +20,7 @@ For exactly reproduced Windows packages, install `requirements-lock-win-py311.tx
 
 ## Use
 
-Start the application with `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`. Main workflows are `POST /process-invoice` (legacy route), `POST /api/invoices/analyze`, `POST /api/cdc/analyze`, and `POST /api/cdc/male/analyze`. Each accepts a multipart `file`; successful responses include an opaque document ID and a process-lifetime retrieval URL. See [integrated backend architecture and API contracts](docs/INTEGRATED_BACKEND_V1.md).
+Start the application with `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`. Main workflows are `POST /process-invoice` (legacy route), `POST /api/invoices/analyze`, `POST /api/v2/cdc/analyze`, and `POST /api/v2/cdc/male/analyze`. Each accepts a multipart `file`. Tender responses include an opaque document ID and a local persistent retrieval URL. `GET /api/v2/cdc` lists completed tender analyses; `/analyses` opens the local library. See [integrated backend architecture and API contracts](docs/INTEGRATED_BACKEND_V1.md).
 
 ```python
 from app.document_intelligence import DocumentProcessor
@@ -39,7 +39,7 @@ python scripts/process_document.py document.pdf --output outputs/document.json
 ## Verification
 
 ```powershell
-python -m pytest -q
+pytest -q -rs
 ```
 
 The deterministic tests cover producer/CDC/BOQ integration, API startup and responses, and selected historical invoice regressions. The real local-model test is skipped unless `RUN_REAL_OCR=1`.

@@ -93,6 +93,11 @@ def cdc_ui(result_id: str = "") -> FileResponse:
     return FileResponse(static_dir / "cdc.html")
 
 
+@app.get("/analyses", include_in_schema=False)
+def analyses_ui() -> FileResponse:
+    return FileResponse(static_dir / "index.html")
+
+
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok", "service": settings.app_name}

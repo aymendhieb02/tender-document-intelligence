@@ -69,6 +69,16 @@ def test_tender_workspace_uses_real_v2_modules_and_truthful_empty_states():
     assert "payload.document_store_id || payload.document_result?.document_id" in state
 
 
+def test_saved_tender_library_has_route_and_reopen_links():
+    router = (ROOT / "app/static/app/router.js").read_text(encoding="utf-8")
+    shell = (ROOT / "app/static/app/components/shell.js").read_text(encoding="utf-8")
+    library = (ROOT / "app/static/app/pages/library.js").read_text(encoding="utf-8")
+    assert 'path === "/analyses"' in router
+    assert 'href="/analyses"' in shell
+    assert 'listTenderAnalyses()' in library
+    assert 'encodeURIComponent(item.document_id)' in library
+
+
 def test_important_tender_and_invoice_routes_remain_available():
     for route in ("/", "/invoice", "/invoice/result/abc", "/cdc", "/cdc/result/abc",
                   "/cdc/male", "/cdc/male/result/abc"):

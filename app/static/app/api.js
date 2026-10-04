@@ -103,6 +103,12 @@ export async function loadTenderAnalysis(documentId) {
   };
 }
 
+export async function listTenderAnalyses() {
+  const response = await fetch("/api/v2/cdc");
+  if (!response.ok) throw new Error("Les analyses enregistrées sont indisponibles.");
+  return response.json();
+}
+
 export async function exportBoqCsv(documentId) {
   if (!documentId) throw new Error("Identifiant du dossier manquant.");
   const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/boq.csv`);

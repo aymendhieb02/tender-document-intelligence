@@ -3,6 +3,7 @@ from __future__ import annotations
 import mimetypes
 import json
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
@@ -48,6 +49,7 @@ class LocalDocumentStore:
         self._write_json(record_dir / "document.json", {
             "document_id": document_id, "filename": original_name,
             "media_type": media_type, "source_path": path.name,
+            "created_at": datetime.now(timezone.utc).isoformat(),
         })
         return stored
 
@@ -74,7 +76,37 @@ class LocalDocumentStore:
         self._write_json(self._root / document_id / "analysis.json", {
             "schema_version": 1, "workflow": workflow,
             "tender_document": tender_document, "response": response,
+            "analyzed_at": datetime.now(timezone.utc).isoformat(),
         })
+
+    def list_analyses(self) -> list[dict]:
+        """List completed local tender results; skip stale and malformed records."""
+        if not self._root.is_dir():
+            return []
+        records = []
+        for directory in self._root.iterdir():
+            document_id = directory.name
+            if not directory.is_dir() or len(document_id) != 32 or any(
+                    char not in "0123456789abcdef" for char in document_id):
+                continue
+            stored = self.get(document_id)
+            analysis = self.get_analysis(document_id)
+            if stored is None or not analysis or not isinstance(analysis.get("response"), dict):
+                continue
+            response = analysis["response"]
+            document = response.get("document")
+            if not isinstance(document, dict) or not isinstance(document.get("page_count"), int):
+                continue
+            analysis_path = directory / "analysis.json"
+            try:
+                timestamp = analysis.get("analyzed_at") or datetime.fromtimestamp(
+                    analysis_path.stat().st_mtime, timezone.utc).isoformat()
+            except OSError:
+                continue
+            records.append({"document_id": document_id, "filename": stored.filename,
+                            "analyzed_at": timestamp, "page_count": document["page_count"],
+                            "workflow": analysis.get("workflow", "cdc"), "status": "completed"})
+        return sorted(records, key=lambda item: item["analyzed_at"], reverse=True)
 
     def get_analysis(self, document_id: str) -> dict | None:
         if self.get(document_id) is None:

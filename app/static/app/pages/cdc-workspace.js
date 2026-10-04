@@ -3,7 +3,7 @@ import { DocumentViewer } from "../components/document-viewer.js?v=platform-refa
 import { createEvidenceController } from "../components/evidence-highlight.js?v=platform-refactor-5";
 import { originBadge, statusBadge } from "../components/status-badge.js?v=platform-refactor-5";
 import { setActiveAnalysis } from "../state.js?v=platform-refactor-5";
-import { renderBoqWorkspace } from "./boq-workspace.js?v=mvp-fix-01";
+import { renderBoqWorkspace } from "./boq-workspace.js?v=focused-sprint-1";
 import { askTender } from "../api.js?v=persisted-results-3";
 
 const primaryViews = [["Vue d’ensemble", 0], ["Exigences", 2], ["Finances & Délais", 7], ["Bordereau", 4], ["Sources", 5], ["Ask Tender", 8]];
@@ -166,7 +166,9 @@ function renderAnalysisView(root, index, cdc, payload, documentResult, file, wor
   if (index === 1) root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">DOCUMENT</p><h2>Structure du document</h2><p>Hiérarchie extraite du cahier des charges.</p></div></div>${renderStructure(cdc, registerEvidence)}`;
   if (index === 2) { const items = payload.modules?.requirements_intelligence?.data || cdc.requirements || []; root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">CANDIDATS</p><h2>Exigences</h2><p>${items.length} éléments structurés avec leur état de revue.</p></div></div>${renderRequirements(items, registerEvidence)}`; }
   if (index === 3) root.innerHTML = `<div class="view-heading"><div><p class="eyebrow">ANNEXES</p><h2>Annexes</h2><p>Classement et plages de pages détectées.</p></div></div>${renderAnnexes(cdc.annexes || [], workflow, payload)}`;
-  if (index === 4) root.innerHTML = workflow === "male" ? renderBoqWorkspace(payload.boq_document, { canExport: Boolean(payload.document_store_id) }) : renderBqHandoff(cdc, payload);
+  if (index === 4) root.innerHTML = payload.boq_document?.detected || workflow === "male"
+    ? renderBoqWorkspace(payload.boq_document, { canExport: Boolean(payload.document_store_id) })
+    : renderBqHandoff(cdc, payload);
   if (index === 5) root.innerHTML = selectedEvidence ? `<div class="view-heading"><div><p class="eyebrow">PROVENANCE</p><h2>Élément source</h2></div></div>${renderEvidenceDetail(selectedEvidence)}` : `<div class="view-heading"><div><p class="eyebrow">PROVENANCE</p><h2>Preuves</h2><p>Sélectionnez une exigence, un article ou une annexe pour afficher sa preuve dans le panneau Document.</p></div></div><div class="empty-state"><strong>Aucune preuve sélectionnée</strong><span>Les identifiants et coordonnées sont issus du résultat d’analyse.</span></div>`;
   if (index === 6) root.innerHTML = renderDiagnostics(documentResult, cdc, payload);
   if (index === 7) root.innerHTML = renderFinancial(payload, registerEvidence);

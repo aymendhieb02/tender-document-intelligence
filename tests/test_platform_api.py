@@ -79,7 +79,8 @@ def test_v2_cdc_envelope_is_typed_and_does_not_change_v1_payload():
     assert len(contract.modules.dossier.data["documents"]) == 1
     assert contract.modules.compliance.availability == "unavailable"
     assert contract.modules.compliance.reason == "not_in_wave_1"
-    assert contract.modules.boq.availability == "not_run"
+    assert contract.modules.boq.availability == "available"
+    assert contract.modules.boq.data[0]["result"]["extractor_family"] == "MALE_MUNICIPAL_MAINTENANCE_BOQ_V1"
 
     references = contract.modules.evidence.data
     assert references
@@ -88,6 +89,38 @@ def test_v2_cdc_envelope_is_typed_and_does_not_change_v1_payload():
     assert "raw_text" not in reference
     assert "pages" not in payload
     assert "document_result" not in payload
+
+
+def test_generic_boq_is_available_in_cdc_response_and_saved_csv(tmp_path):
+    # Synthetic PDF with a simple positioned BOQ, outside the Ministry geometry.
+    pdf = fitz.open()
+    page = pdf.new_page()
+    page.insert_text((70, 80), "Devis estimatif")
+    columns = [(40, "Article"), (120, "Designation"), (280, "Unite"),
+               (350, "Quantite"), (425, "Prix unitaire"), (520, "Montant")]
+    for x, label in columns:
+        page.insert_text((x, 160), label)
+    for y, values in [(205, ["01", "Terrassement", "m3", "2", "100,000", "200,000"]),
+                      (245, ["02", "Drainage", "m", "", "50,000", ""])]:
+        for (x, _), value in zip(columns, values):
+            if value:
+                page.insert_text((x, y), value)
+    data = pdf.tobytes()
+    pdf.close()
+    response = client.post("/api/v2/cdc/analyze", files={"file": ("synthetic-boq.pdf", data, "application/pdf")})
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["modules"]["boq"]["availability"] == "available"
+    boq = payload["modules"]["boq"]["data"][0]["result"]
+    assert boq["extractor_family"] == "GENERIC_LAYOUT_BOQ_V1"
+    assert len(boq["rows"]) == 2
+    assert boq["rows"][1]["quantity"]["normalized_value"] is None
+    document_id = payload["document"]["document_url"].rsplit("/", 1)[-1]
+    saved = client.get(f"/api/v2/cdc/{document_id}/boq.csv")
+    assert saved.status_code == 200
+    rows = list(csv.DictReader(StringIO(saved.text)))
+    assert len(rows) == 2
+    assert rows[1]["quantity"] == ""
 
 
 def test_v2_ministry_marks_unrecognized_boq_unavailable_without_fake_data(tmp_path):
@@ -215,6 +248,29 @@ def test_tender_result_and_ask_survive_store_reload_without_reprocessing(tmp_pat
     })
     assert answer.status_code == 200, answer.text
     assert answer.json()["evidence"]
+
+
+def test_document_library_lists_completed_tenders_newest_first_and_skips_stale(tmp_path, monkeypatch):
+    from app.api import workflow_routes
+    from app.api.document_store import LocalDocumentStore
+
+    workspace = tmp_path / "workspace"
+    monkeypatch.setattr(workflow_routes, "document_store", LocalDocumentStore(workspace))
+    source = make_pdf(tmp_path / "small.pdf", ["Cahier des charges", "Le candidat fournit une offre."])
+    ids = []
+    for filename in ("Premier.pdf", "Deuxième.pdf"):
+        response = client.post("/api/v2/cdc/analyze", files={"file": (filename, source, "application/pdf")})
+        assert response.status_code == 200, response.text
+        ids.append(response.json()["document"]["document_url"].rsplit("/", 1)[-1])
+    (workspace / ("a" * 32)).mkdir()
+    listed = client.get("/api/v2/cdc")
+    assert listed.status_code == 200
+    assert [item["document_id"] for item in listed.json()] == ids[::-1]
+    assert listed.json()[0]["filename"] == "Deuxième.pdf"
+    assert listed.json()[0]["page_count"] == 1
+    assert listed.json()[0]["status"] == "completed"
+    assert "source_path" not in listed.json()[0]
+    assert client.get(f"/api/v2/cdc/{ids[0]}").status_code == 200
 
 
 def test_cdc_api_processes_reference_and_serves_document():

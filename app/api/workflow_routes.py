@@ -16,7 +16,7 @@ from app.core.schemas import ProcessInvoiceResponse
 from app.cdc_analysis import CDCAnalyzer
 from app.document_intelligence import DocumentProcessor
 from app.document_intelligence.schemas import DocumentResult
-from app.boq import BOQDocument, export_boq_csv, extract_male_municipal_from_document
+from app.boq import BOQDocument, export_boq_csv, extract_boq_candidates
 from app.invoice.document_result_adapter import DocumentResultInvoiceAdapter
 from app.ask_tender.service import AskRequest, AskResponse, answer_question
 from app.services.pipeline_runner import process_document_file
@@ -25,7 +25,6 @@ from app.cdc_analysis.schema import TenderDocument
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
 MAX_UPLOAD_BYTES = settings.max_upload_size_mb * 1024 * 1024
-BOQ_FAMILY = "MALE_MUNICIPAL_MAINTENANCE_BOQ_V1"
 
 
 class WorkflowError(Exception):
@@ -135,6 +134,15 @@ async def _run_cdc_upload(file: UploadFile) -> tuple[dict[str, Any], Any, Any]:
                    "coordinate_space": page.coordinate_space} for page in document.pages],
         "tender_document": tender.model_dump(mode="json"),
     }
+    boq_started = perf_counter()
+    candidates = extract_boq_candidates(document)
+    payload["boq_results"] = [
+        {"source_page": item.rows[0].source_page, "result": item.model_dump(mode="json")}
+        for item in candidates
+    ]
+    payload["template_detected"] = bool(candidates)
+    logger.info("Tender timing workflow=cdc stage=boq_detection total_ms=%.1f detected=%s",
+                (perf_counter() - boq_started) * 1000, bool(candidates))
     document_store.save_analysis(stored.document_id, workflow="cdc",
                                  tender_document=tender.model_dump(mode="json"), response={})
     logger.info("Tender timing workflow=cdc stage=workflow_total total_ms=%.1f", (perf_counter() - started) * 1000)
@@ -161,29 +169,21 @@ async def _run_ministry_upload(file: UploadFile) -> tuple[dict[str, Any], Any, A
                             diagnostics=["evidence_page_mismatch"] if isinstance(exc, ValueError) and "Element page does not match" in str(exc) else []) from exc
 
     handoffs = [item for item in tender.detected_special_documents if item.handoff == "boq_agent"]
-    physical_pages = {page.page_number for page in document.pages}
     boq_results = []
     diagnostics: list[str] = []
     boq_started = perf_counter()
-    for handoff in handoffs:
-        requested_pages = range(handoff.page_start, handoff.page_end + 1)
-        valid_pages = [page_number for page_number in requested_pages if page_number in physical_pages]
-        missing_pages = [page_number for page_number in requested_pages if page_number not in physical_pages]
-        if missing_pages:
-            diagnostics.append("boq_handoff_references_unavailable_physical_page")
-        for page_number in valid_pages:
-            try:
-                result = extract_male_municipal_from_document(document, page_number=page_number)
-            except Exception as exc:
-                logger.exception("Specialized BOQ extraction failed")
-                raise WorkflowError("boq_extraction_failed", "ministry_boq",
-                                    "The supported BOQ page could not be extracted.", status_code=422,
-                                    technical_detail=type(exc).__name__,
-                                    recoverable=True) from exc
-            if result.detected:
-                boq_results.append({"source_page": page_number, "result": result.model_dump(mode="json")})
-            else:
-                diagnostics.extend(result.diagnostics)
+    physical_pages = {page.page_number for page in document.pages}
+    if any(page_number not in physical_pages for handoff in handoffs
+           for page_number in range(handoff.page_start, handoff.page_end + 1)):
+        diagnostics.append("boq_handoff_references_unavailable_physical_page")
+    try:
+        boq_results = [{"source_page": item.rows[0].source_page, "result": item.model_dump(mode="json")}
+                       for item in extract_boq_candidates(document)]
+    except Exception as exc:
+        logger.exception("BOQ extraction failed")
+        raise WorkflowError("boq_extraction_failed", "ministry_boq",
+                            "The BOQ candidate could not be extracted.", status_code=422,
+                            technical_detail=type(exc).__name__, recoverable=True) from exc
 
     detected = bool(boq_results)
     logger.info("Tender timing workflow=ministry_boq stage=boq_detection total_ms=%.1f handoffs=%s detected=%s",
@@ -197,7 +197,7 @@ async def _run_ministry_upload(file: UploadFile) -> tuple[dict[str, Any], Any, A
         "page_count": len(document.pages),
         "tender_document": tender.model_dump(mode="json"),
         "template_detected": detected,
-        "template_family": BOQ_FAMILY if detected else None,
+        "template_family": boq_results[0]["result"]["extractor_family"] if detected else None,
         "boq_handoffs": [item.model_dump(mode="json") for item in handoffs],
         "boq_results": boq_results,
         "diagnostics": diagnostics,
@@ -249,6 +249,12 @@ async def analyze_ministry_v2(file: UploadFile = File(...)) -> TenderAnalysisRes
                                  response=response.model_dump(mode="json"))
     logger.info("Tender timing workflow=ministry_boq stage=response_build total_ms=%.1f", (perf_counter() - started) * 1000)
     return response
+
+
+@router.get("/v2/cdc")
+def list_tender_results() -> list[dict]:
+    """Return compact metadata for previously analyzed local tenders."""
+    return document_store.list_analyses()
 
 
 @router.get("/v2/cdc/{document_id}", response_model=TenderAnalysisResponseV2)

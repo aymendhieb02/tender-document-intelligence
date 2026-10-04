@@ -54,3 +54,31 @@ def test_ollama_success_and_timeout_boundary(monkeypatch):
     answer, model = service._ollama("warranty?", [])
     assert answer is None
     assert model == "llama3.2:3b"
+
+
+def test_french_procurement_paraphrases_retrieve_expected_evidence_in_top_three(monkeypatch):
+    # Synthetic reviewed retrieval set: evaluate evidence reachability, not answer accuracy.
+    passages = [
+        (3, "Les offres doivent parvenir au plus tard le 31 octobre 2026 au bureau d’ordre."),
+        (4, "La caution provisoire est fixée à 1 000 dinars."),
+        (5, "Le délai d’exécution des travaux est de 60 jours."),
+        (6, "Les pièces à fournir comprennent le registre et l’attestation fiscale."),
+    ]
+    articles = [Article(id=f"a-{page}", number=str(page), text=text, page_start=page, page_end=page,
+                        source_evidence=[Evidence(document_id="synthetic-retrieval", page=page,
+                                                  element_id=f"e-{page}", raw_text=text)])
+                for page, text in passages]
+    document = TenderDocument(document_id="synthetic-retrieval", articles=articles)
+    questions = [
+        ("Jusqu'à quand peut-on déposer l'offre ?", 3),
+        ("Quel est le montant de la garantie provisoire ?", 4),
+        ("Quelle est la durée des travaux ?", 5),
+        ("Quels documents sont demandés ?", 6),
+    ]
+    for question, expected_page in questions:
+        ranked = service.retrieve(document, question, limit=3)
+        assert expected_page in [item.reference.page_number for item in ranked], question
+    monkeypatch.setattr(service, "_ollama", lambda *args: (None, "offline"))
+    result = service.answer_question(document, questions[0][0])
+    assert result.status == "generation_unavailable"
+    assert result.evidence and result.evidence[0].reference.page_number == 3

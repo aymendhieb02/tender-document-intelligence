@@ -156,13 +156,12 @@ def build_tender_analysis_v2(
     # Preserve order while avoiding repeated codes from multiple evidence paths.
     workflow_diagnostics = list(dict.fromkeys(workflow_diagnostics))
 
-    if workflow == "ministry_boq":
-        boq_detected = bool(payload.get("template_detected"))
+    if payload.get("template_detected"):
+        boq = ModuleResultV2(availability="available", data=payload["boq_results"])
+    elif workflow == "ministry_boq":
         boq = ModuleResultV2(
-            availability="available" if boq_detected else "unavailable",
-            data=payload.get("boq_results") if boq_detected else None,
-            reason=None if boq_detected else "supported_template_not_detected",
-            diagnostics=workflow_diagnostics if not boq_detected else [],
+            availability="unavailable", reason="supported_template_not_detected",
+            diagnostics=workflow_diagnostics,
         )
     else:
         boq = ModuleResultV2(availability="not_run", reason="boq_workflow_not_invoked")

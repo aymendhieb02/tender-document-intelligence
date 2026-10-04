@@ -24,3 +24,9 @@ The UI exposes Ask Tender in the primary workspace navigation and at the page he
 ## Limitations
 
 Lexical matching can miss paraphrases and broad questions can surface adjacent passages. The reference test has no OCR pages and is not a broad question-answer quality benchmark. There is no conversation history, answer review workflow, semantic index, or durable feedback loop. Ollama is optional and quality depends on an installed local model; the application does not download one.
+
+## Focused retrieval update
+
+The retrieval scorer now removes common French/English question words and applies a small procurement concept map for submission deadlines, provisional guarantees, execution periods, and required documents. Concepts boost **existing** cited passages; they do not generate answers or facts. The deterministic structured-fact path recognizes paraphrased deadline/guarantee/execution queries where a matching fact is present. The optional Ollama path and offline citation behavior remain the same.
+
+A four-question **synthetic reviewed regression set** covers “Jusqu'à quand peut-on déposer l'offre ?”, “garantie provisoire”, “durée des travaux”, and “documents demandés”. The expected evidence page reached top three in **4/4** cases. This measures only top-k reachability on these four crafted passages; it is not general retrieval accuracy. On the 30-page reference, the deposit paraphrase surfaced pages 3 and 4 in the top three, including the deadline passage on page 4; other broad questions can still rank adjacent clauses. Retrieval quality on diverse tenders remains to be evaluated.

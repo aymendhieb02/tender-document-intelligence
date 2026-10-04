@@ -44,13 +44,37 @@ def _fold(value: str) -> str:
 
 
 def _tokens(value: str) -> set[str]:
-    return {token for token in re.findall(r"[\w]+", _fold(value)) if len(token) > 1}
+    stopwords = {"le", "la", "les", "de", "des", "du", "un", "une", "et", "est", "dans", "pour",
+                 "quel", "quelle", "quels", "quelles", "que", "qui", "peut", "on", "aux", "sur",
+                 "the", "what", "when", "does", "with", "about"}
+    return {token for token in re.findall(r"[\w]+", _fold(value)) if len(token) > 1 and token not in stopwords}
+
+
+CONCEPT_ALIASES = {
+    "submission_deadline": ("date limite", "delai de reception", "reception des offres", "depot des offres",
+                            "deposer l offre", "deposer les offres", "remise des offres", "au plus tard",
+                            "jusqu a quand", "submission deadline"),
+    "provisional_guarantee": ("caution provisoire", "garantie provisoire", "cautionnement provisoire",
+                              "provisional guarantee"),
+    "execution_period": ("delai d execution", "duree des travaux", "periode d execution",
+                         "temps pour executer", "execution period"),
+    "required_documents": ("pieces a fournir", "documents demandes", "documents a fournir",
+                           "documents sont demandes", "pieces demandees", "dossier de soumission",
+                           "required documents"),
+}
+
+
+def _concepts(value: str) -> set[str]:
+    folded = _fold(value).replace("'", " ").replace("’", " ")
+    return {concept for concept, aliases in CONCEPT_ALIASES.items()
+            if any(re.search(rf"\b{re.escape(alias)}\b", folded) for alias in aliases)}
 
 
 def retrieve(document: TenderDocument, question: str, *, limit: int = 6) -> list[AskEvidence]:
     """Rank bounded source passages using explainable token and phrase overlap."""
     q = _fold(question)
     terms = _tokens(question)
+    query_concepts = _concepts(question)
     sources: list[tuple[str, str, str, Any, str | None]] = []
 
     def add(kind: str, label: str, text: str, evidence: list[Any], status: str | None = None) -> None:
@@ -119,7 +143,9 @@ def retrieve(document: TenderDocument, question: str, *, limit: int = 6) -> list
         candidate = _fold(label + " " + text)
         overlap = len(terms & _tokens(candidate))
         phrase = 3 if len(q) > 3 and q in candidate else 0
-        lexical_score = overlap + phrase
+        concept_overlap = len(query_concepts & _concepts(candidate))
+        # Aliases rank observed passages; they never supply an answer or evidence.
+        lexical_score = overlap + phrase + 4 * concept_overlap
         score = lexical_score + (2 if lexical_score and kind in {"article", "requirement", "financial_fact"} else 0)
         if lexical_score:
             ranked.append((score, -index, AskEvidence(kind=kind, label=label, text=text[:1800], reference=ref, status=status)))
@@ -143,7 +169,11 @@ def fast_path(question: str, evidence: list[AskEvidence]) -> str | None:
                 (r"guarantee|garantie|caution", {"provisional_guarantee", "final_guarantee", "guarantee_amount"}),
                 (r"execution period|duration|delai d execution|how long", {"execution_period"}),
                 (r"payment|paiement", {"payment_component", "payment_schedule", "payment_deadline"}))
-    wanted = next((cats for pattern, cats in patterns if re.search(pattern, q)), None)
+    concepts = _concepts(question)
+    wanted = ({"submission_deadline"} if "submission_deadline" in concepts else
+              {"provisional_guarantee", "final_guarantee", "guarantee_amount"} if "provisional_guarantee" in concepts else
+              {"execution_period"} if "execution_period" in concepts else
+              next((cats for pattern, cats in patterns if re.search(pattern, q)), None))
     if wanted is None:
         return None
     found = [e for e in evidence if e.kind == "financial_fact" and any(e.label.endswith("· " + cat.replace("_", " ")) for cat in wanted)]
