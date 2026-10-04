@@ -1,4 +1,7 @@
 from pathlib import Path
+from html.parser import HTMLParser
+import json
+import subprocess
 
 from fastapi.testclient import TestClient
 
@@ -55,9 +58,15 @@ def test_tender_workspace_uses_real_v2_modules_and_truthful_empty_states():
     assert 'item.raw ?? "—"' in cdc
     assert 'Ask Tender' in cdc and 'Finances & échéances' in cdc
     assert 'askTender(payload.document_store_id, question)' in cdc
-    assert 'exportBoqCsv(file)' in cdc
+    assert 'exportBoqCsv(payload.document_store_id)' in cdc
+    assert 'reference.page_number ?? reference.page' in cdc
+    assert 'data-ask-evidence' in cdc
     assert 'data-boq-export' in boq
-    assert 'fetch("/api/cdc/male/export.csv"' in api
+    assert 'fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/boq.csv`)' in api
+    router = (ROOT / "app/static/app/router.js").read_text(encoding="utf-8")
+    state = (ROOT / "app/static/app/state.js").read_text(encoding="utf-8")
+    assert "loadTenderAnalysis(documentId)" in router
+    assert "payload.document_store_id || payload.document_result?.document_id" in state
 
 
 def test_important_tender_and_invoice_routes_remain_available():
@@ -72,6 +81,62 @@ def test_sidebar_uses_only_the_most_specific_tender_route():
     assert 'activePath.startsWith(`${href}/`)' in shell
     # The special handling for /cdc must avoid matching Ministry result routes.
     assert 'href === "/cdc" ?' in shell
+
+
+def test_sidebar_rendered_dom_has_one_active_route_with_aria_current():
+    class LinkParser(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.links = []
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if tag == "a" and "side-link" in attrs.get("class", ""):
+                self.links.append(attrs)
+
+    script = r'''import { mountShell } from "./app/static/app/components/shell.js";
+globalThis.Node = class Node {};
+const target = new Node(); target.append = () => {};
+const root = { innerHTML: "", querySelector: (selector) => selector === "#mainContent" ? target : { addEventListener() {}, setAttribute() {}, textContent: "" } };
+globalThis.document = { getElementById: () => root };
+globalThis.fetch = async () => ({ json: async () => ({ status: "ok" }) });
+mountShell(null, process.argv[1]);
+console.log(root.innerHTML);'''
+    expected = {
+        "/cdc": "/cdc",
+        "/cdc/result/abc": "/cdc",
+        "/cdc/male": "/cdc/male",
+        "/cdc/male/result/abc": "/cdc/male",
+        "/invoice/result/abc": "/invoice",
+    }
+    for route, active_href in expected.items():
+        rendered = subprocess.run(
+            ["node", "--experimental-default-type=module", "-e", script, route],
+            cwd=ROOT, check=True, capture_output=True, text=True,
+        ).stdout
+        parser = LinkParser()
+        parser.feed(rendered)
+        active = [link for link in parser.links if "active" in link.get("class", "").split()]
+        current = [link for link in parser.links if link.get("aria-current") == "page"]
+        assert [link.get("href") for link in active] == [active_href], (route, active)
+        assert [link.get("href") for link in current] == [active_href], (route, current)
+
+
+def test_upload_loading_and_workspace_actions_are_discoverable():
+    upload = (ROOT / "app/static/app/pages/cdc-upload.js").read_text(encoding="utf-8")
+    workspace = (ROOT / "app/static/app/pages/cdc-workspace.js").read_text(encoding="utf-8")
+    css = (ROOT / "app/static/app/styles/workspace.css").read_text(encoding="utf-8")
+    assert "Analyse du document en cours" in upload
+    assert "data-elapsed-time" in upload and "window.setInterval" in upload
+    assert "if (!file || submitting) return" in upload
+    assert "finally { submitting = false; clearBusy(outlet); }" in upload
+    assert '"Finances & Délais", 7' in workspace
+    assert '"Ask Tender", 8' in workspace and 'class="ask-tab-icon"' in workspace
+    assert '"Structure", 1' in workspace and '"Annexes", 3' in workspace and '"Diagnostics", 6' in workspace
+    assert 'role="menu" aria-label="Détails techniques"' in workspace
+    assert ".analysis-tabs { display: grid; grid-template-columns: minmax(0, 1fr) auto" in css
+    assert "overflow-x: auto" not in css[css.rfind(".analysis-tabs {"):]
+    assert "analyse générale terminée" in workspace.lower()
 
 
 def test_cdc_views_use_recursive_nodes_and_backend_handoffs_without_fixture_numbers():

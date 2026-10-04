@@ -2163,6 +2163,8 @@ function addBox(stage, bbox, scaleX, scaleY, type, label, confidence, payload, c
   }
   box.addEventListener("click", (event) => {
     event.stopPropagation();
+    stage.querySelectorAll(".overlay-box.is-selected").forEach((selected) => selected.classList.remove("is-selected"));
+    box.classList.add("is-selected");
     showRegionDetails(type, label, payload);
   });
   stage.appendChild(box);

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from time import perf_counter
 from typing import Any
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
@@ -19,6 +20,7 @@ from app.boq import BOQDocument, export_boq_csv, extract_male_municipal_from_doc
 from app.invoice.document_result_adapter import DocumentResultInvoiceAdapter
 from app.ask_tender.service import AskRequest, AskResponse, answer_question
 from app.services.pipeline_runner import process_document_file
+from app.cdc_analysis.schema import TenderDocument
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
@@ -48,6 +50,7 @@ class WorkflowError(Exception):
 
 
 async def _process_upload(file: UploadFile, workflow: str):
+    started = perf_counter()
     try:
         stored = await document_store.save_upload(file, max_bytes=MAX_UPLOAD_BYTES)
     except ValueError as exc:
@@ -62,6 +65,10 @@ async def _process_upload(file: UploadFile, workflow: str):
                             technical_detail=type(exc).__name__, recoverable=True) from exc
     if not result.pages:
         raise WorkflowError("empty_document", workflow, "No physical pages were produced.", status_code=422)
+    logger.info("Tender timing workflow=%s stage=document_intelligence total_ms=%.1f timings_ms=%s",
+                workflow, result.diagnostics.processing_ms, result.diagnostics.timings_ms)
+    logger.info("Tender timing workflow=%s stage=upload_to_document_result total_ms=%.1f",
+                workflow, (perf_counter() - started) * 1000)
     return stored, result
 
 
@@ -108,9 +115,12 @@ def render_uploaded_document_page(document_id: str, page_number: int, width: int
 
 
 async def _run_cdc_upload(file: UploadFile) -> tuple[dict[str, Any], Any, Any]:
+    started = perf_counter()
     stored, document = await _process_upload(file, "cdc")
     try:
+        cdc_started = perf_counter()
         tender = CDCAnalyzer().analyze(document)
+        logger.info("Tender timing workflow=cdc stage=cdc_analysis total_ms=%.1f", (perf_counter() - cdc_started) * 1000)
     except Exception as exc:
         logger.exception("CDC analysis failed")
         raise WorkflowError("cdc_analysis_failed", "cdc", "Tender structure could not be analyzed.",
@@ -125,6 +135,9 @@ async def _run_cdc_upload(file: UploadFile) -> tuple[dict[str, Any], Any, Any]:
                    "coordinate_space": page.coordinate_space} for page in document.pages],
         "tender_document": tender.model_dump(mode="json"),
     }
+    document_store.save_analysis(stored.document_id, workflow="cdc",
+                                 tender_document=tender.model_dump(mode="json"), response={})
+    logger.info("Tender timing workflow=cdc stage=workflow_total total_ms=%.1f", (perf_counter() - started) * 1000)
     return payload, stored, document
 
 
@@ -135,9 +148,12 @@ async def analyze_cdc(file: UploadFile = File(...)) -> dict[str, Any]:
 
 
 async def _run_ministry_upload(file: UploadFile) -> tuple[dict[str, Any], Any, Any]:
+    started = perf_counter()
     stored, document = await _process_upload(file, "ministry_boq")
     try:
+        cdc_started = perf_counter()
         tender = CDCAnalyzer().analyze(document)
+        logger.info("Tender timing workflow=ministry_boq stage=cdc_analysis total_ms=%.1f", (perf_counter() - cdc_started) * 1000)
     except Exception as exc:
         logger.exception("CDC analysis for Ministry workflow failed")
         raise WorkflowError("cdc_analysis_failed", "ministry_boq", "Tender structure could not be analyzed.",
@@ -148,6 +164,7 @@ async def _run_ministry_upload(file: UploadFile) -> tuple[dict[str, Any], Any, A
     physical_pages = {page.page_number for page in document.pages}
     boq_results = []
     diagnostics: list[str] = []
+    boq_started = perf_counter()
     for handoff in handoffs:
         requested_pages = range(handoff.page_start, handoff.page_end + 1)
         valid_pages = [page_number for page_number in requested_pages if page_number in physical_pages]
@@ -169,6 +186,8 @@ async def _run_ministry_upload(file: UploadFile) -> tuple[dict[str, Any], Any, A
                 diagnostics.extend(result.diagnostics)
 
     detected = bool(boq_results)
+    logger.info("Tender timing workflow=ministry_boq stage=boq_detection total_ms=%.1f handoffs=%s detected=%s",
+                (perf_counter() - boq_started) * 1000, len(handoffs), detected)
     if not handoffs:
         diagnostics.append("cdc_did_not_detect_boq_handoff")
     payload = {
@@ -183,6 +202,9 @@ async def _run_ministry_upload(file: UploadFile) -> tuple[dict[str, Any], Any, A
         "boq_results": boq_results,
         "diagnostics": diagnostics,
     }
+    document_store.save_analysis(stored.document_id, workflow="ministry_boq",
+                                 tender_document=tender.model_dump(mode="json"), response={})
+    logger.info("Tender timing workflow=ministry_boq stage=workflow_total total_ms=%.1f", (perf_counter() - started) * 1000)
     return payload, stored, document
 
 
@@ -205,16 +227,58 @@ async def export_ministry_boq_csv(file: UploadFile = File(...)) -> Response:
 async def analyze_cdc_v2(file: UploadFile = File(...)) -> TenderAnalysisResponseV2:
     """Versioned envelope over the existing single-pass deterministic CDC workflow."""
     payload, stored, document = await _run_cdc_upload(file)
-    return build_tender_analysis_v2(payload, workflow="cdc", document_result=document,
-                                    filename=stored.filename)
+    started = perf_counter()
+    response = build_tender_analysis_v2(payload, workflow="cdc", document_result=document,
+                                        filename=stored.filename)
+    document_store.save_analysis(stored.document_id, workflow="cdc",
+                                 tender_document=response.tender_document.model_dump(mode="json"),
+                                 response=response.model_dump(mode="json"))
+    logger.info("Tender timing workflow=cdc stage=response_build total_ms=%.1f", (perf_counter() - started) * 1000)
+    return response
 
 
 @router.post("/v2/cdc/male/analyze", response_model=TenderAnalysisResponseV2)
 async def analyze_ministry_v2(file: UploadFile = File(...)) -> TenderAnalysisResponseV2:
     """Versioned envelope over the existing Ministry/BOQ workflow."""
     payload, stored, document = await _run_ministry_upload(file)
-    return build_tender_analysis_v2(payload, workflow="ministry_boq", document_result=document,
-                                    filename=stored.filename)
+    started = perf_counter()
+    response = build_tender_analysis_v2(payload, workflow="ministry_boq", document_result=document,
+                                        filename=stored.filename)
+    document_store.save_analysis(stored.document_id, workflow="ministry_boq",
+                                 tender_document=response.tender_document.model_dump(mode="json"),
+                                 response=response.model_dump(mode="json"))
+    logger.info("Tender timing workflow=ministry_boq stage=response_build total_ms=%.1f", (perf_counter() - started) * 1000)
+    return response
+
+
+@router.get("/v2/cdc/{document_id}", response_model=TenderAnalysisResponseV2)
+def get_tender_result(document_id: str) -> TenderAnalysisResponseV2:
+    """Reload a completed local analysis without parsing or OCRing its source again."""
+    saved = document_store.get_analysis(document_id)
+    if saved is None:
+        raise WorkflowError("analysis_not_found", "cdc", "The saved analysis is unavailable.",
+                            status_code=404, recoverable=True)
+    try:
+        return TenderAnalysisResponseV2.model_validate(saved["response"])
+    except Exception as exc:
+        logger.exception("Saved tender analysis could not be restored")
+        raise WorkflowError("saved_analysis_invalid", "cdc", "The saved analysis could not be restored.",
+                            status_code=422, technical_detail=type(exc).__name__, recoverable=True) from exc
+
+
+@router.get("/v2/cdc/{document_id}/boq.csv")
+def export_saved_boq_csv(document_id: str) -> Response:
+    saved = document_store.get_analysis(document_id)
+    if saved is None:
+        raise WorkflowError("analysis_not_found", "boq", "The saved analysis is unavailable.",
+                            status_code=404, recoverable=True)
+    result = TenderAnalysisResponseV2.model_validate(saved["response"])
+    if result.modules.boq.availability != "available" or not result.modules.boq.data:
+        raise WorkflowError("boq_unavailable", "boq", "A supported BOQ was not extracted from this document.",
+                            status_code=404, recoverable=True)
+    documents = [BOQDocument.model_validate(item.get("result", item)) for item in result.modules.boq.data]
+    return Response(content=export_boq_csv(documents), media_type="text/csv; charset=utf-8",
+                    headers={"Content-Disposition": 'attachment; filename="boq-export.csv"'})
 
 
 @router.post("/v2/cdc/{document_id}/ask", response_model=AskResponse)
@@ -225,8 +289,18 @@ def ask_tender_v2(document_id: str, request: AskRequest) -> AskResponse:
         raise WorkflowError("document_not_found", "ask_tender", "The document is unavailable or expired.",
                             status_code=404, recoverable=True)
     try:
-        document_result = DocumentProcessor().process(stored.path)
-        tender = CDCAnalyzer().analyze(document_result)
+        saved = document_store.get_analysis(document_id)
+        if saved is not None:
+            tender = TenderDocument.model_validate(saved["tender_document"])
+        else:
+            # Recover source-only records from before the structured record was written.
+            document_result = DocumentProcessor().process(stored.path)
+            tender = CDCAnalyzer().analyze(document_result)
+            try:
+                document_store.save_analysis(document_id, workflow="cdc",
+                                             tender_document=tender.model_dump(mode="json"), response={})
+            except OSError:
+                logger.warning("Recovered Ask Tender result could not be persisted for %s", document_id)
     except Exception as exc:
         logger.exception("Ask Tender source analysis failed")
         raise WorkflowError("cdc_analysis_failed", "ask_tender", "Tender evidence could not be analyzed.",

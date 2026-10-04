@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import csv
+from decimal import Decimal, InvalidOperation
 from io import StringIO
 from typing import Iterable
 
@@ -17,7 +18,17 @@ CSV_COLUMNS = (
 def _cell(row: BOQRow, field: str) -> str:
     value = getattr(row, field)
     normalized = value.normalized_value
-    return "" if normalized is None else str(normalized)
+    if normalized is None:
+        return ""
+    text = str(normalized)
+    # Spreadsheet applications may execute cells beginning with formula markers.
+    candidate = text.lstrip("\ufeff \t\r\n")
+    try:
+        Decimal(candidate)
+        is_number = True
+    except InvalidOperation:
+        is_number = False
+    return f"'{text}" if not is_number and candidate.startswith(("=", "+", "-", "@")) else text
 
 
 def export_boq_csv(documents: Iterable[BOQDocument]) -> str:

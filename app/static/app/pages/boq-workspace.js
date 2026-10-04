@@ -5,7 +5,10 @@ const visibleFields = ["article", "designation", "quantity", "unit", "unit_price
 const labels = { article: "Art.", designation: "Désignation", quantity: "Qté", unit: "Unité", unit_price_ht: "PU HT", total_ht: "Total HT", unit_price_ttc: "PU TTC", total_ttc: "Total TTC" };
 
 export function renderBoqWorkspace(boq, { canExport = false } = {}) {
-  if (!boq?.detected) return `<div class="view-heading"><div><p class="eyebrow">MINISTÈRE DES AFFAIRES LOCALES</p><h2>Devis estimatif</h2></div></div>${empty("Document du Ministère non reconnu", "Le document n’a pas été reconnu. Aucun bordereau n’a été extrait.")}`;
+  if (!boq?.detected) {
+    const noHandoff = boq?.diagnostics?.includes("cdc_did_not_detect_boq_handoff");
+    return `<div class="view-heading"><div><p class="eyebrow">MINISTÈRE DES AFFAIRES LOCALES · MODULE SPÉCIALISÉ</p><h2>Bordereau des prix</h2></div></div>${empty("Bordereau spécialisé indisponible", noHandoff ? "Aucun bordereau n’a été repéré dans les annexes. L’analyse générale du dossier reste accessible." : "Le bordereau ne correspond pas au modèle spécialisé pris en charge. L’analyse générale du dossier reste accessible.")}`;
+  }
   const rows = boq.rows || [];
   const blank = rows.length > 0 && rows.every(row => amountFields.every(field => !hasValue(row[field])));
   const body = rows.map((row, rowIndex) => `<tr>${visibleFields.map(field => `<td>${renderValue(row[field], rowIndex, field)}</td>`).join("")}<td>${statusBadge(row.validation_status || "NOT_CHECKABLE")}</td></tr>`).join("");

@@ -12,7 +12,7 @@ from app.boq.evaluate import evaluate
 from app.boq.extractor import extract_male_municipal_from_document, extract_male_municipal_v1
 from app.boq.normalize import normalize_header, parse_french_decimal
 from app.boq.detect import normalize_male_municipal_header
-from app.boq.models import BoundingBox
+from app.boq.models import BOQDocument, BOQRow, BoundingBox, ParsedValue
 from app.boq.export import CSV_COLUMNS, export_boq_csv
 from app.boq.validate import validate_document, validate_row
 try:
@@ -38,6 +38,20 @@ def make_page(*, page_number, width, height, elements):
 def make_document(*, document_id, pages):
     diagnostics = DocumentDiagnostics(processing_ms=0,timings_ms={},missing_geometry_count=0,ocr_page_count=0,fallback_page_count=0,cache_enabled=False) if DocumentDiagnostics else SimpleNamespace()
     return DocumentResult(document_id=document_id,source_type="pdf",mode="native",pages=pages,diagnostics=diagnostics) if DocumentResult else SimpleNamespace(document_id=document_id,pages=pages)
+
+
+def test_boq_csv_preserves_missing_values_and_neutralizes_formula_text():
+    document = BOQDocument(extractor_family="test", detected=True, rows=[BOQRow(
+        designation=ParsedValue(raw_value="=HYPERLINK(\"https://example.invalid\")",
+                                normalized_value="=HYPERLINK(\"https://example.invalid\")",
+                                parse_status="PARSED", value_origin="OBSERVED"),
+        quantity=ParsedValue(normalized_value=None),
+        unit_price_ht=ParsedValue(normalized_value=Decimal("-12.50")),
+    )])
+    exported = list(csv.DictReader(StringIO(export_boq_csv([document]))))[0]
+    assert exported["designation"].startswith("'=")
+    assert exported["quantity"] == ""
+    assert exported["unit_price_ht"] == "-12.50"
 
 
 def page(items, *, shift=0):

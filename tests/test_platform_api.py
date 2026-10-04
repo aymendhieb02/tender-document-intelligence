@@ -100,6 +100,43 @@ def test_v2_ministry_marks_unrecognized_boq_unavailable_without_fake_data(tmp_pa
     assert contract.modules.boq.data is None
     assert contract.modules.boq.reason == "supported_template_not_detected"
     assert "cdc_did_not_detect_boq_handoff" in contract.diagnostics
+    assert contract.modules.summary.availability == "available"
+    assert contract.modules.requirements_intelligence.availability == "available"
+    assert contract.modules.financial_deadline_intelligence.availability in {"available", "partial"}
+    assert contract.modules.evidence.availability == "available"
+
+
+def test_ask_tender_reuses_successful_generic_analysis_when_boq_is_not_run(tmp_path, monkeypatch):
+    from app.api import workflow_routes
+
+    data = make_pdf(tmp_path / "ordinary.pdf", [
+        "Cahier des charges", "Le candidat doit fournir une offre valable 60 jours.",
+    ])
+    original = workflow_routes.DocumentProcessor
+    calls = 0
+
+    class CountingProcessor:
+        def __init__(self, *args, **kwargs):
+            self.delegate = original(*args, **kwargs)
+
+        def process(self, path):
+            nonlocal calls
+            calls += 1
+            return self.delegate.process(path)
+
+    monkeypatch.setattr(workflow_routes, "DocumentProcessor", CountingProcessor)
+    monkeypatch.setattr(workflow_routes, "answer_question", lambda tender, question: workflow_routes.AskResponse(
+        answer="Offre valable 60 jours.", status="answered", evidence=[], backend="deterministic"))
+    response = client.post("/api/v2/cdc/analyze", files={"file": ("ordinary.pdf", data, "application/pdf")})
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["modules"]["boq"]["availability"] == "not_run"
+    assert calls == 1
+    answer = client.post(f"/api/v2/cdc/{payload['document']['document_url'].split('/')[-1]}/ask",
+                         json={"question": "Quelle est la durée de validité de l’offre ?"})
+    assert answer.status_code == 200, answer.text
+    assert answer.json()["answer"] == "Offre valable 60 jours."
+    assert calls == 1
 
 
 def test_v2_errors_validate_against_existing_structured_error_contract():
@@ -141,6 +178,43 @@ def test_v2_processes_document_once_and_uses_same_result_for_modules(tmp_path, m
     facts = payload.modules.financial_deadline_intelligence.data
     assert any(fact["category"] == "offer_validity" and fact["normalized"] == {"value": "60", "unit": "DAY"}
                for fact in facts)
+
+
+def test_tender_result_and_ask_survive_store_reload_without_reprocessing(tmp_path, monkeypatch):
+    from app.api import workflow_routes
+    from app.api.document_store import LocalDocumentStore
+
+    data = REFERENCE_PDF.read_bytes()
+    first_store = LocalDocumentStore(tmp_path / "workspace")
+    monkeypatch.setattr(workflow_routes, "document_store", first_store)
+    response = client.post("/api/v2/cdc/male/analyze", files={"file": (REFERENCE_PDF.name, data, "application/pdf")})
+    assert response.status_code == 200, response.text
+    original = response.json()
+    document_id = original["document"]["document_url"].rsplit("/", 1)[-1]
+
+    # A new store instance simulates an application restart; no analysis cache survives.
+    reloaded_store = LocalDocumentStore(tmp_path / "workspace")
+    monkeypatch.setattr(workflow_routes, "document_store", reloaded_store)
+    def unexpected_processing(*args, **kwargs):
+        raise AssertionError("persisted result should not rerun Document Intelligence")
+
+    monkeypatch.setattr(workflow_routes, "DocumentProcessor", unexpected_processing)
+    retrieved = client.get(f"/api/v2/cdc/{document_id}")
+    assert retrieved.status_code == 200, retrieved.text
+    assert retrieved.json()["tender_document"] == original["tender_document"]
+    assert client.get(original["document"]["document_url"]).status_code == 200
+    assert retrieved.json()["modules"]["boq"]["availability"] == "available"
+    assert len(retrieved.json()["modules"]["boq"]["data"][0]["result"]["rows"]) == 5
+    exported = client.get(f"/api/v2/cdc/{document_id}/boq.csv")
+    assert exported.status_code == 200
+    csv_rows = list(csv.DictReader(StringIO(exported.text)))
+    assert len(csv_rows) == 5
+    assert all(row["quantity"] == "" and row["total_ht"] == "" for row in csv_rows)
+    answer = client.post(f"/api/v2/cdc/{document_id}/ask", json={
+        "question": "Quelle est la date limite de réception des offres ?",
+    })
+    assert answer.status_code == 200, answer.text
+    assert answer.json()["evidence"]
 
 
 def test_cdc_api_processes_reference_and_serves_document():

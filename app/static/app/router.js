@@ -1,6 +1,6 @@
-import { mountShell } from "./components/shell.js?v=platform-refactor-5";
+import { mountShell } from "./components/shell.js?v=mvp-fix-01";
 import { renderDashboard } from "./pages/dashboard.js?v=platform-refactor-5";
-import { renderCdcUpload } from "./pages/cdc-upload.js?v=platform-refactor-qa1";
+import { renderCdcUpload } from "./pages/cdc-upload.js?v=mvp-fix-01";
 import { renderInvoicePage } from "./pages/invoice.js?v=platform-refactor-5";
 
 const path = window.location.pathname.replace(/\/$/, "") || "/";
@@ -21,7 +21,18 @@ if (invoiceContent || path === "/invoice" || path.startsWith("/invoice/result/")
 }
 
 async function renderCdcRoute(outlet, route) {
-  const { renderCdcWorkspace } = await import("./pages/cdc-workspace.js?v=platform-refactor-qa1");
+  const { renderCdcWorkspace } = await import("./pages/cdc-workspace.js?v=persisted-results-3");
+  if (route.includes("/result/")) {
+    const { loadTenderAnalysis } = await import("./api.js?v=persisted-results-3");
+    const documentId = decodeURIComponent(route.split("/result/").at(-1) || "");
+    try {
+      const payload = await loadTenderAnalysis(documentId);
+      renderCdcWorkspace(outlet, payload, null, route.startsWith("/cdc/male") ? "male" : "cdc");
+      return;
+    } catch (error) {
+      // Fall through to an actionable upload page when the local record expired or is damaged.
+    }
+  }
   renderCdcUpload(outlet, {
     workflow: route.startsWith("/cdc/male") ? "male" : "cdc",
     showUnavailable: route.includes("/result/"),

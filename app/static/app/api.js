@@ -80,11 +80,32 @@ export async function askTender(documentId, question) {
   return payload;
 }
 
-export async function exportBoqCsv(file) {
-  if (!file) throw new Error("Le document source n’est plus disponible.");
-  const form = new FormData();
-  form.append("file", file);
-  const response = await fetch("/api/cdc/male/export.csv", { method: "POST", body: form });
+export async function loadTenderAnalysis(documentId) {
+  const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}`);
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.error?.message || "Cette analyse n’est plus disponible.");
+  const firstBoq = payload.modules?.boq?.data?.[0]?.result || payload.modules?.boq?.data?.[0];
+  return {
+    ...payload,
+    document_id: payload.document.document_id,
+    document_url: payload.document.document_url,
+    document_store_id: storedDocumentId(payload.document.document_url),
+    source_type: payload.document.source_type,
+    page_count: payload.document.page_count,
+    document_result: {
+      document_id: payload.document.document_id,
+      source_type: payload.document.source_type,
+      mode: "Document Intelligence",
+      pages: Array.from({ length: payload.document.page_count }, (_, index) => ({ page_number: index + 1 })),
+      diagnostics: { processing_ms: null },
+    },
+    boq_document: firstBoq || { detected: false, rows: [], diagnostics: payload.modules?.boq?.diagnostics || [] },
+  };
+}
+
+export async function exportBoqCsv(documentId) {
+  if (!documentId) throw new Error("Identifiant du dossier manquant.");
+  const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/boq.csv`);
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));
     const detail = payload.error || payload.detail || {};
