@@ -108,7 +108,8 @@ def extract_generic_boq(page, *, document_id: str | None = None) -> BOQDocument:
     if detected is None:
         return result
     header_y, ordered, price_basis = detected
-    result.column_mapping = {field: field for field, _ in ordered}
+    price_field = {"unit_price_ht": "unit_price_ttc", "total_ht": "total_ttc"} if price_basis == "ttc" else {}
+    result.column_mapping = {price_field.get(field, field): price_field.get(field, field) for field, _ in ordered}
     result.detection = {"method": "heading_and_positioned_header", "header_page": page.page_number,
                         "column_centres": {field: round(x, 2) for field, x in ordered},
                         "price_basis": price_basis}
@@ -148,7 +149,7 @@ def extract_generic_boq(page, *, document_id: str | None = None) -> BOQDocument:
         row = BOQRow(source_page=page.page_number, source_bbox=_evidence(page, line).source_bbox)
         for field in ("article", "designation", "unit", "quantity", "unit_price_ht", "total_ht"):
             if cells.get(field):
-                setattr(row, field, _text_value(page, cells[field], numeric=field in NUMERIC))
+                setattr(row, price_field.get(field, field), _text_value(page, cells[field], numeric=field in NUMERIC))
         result.rows.append(row)
         previous_y = y
     if result.rows:

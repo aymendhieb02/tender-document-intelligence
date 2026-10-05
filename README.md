@@ -22,6 +22,8 @@ For exactly reproduced Windows packages, install `requirements-lock-win-py311.tx
 
 Start the application with `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`. Main workflows are `POST /process-invoice` (legacy route), `POST /api/invoices/analyze`, `POST /api/v2/cdc/analyze`, and `POST /api/v2/cdc/male/analyze`. Each accepts a multipart `file`. Tender responses include an opaque document ID and a local persistent retrieval URL. `GET /api/v2/cdc` lists completed tender analyses; `/analyses` opens the local library. See [integrated backend architecture and API contracts](docs/INTEGRATED_BACKEND_V1.md).
 
+The **Bordereau** view now opens a persistent pricing draft with exact-decimal line totals and a separate CSV export. See [pricing workflow](docs/BOQ_PRICING_WORKFLOW.md). The library supports local search and guarded deletion; financial facts support separate human review. Cross-origin requests are disabled by default; set `INVOICE_OCR_CORS_ORIGINS` to a comma-separated list of trusted origins when deploying across origins. Public or multi-user deployment requires authentication and access control.
+
 ```python
 from app.document_intelligence import DocumentProcessor
 

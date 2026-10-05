@@ -36,3 +36,9 @@ This is a digital, searchable reference template, so the measurement says little
 2. Measure CDC structure and Ask retrieval against longer real tenders, including citation coverage and relevance review.
 3. Track persistence serialization/restore at larger evidence volumes before increasing document limits.
 4. Evaluate local Ollama only with controlled prompts, model/version recording and answer-grounding review.
+
+## 2026-10-05 warm local remeasurement
+
+One sequential final-code run of the same 30-page native PDF measured Document Intelligence 530.0 ms, CDC 270.6 ms, BOQ candidate scan 248.5 ms across all 30 pages, V2 composition 611.6 ms, and Ask evidence retrieval 1037.6 ms for six passages. A five-row pricing calculation took 1.478 ms; pricing CSV assembly took 0.096 ms; JSON serialization plus temporary write of the 3.53 MB response took 54.2 ms and reload/parse 34.1 ms. These are one-run observations on this host, not latency guarantees. This broader BOQ scan includes generic candidate checks on all pages, so it is not directly comparable with the earlier 6 ms specialized-page-only figure.
+
+The persisted API paths for Ask, pricing GET/PUT, pricing CSV, and library reopen operate on saved analysis; API tests replace `DocumentProcessor` with a failing stub on reload to detect duplicate processing. Browser refresh and library reopen restored the pricing draft. Scanned/OCR performance remains unmeasured here.

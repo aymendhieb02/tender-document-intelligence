@@ -114,6 +114,20 @@ def test_generic_boq_multiline_header_wrapped_designation_and_repeated_header():
     assert len(result.rows[0].designation.evidence) == 2
 
 
+def test_generic_ttc_header_maps_observed_values_to_ttc_fields():
+    items = [("Devis estimatif", 250, 80, .99),
+             ("Article", 100, 200, .99), ("Désignation", 300, 200, .99),
+             ("Quantité", 570, 200, .99), ("Prix unitaire TTC", 720, 200, .99),
+             ("Montant TTC", 870, 200, .99), ("01", 100, 300, .99),
+             ("Service", 300, 300, .99), ("2", 570, 300, .99),
+             ("12,500", 720, 300, .99), ("25,000", 870, 300, .99)]
+    result = extract_generic_boq(page(items))
+    assert result.detection["price_basis"] == "ttc"
+    assert result.rows[0].unit_price_ht.normalized_value is None
+    assert result.rows[0].unit_price_ttc.normalized_value == Decimal("12.500")
+    assert result.rows[0].total_ttc.normalized_value == Decimal("25.000")
+
+
 ANCHORS = [("Annexe 05", 80, 80, .99), ("BORDEREAU DES PRIX", 300, 130, .99),
     ("DEVIS ESTIMATIF", 300, 155, .99), ("Prix HTVA", 700, 250, .99), ("Prix TTC", 880, 250, .99)]
 

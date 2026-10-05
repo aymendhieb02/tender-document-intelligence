@@ -104,3 +104,12 @@ def test_unknown_generic_price_basis_never_labels_amount_ht():
     assert result["rows"][0]["computed"]["line_total"]["value"] == "12500.000"
     assert result["rows"][0]["computed"]["line_total_ht"]["value"] is None
     assert result["totals"]["total_ttc"]["value"] is None
+
+
+def test_ttc_generic_draft_uses_ttc_inputs_without_ht_or_tax_inference():
+    boq = fixture(family="GENERIC_LAYOUT_BOQ_V1", price_basis="ttc")
+    result = draft(boq, [PricingRowInput(index=0, unit_price_ttc="14.875")])
+    assert result["profile"]["has_ht"] is False
+    assert result["rows"][0]["computed"]["line_total_ht"]["value"] is None
+    assert result["rows"][0]["computed"]["line_total_ttc"]["value"] == "14875.000"
+    assert result["totals"]["tax_amount"]["value"] is None
