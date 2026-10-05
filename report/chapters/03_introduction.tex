@@ -1,0 +1,20 @@
+\chapter*{Introduction générale}\addcontentsline{toc}{chapter}{Introduction générale}
+Une organisation qui prépare une réponse à un appel d'offres doit retrouver des obligations, des dates, des pièces à fournir et parfois des tableaux de prix dispersés sur de nombreuses pages. Les PDF reçus ne présentent pas tous la même structure : certains contiennent une couche de texte exploitable, d'autres sont des scans, et un dossier peut combiner les deux. Une lecture manuelle reste indispensable pour les décisions engageantes, mais elle peut être aidée par une extraction qui ramène chaque information à sa page et à sa zone d'origine.
+
+La reconnaissance optique de caractères (OCR) transforme une image de texte en éléments textuels. Elle ne dit pas, à elle seule, si une phrase énonce un délai, une obligation ou un prix. La \DI{} étudiée ici ajoute un contrat commun de preuve, puis une interprétation propre au domaine des cahiers des charges (CDC). Le projet ne cherche donc pas à remplacer le jugement de l'analyste ; il organise des candidats vérifiables et les rend consultables dans un espace de travail.
+
+L'objectif du stage, réalisé chez UDGroup du 1\textsuperscript{er} juillet au 31 août 2026, est présenté en deux tâches complémentaires. La première construit une fondation générique pour documents PDF et images : chargement, extraction native ou OCR, coordonnées, ordre de lecture, géométrie et diagnostics. La seconde transforme ces preuves en information de marché : sections, articles, exigences, informations temporelles et financières, annexes, bordereaux et réponses accompagnées de citations. La \autoref{fig:evolution} résume cette progression.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[node distance=5mm, every node/.style={font=\small}, box/.style={draw=ink,rounded corners=2pt,fill=pale,minimum width=0.79\textwidth,minimum height=8mm,align=center},arr/.style={-{Latex[length=2mm]},thick,draw=espritred}]
+\node[box] (a) {PDF ou image : texte natif, scan et tableaux};
+\node[box,below=of a] (b) {Document Intelligence : pages, éléments, géométrie, origine};
+\node[box,below=of b] (c) {Analyse CDC : hiérarchie, exigences, faits, annexes};
+\node[box,below=of c] (d) {BOQ et Ask Tender : lignes, contrôles, passages cités};
+\node[box,below=of d] (e) {Espace de travail : inspection, chiffrage séparé, revue};
+\draw[arr] (a)--(b);\draw[arr] (b)--(c);\draw[arr] (c)--(d);\draw[arr] (d)--(e);
+\end{tikzpicture}
+\caption{Progression fonctionnelle du document brut vers une aide à l'analyse vérifiable.}\label{fig:evolution}
+\end{figure}
+
+Ce rapport repose sur le code, les tests, les artefacts d'évaluation et l'historique Git accessibles à sa rédaction. Les premiers commits visibles datent du 28 septembre 2026, après la période administrative du stage. Leur ordre éclaire l'évolution technique sans dater précisément chaque fonction pendant juillet--août. Les résultats synthétiques sont désignés comme tels et le BOQ réel vide n'est jamais utilisé comme preuve de précision numérique. Les chapitres suivent les deux tâches, puis examinent leur évaluation et leurs limites.

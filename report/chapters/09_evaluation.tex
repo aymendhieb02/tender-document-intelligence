@@ -1,0 +1,91 @@
+\chapter{Validation, résultats et analyse des erreurs}\label{chap:evaluation}
+\section{Protocole : trois niveaux de preuve}
+L'évaluation n'agrège pas toutes les vérifications en un score global. Un test unitaire contrôle une règle sur une entrée connue ; un benchmark annoté compare une sortie à une référence limitée ; un parcours de bout en bout vérifie l'enchaînement de l'interface et de la persistance. Aucun de ces niveaux, pris isolément, ne démontre l'exactitude d'un système sur la population entière des appels d'offres. Les jeux sont donc décrits avec leur origine et leur statut d'annotation.
+
+Le corpus de développement CDC V2 comprend sept documents traités du PDF à l'analyse ; six disposent d'étiquettes de source vérifiées pour les catégories scorées. Un scan arabe de 37 pages a été exécuté historiquement avec OCR, mais ses annotations restent provisoires et il est exclu des scores. Pour le BOQ, une référence réelle vide sert à mesurer seulement la structure. Les formulaires synthétiques contrôlent les cas numériques et géométriques. Enfin, la récupération Ask Tender est éprouvée sur de petites questions synthétiques revues. La \autoref{tab:cohortes} explicite ce découpage.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{31mm}p{22mm}Y Y@{}}\toprule
+Ensemble & Volume & Ce qui est observable & Ce qui ne l'est pas\\\midrule
+CDC développement & 7 traités ; 6 vérifiés & Sections, annexes et exemples positifs annotés & Généralisation à un corpus indépendant\\
+BOQ réel vide & 1 PDF, 30 pages & Page 25, 5 lignes structurelles, champs vides & Précision des prix d'offres remplies\\
+BOQ réel rempli & 0 & Aucun score possible & Extraction numérique réelle\\
+BOQ synthétique & Fixtures contrôlées & Règles de parsing, manque et calcul & Exactitude en production\\
+Ask Tender synthétique & 4 puis 7 questions & Rang de la page attendue & Qualité générale des réponses\\\bottomrule
+\end{tabularx}
+\caption{Séparation des cohortes et limites de mesure.}\label{tab:cohortes}
+\end{table}
+
+\section{Tests du logiciel et contrat documentaire}
+La commande \texttt{\detokenize{pytest -q -rs}}, exécutée le 5 octobre 2026 sur l'état \texttt{\detokenize{f292de8}}, donne \textbf{305 tests réussis, aucun échec, un test ignoré et un avertissement} en 33,40~s. Le test ignoré est la vérification réelle Paddle nécessitant \texttt{\detokenize{RUN_REAL_OCR=1}} et des modèles locaux. L'avertissement concerne la dépréciation de la combinaison Starlette/httpx utilisée par TestClient. Les tests couvrent notamment le contrat DI, la rotation des pages, les adaptateurs, l'analyse CDC, les cas BOQ, les routes V2 et la persistance. Ils ne sont pas un taux de réussite documentaire : beaucoup reposent sur des fixtures conçues pour reproduire un comportement attendu.
+
+La conformité OCR du parcours natif est particulièrement importante pour l'étude : la référence réelle possède du texte sélectionnable sur ses 30 pages. Le diagnostic de la mesure locale indique zéro page OCR et zéro repli. Le nombre d'éléments de preuve rapporté par cette exécution est 10\,451 ; il s'agit d'éléments textuels du PDF, pas de champs métier correctement extraits. Les tests de schéma protègent la sérialisation \texttt{\detokenize{DocumentResult}} et l'identité des références de preuve à travers les consommateurs.
+
+\section{Mesures CDC et interprétation}
+Sur les catégories entièrement revues, la version V2 retrouve les neuf sections annotées sans faux positif ni omission dans ce sous-ensemble : précision et rappel 9/9. Les 27 annexes annotées sont également retrouvées. Ces ratios portent sur des listes complètes pour les documents sélectionnés, pas sur tout document futur. Les titres d'articles et les faits d'exigence, eux, sont des \emph{exemples positifs} sélectionnés : 19 titres sur 19 sont retrouvés, mais aucune précision de tous les articles ne peut être calculée. Parmi 26 faits positifs, 14 sont détectés ; sur ces 14, sept valeurs normalisées correspondent à l'attendu et les 14 pages de preuve sont correctes. Les douze faits manqués et sept valeurs incorrectes restent des échecs visibles.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}Y p{37mm}Y@{}}\toprule
+Objet scoré & Résultat V2 & Portée correcte\\\midrule
+Sections majeures & 9 vrais positifs, 0 FP, 0 FN & Listes complètes revues sur le sous-ensemble\\
+Annexes & 27/27, 0 FP, 0 FN & Listes complètes revues sur le sous-ensemble\\
+Titres d'articles & 19/19 exemples positifs & Aucun calcul de précision exhaustive\\
+Exigences & 14/26 exemples positifs retrouvés & 12 exemples non détectés\\
+Valeurs normalisées & 7/14 parmi les détectés & Sept valeurs détectées mais non conformes\\
+Pages des faits détectés & 14/14 & Provenance des seuls faits retrouvés\\
+BOQ présents dans CDC pilote & 3/3 pages chevauchées & Détection sur sous-ensemble de développement\\\bottomrule
+\end{tabularx}
+\caption{Résultats du benchmark CDC V2 sur annotations de développement ; aucune métrique globale n'est déduite.}\label{tab:cdc-resultats}
+\end{table}
+
+Le changement V2 cible des erreurs identifiées : titres arabes non reconnus, frontières «~Partie~» et «~Lot~» mal classées. La comparaison V1/V2 sur les mêmes labels montre que les sections passent de 5 vrais positifs, 2 faux positifs et 4 omissions à 9, 0 et 0. Elle ne démontre pas une progression sur un jeu tenu à l'écart, puisque le même corpus a guidé l'évolution. Les 14 faits d'exigence détectés restent inchangés en nombre ; une meilleure structure rend deux normalisations visibles à l'évaluateur, sans changement général du parseur de valeur.
+
+\section{Bordereau et contrôle de l'absence}
+Le mécanisme d'évaluation BOQ V2 distingue \texttt{\detokenize{real_completed}}, \texttt{\detokenize{real_empty_template}} et \texttt{\detokenize{synthetic}}. Dans la cohorte réelle vide, la présence du tableau, sa page candidate et son nombre de lignes sont corrects chacun sur l'unique document. Les cinq numéros d'article sont retrouvés et 25 cellules explicitement vides de quantité ou de montant demeurent vides. Ces comptes portent sur \emph{un seul gabarit vide}. Aucune précision, rappel ou erreur absolue des montants sur un bordereau réel rempli ne peut être annoncé. Les tests synthétiques vérifient notamment les formes numériques françaises, les lignes à valeur absente, l'erreur arithmétique, un décalage géométrique et les calculs du brouillon.
+
+Un exemple de chiffrage de démonstration calcule 1000 multiplié par 12,500 pour obtenir 12\,500,000 HT ; un taux de 19\,\% saisi \emph{dans ce scénario synthétique} donne 2\,375,000 de taxe et 14\,875,00000 TTC. Ces valeurs ne viennent pas du PDF de référence. Elles vérifient l'arithmétique, la persistance après redémarrage et l'affichage, sans établir un devis réel.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=44mm,minimum height=14mm},arr/.style={-{Latex},draw=espritred,thick},node distance=9mm]
+\node[box] (real) {Réel rempli\\0 document : non mesurable};
+\node[box,right=of real] (empty) {Réel vide\\1 gabarit : structure};
+\node[box,below=of empty] (synthetic) {Synthétique\\parsing et calcul contrôlés};
+\draw[arr] (real)--node[above]{\scriptsize cohortes distinctes}(empty);\draw[arr] (empty)--(synthetic);
+\end{tikzpicture}
+\caption{Trois cohortes BOQ qui ne doivent pas être fusionnées en une « précision » unique.}\label{fig:cohortes}
+\end{figure}
+
+\section{Ask Tender et parcours utilisateur}
+Quatre questions synthétiques initiales placent la page attendue parmi les trois premières réponses dans 4/4 cas. La mise à jour suivante couvre sept autres questions synthétiques ; leur page attendue arrive en tête dans 7/7 cas, et donc également dans les trois et sept premières places. Le protocole évalue la \emph{présence de la bonne page dans le classement}, pas la véracité complète d'une réponse rédigée. Sur le document de référence, une formulation du délai de dépôt a remonté des pages liées au sujet, mais des questions larges peuvent aussi favoriser un passage voisin.
+
+Un parcours navigateur local documenté a couvert le chargement d'un bordereau synthétique, l'ouverture du workspace, le chiffrage et ses calculs, le rafraîchissement, la réouverture après redémarrage, une citation Ask Tender et la bibliothèque. L'export CSV a été vérifié côté API ; le téléchargement navigateur n'a pas produit de chemin de fichier observable dans l'automatisation. La suppression a été testée par API sur un enregistrement jetable. Cette description distingue précisément ce qui a été vu dans le navigateur de ce que prouvent seulement les tests de route.
+
+\section{Temps observés et erreurs résiduelles}
+Une mesure séquentielle locale, sur le PDF natif de 30 pages et le code final du dépôt, rapporte 530,0~ms pour DI, 270,6~ms pour CDC, 248,5~ms pour le balayage BOQ de toutes les pages, 611,6~ms pour la composition V2 et 1\,037,6~ms pour la récupération de six passages Ask Tender. Un calcul de prix sur cinq lignes prend 1,478~ms dans cette exécution. L'écriture d'une réponse JSON de 3,53~Mo prend 54,2~ms et sa lecture/analyse 34,1~ms. Les étapes sont mesurées séparément et ne doivent pas être additionnées aveuglément : le balayage BOQ final diffère d'une mesure historique limitée à la page spécialisée. Aucun intervalle de confiance, test de charge ou mesure du chemin OCR scanné n'accompagne ces nombres.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{38mm}p{25mm}Y@{}}\toprule
+Étape locale & Temps observé & Contexte\\\midrule
+Document Intelligence & 530,0 ms & PDF natif 30 pages, environnement chaud\\
+CDC Analyzer & 270,6 ms & Même référence\\
+Balayage BOQ & 248,5 ms & Vérification des 30 pages\\
+Composition réponse V2 & 611,6 ms & Assemblage du contrat API\\
+Ask Tender & 1\,037,6 ms & Récupération de six passages\\
+Calcul prix cinq lignes & 1,478 ms & Brouillon local\\\bottomrule
+\end{tabularx}
+\caption{Observations d'une seule exécution locale, sans garantie de latence.}\label{tab:performance}
+\end{table}
+
+L'analyse des échecs reste prioritaire. Les douze faits CDC non détectés comprennent des clauses arabes et des formulations non couvertes. Sept valeurs détectées ont une normalisation incorrecte ou absente, notamment une date, une garantie et des pénalités. Le scan arabe de développement a produit historiquement 1\,192 éléments OCR sur 37 pages, mais un texte bruité et aucune annotation définitive : l'échec ne peut être attribué séparément au reconnaisseur ou à l'analyseur. Le parseur générique BOQ présuppose encore des colonnes stables et ne prouve pas la lecture de tables arbitraires.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{30mm}Y Y@{}}\toprule
+Échec observé & Cause plausible appuyée par les traces & Réponse et risque restant\\\midrule
+Titres arabes absents & Cues de titre V1 insuffisants, ordre de mots variable & Règles V2 ; scans arabes encore non validés\\
+Faits non détectés & Motifs d'obligation incomplets & 12/26 exemples manqués ; élargir après annotation\\
+Valeurs financières fausses & Normalisation sémantique limitée & Conserver source et revue ; 7/14 valeurs correctes\\
+BOQ générique irrégulier & Colonnes et hauteurs variables & Tests synthétiques ciblés ; corpus réel rempli requis\\
+Question générale mal classée & Récupération lexicale sans compréhension vectorielle & Citations visibles ; évaluation diversifiée requise\\\bottomrule
+\end{tabularx}
+\caption{Erreurs conservées dans l'analyse plutôt que masquées par un score global.}\label{tab:erreurs}
+\end{table}

@@ -1,0 +1,42 @@
+\chapter{État de l'art ciblé et choix techniques}\label{chap:etat-art}
+\section{OCR et extraction native : deux sources différentes}
+Un PDF numérique peut contenir des glyphes et des positions extractibles directement. PyMuPDF expose notamment l'extraction de mots et prévient que l'ordre textuel du PDF ne correspond pas nécessairement à l'ordre de lecture visuel \cite{pymupdf}. Un scan, au contraire, exige une reconnaissance sur pixels. PaddleOCR est le moteur de reconnaissance principal prévu par le dépôt ; son installation et ses modèles constituent une dépendance d'exécution distincte \cite{paddle}. Tesseract peut jouer un rôle de repli si son exécutable et ses données de langue sont installés \cite{tesseract}. La solution ne suppose pas qu'un des deux chemins soit universellement meilleur : elle choisit au niveau de la page et consigne la décision.
+
+L'OCR produit généralement des lignes accompagnées d'une confiance du reconnaisseur, alors que l'extraction native fournit des mots sans confiance OCR. Mélanger ces valeurs dans un score unique serait trompeur. Le contrat conserve donc la source (\texttt{\detokenize{native_pdf}}, \texttt{\detokenize{paddleocr}}, \texttt{\detokenize{tesseract}}), les boîtes d'origine et la transformation vers un repère commun. La \autoref{tab:choix} synthétise les composants réellement présents.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{26mm}Y Y@{}}\toprule
+Technologie & Fonction dans le dépôt & Motif vérifiable du choix\\\midrule
+Python / Pydantic & Modèles de sortie et traitement & Contrats sérialisables et validation de types\\
+PyMuPDF & Lecture PDF native et rendu des pages & Mots avec positions et rendu pour OCR\\
+PaddleOCR & Reconnaissance sur images & Adapteurs et profils OCR réutilisés\\
+Tesseract & Repli local optionnel & Garde une voie de secours, sous condition d'installation\\
+FastAPI & Routes d'analyse et de restitution & Contrats HTTP et validation d'entrées\\
+HTML / CSS / JS & Workspace de consultation & Navigation vers les preuves et saisie de brouillon\\
+Ollama & Génération locale optionnelle & Réponse textuelle depuis passages, repli sans modèle\\
+pytest & Régressions et tests API & Vérification déterministe reproductible\\\bottomrule
+\end{tabularx}
+\caption{Technologies effectivement mobilisées ; les performances ne sont pas comparées entre produits.}\label{tab:choix}
+\end{table}
+
+\section{De l'extraction à l'interprétation documentaire}
+La \DI{} désigne ici la transformation d'un fichier en éléments textuels localisés et structurés, puis leur exploitation par un analyseur métier. La géométrie aide à regrouper les fragments d'une même ligne et à repérer des colonnes potentielles, mais elle ne constitue pas une compréhension automatique du tableau. Le producteur générique ne crée pas de «~prix~» : ce sens est ajouté par le consommateur BOQ après détection d'un en-tête et association de cellules. La même séparation s'applique aux obligations : un titre d'article ne devient pas une exigence seulement parce qu'il est en gras ou numéroté.
+
+Les règles déterministes ont des avantages dans ce contexte : elles sont inspectables, simples à versionner et peuvent retourner une absence explicite. Elles ont aussi des limites de couverture face aux paraphrases, aux langues et aux mises en page inédites. Le choix architectural observé combine des règles structurales pour les champs critiques avec un mécanisme de recherche de passages pour les questions ouvertes. Il n'y a pas dans le dépôt de base vectorielle ni d'embeddings servant à Ask Tender ; la récupération reste lexicale et enrichie par une petite carte de concepts.
+
+\section{Récupération, génération et preuve}
+La littérature RAG distingue l'accès à des passages et la génération conditionnée par ces passages \cite{rag}. Dans l'application, l'interrogation se décompose en normalisation de la question, recherche parmi des preuves structurées ou textuelles, classement, puis production d'une réponse courte. Une génération via Ollama peut être tentée localement, mais son indisponibilité laisse une réponse fondée sur les passages récupérés. Il serait excessif de décrire le mécanisme comme une recherche sémantique vectorielle ou de déduire la fidélité d'une réponse de la seule présence de citations.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=36mm,minimum height=10mm},node distance=7mm,arr/.style={-{Latex},thick,draw=espritred}]
+\node[box] (ocr) {OCR / texte natif\\éléments observés};
+\node[box,right=of ocr] (di) {DocumentResult\\preuves sans métier};
+\node[box,right=of di] (cdc) {TenderDocument\\candidats métier};
+\node[box,below=of cdc] (qa) {Réponse / tableau\\avec renvoi source};
+\draw[arr] (ocr)--(di);\draw[arr] (di)--(cdc);\draw[arr] (cdc)--(qa);
+\end{tikzpicture}
+\caption{Frontière entre reconnaissance, preuve normalisée et interprétation métier.}\label{fig:frontiere}
+\end{figure}
+
+\section{Approche de validation}
+Une suite logicielle peut vérifier les transformations, les calculs et les routes sans mesurer la qualité sur des documents inconnus. La présente étude sépare donc trois plans : conformité du code à ses contrats, comparaison avec des annotations de développement, et démonstration d'un parcours local. Cette séparation protège des conclusions abusives. Une précision de 100\,\% sur quelques listes d'annexes entièrement annotées ne vaut pas précision de toutes les informations d'un appel d'offres ; un top~1 sur des questions synthétiques ne vaut pas exactitude générale des réponses.

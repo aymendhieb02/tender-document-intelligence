@@ -1,0 +1,26 @@
+\chapter{UDGroup et contexte de la mission}\label{chap:entreprise}
+\section{Présentation de l'entreprise}
+UDGroup, pour Universal Digital Group, se présente sur son site officiel comme une entreprise de solutions numériques. Les offres visibles comprennent notamment le commerce électronique, la conception et le développement web, les applications ainsi que des services de marketing numérique \cite{udgroup}. Cette présentation publique suffit à situer le stage dans un environnement de réalisation logicielle. Le présent travail porte spécifiquement sur l'analyse de documents d'appel d'offres ; il ne faut pas déduire du site que la plateforme décrite ici constitue déjà une offre commerciale ou un déploiement client.
+
+Le problème retenu présente un intérêt transversal pour une entreprise qui développe des solutions numériques : les documents reçus par un métier ne sont pas des données structurées prêtes à alimenter une interface. Un cahier des charges peut renfermer des conditions administratives, des contraintes techniques, des annexes et une trame de prix. Leur saisie manuelle est répétitive, tandis qu'une extraction non traçable serait difficile à contrôler. La mission consiste à définir une chaîne capable de produire des informations exploitables \emph{avec leur preuve source}.
+
+\section{Périmètre et démarche}
+Le stage couvre deux mois, du 01/07/2026 au 31/08/2026. Le dépôt étudié documente une base OCR issue d'un historique de traitement de factures, puis un contrat de \DI{} généraliste et une couche propre aux CDC. Dans ce rapport, la réutilisation d'un moteur OCR ne signifie pas que les règles de facturation s'appliquent aux appels d'offres : l'architecture isole explicitement le producteur de preuves des consommateurs métier.
+
+La démarche d'ingénierie visible dans le dépôt peut être résumée en quatre boucles : définir un contrat de sortie, créer une régression sur un document ou un cas synthétique, corriger un écart observable, puis exposer le résultat dans l'API et l'interface. Cette reconstruction suit les commits disponibles plutôt qu'un journal de stage quotidien. La \autoref{tab:jalons} sépare les principaux jalons attestés de leur interprétation technique.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{26mm}Y Y@{}}\toprule
+Trace Git & Apport attesté & Conséquence architecturale\\\midrule
+\texttt{58d3e89} & Contrat Document Intelligence V1 & Producteur commun de pages et preuves\\
+\texttt{b4b0d01} & Extracteur BOQ spécialisé & Lecture d'un formulaire connu sans supposer un format universel\\
+\texttt{1a62803} & Titres multilingues CDC & Distinction plus fiable entre parties, lots et articles\\
+\texttt{b130e5c} & Ask Tender & Accès à des passages cités depuis l'analyse\\
+\texttt{bd5f383} & Espace de travail persistant & Réouverture sans retraitement du fichier\\
+\texttt{705e81c} & Chiffrage et revue & Origines des valeurs et contrôle humain explicites\\\bottomrule
+\end{tabularx}
+\caption{Jalons visibles dans l'historique du dépôt, tous enregistrés après la période administrative du stage.}\label{tab:jalons}
+\end{table}
+
+\section{Contribution technique et frontières}
+Le cœur de la contribution décrite ici est une architecture de traitement documentaire fondée sur la preuve. Elle relie une extraction générique à l'analyse structurale et à des fonctions de consultation. Le code inclut également une interface historique de factures ; celle-ci sert de contexte de réutilisation technique et ne doit pas être confondue avec le résultat de l'analyse des appels d'offres. Le chiffrage ajoute une saisie et des calculs sur un brouillon indépendant du document. Aucune preuve disponible ne permet de revendiquer un gain de temps métier chiffré, une validation juridique des clauses ou une installation de production chez UDGroup.

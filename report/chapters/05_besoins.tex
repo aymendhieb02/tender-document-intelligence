@@ -1,0 +1,55 @@
+\chapter{Problématique et analyse des besoins}\label{chap:besoins}
+\section{Du fichier à l'information vérifiable}
+Un même dossier d'appel d'offres peut mélanger pages narratives, formulaires, annexes et tableaux. Les mots reconnus ne suffisent pas : il faut distinguer une date limite d'une date de publication, une garantie provisoire d'une garantie définitive et un montant du document d'un montant calculé par l'utilisateur. L'enjeu est double. D'une part, automatiser les opérations répétitives de localisation et de structuration. D'autre part, réduire le risque d'interprétation silencieuse en conservant la page, la zone et le texte à l'origine de chaque candidat.
+
+La question d'ingénierie est donc : \emph{comment produire, à partir de PDF et d'images hétérogènes, un espace d'analyse des CDC qui aide à repérer les informations utiles sans masquer l'incertitude de l'extraction ?} Elle se décompose en acquisition, normalisation de preuves, interprétation métier, restitution et validation. La \autoref{fig:systeme} place ces responsabilités dans le flux observé.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=30mm,minimum height=13mm},arr/.style={-{Latex},thick,draw=espritred},node distance=9mm]
+\node[box] (file) {PDF / image};
+\node[box,right=of file] (di) {Producteur\\de preuves};
+\node[box,right=of di] (cdc) {Analyse\\CDC / BOQ};
+\node[box,below=of cdc] (store) {Stockage\\local};
+\node[box,left=of store] (ask) {Ask Tender\\et citations};
+\node[box,left=of ask] (ui) {Workspace\\et revue};
+\draw[arr] (file)--(di);\draw[arr] (di)--(cdc);\draw[arr] (cdc)--(store);\draw[arr] (store)--(ask);\draw[arr] (ask)--(ui);\draw[arr] (store.west) -| (ui.south);
+\end{tikzpicture}
+\caption{Chaîne d'analyse et de restitution attestée par les modules du dépôt.}\label{fig:systeme}
+\end{figure}
+
+\section{Besoins fonctionnels}
+Les exigences du \autoref{tab:fonctionnels} sont déduites des routes, des classes et des vues effectivement présentes. Le terme «~candidat~» est conservé pour les informations qui réclament une validation humaine.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{15mm}Y p{47mm}@{}}\toprule
+Code & Besoin & Preuve d'implémentation\\\midrule
+F1 & Charger un PDF ou une image et conserver les pages physiques & \texttt{DocumentProcessor}, API d'analyse\\
+F2 & Extraire le texte natif ou OCR et ses coordonnées & \texttt{processor.py}, \texttt{schemas.py}\\
+F3 & Repérer sections, articles, lots, annexes et exigences candidates & \texttt{CDCAnalyzer}, schéma \texttt{TenderDocument}\\
+F4 & Détecter et reconstruire des lignes BOQ lorsque le format est couvert & Modules \texttt{boq/detect}, \texttt{extractor}, \texttt{generic}\\
+F5 & Ouvrir le passage source d'une information ou d'une réponse & Références de preuve, visualiseur de page\\
+F6 & Interroger le document par récupération de passages & \texttt{ask\_tender/service.py}\\
+F7 & Sauvegarder, rechercher et rouvrir l'analyse & \texttt{LocalDocumentStore}, bibliothèque\\
+F8 & Saisir des prix sans écraser les valeurs sources & \texttt{boq/pricing.py}, espace de chiffrage\\\bottomrule
+\end{tabularx}
+\caption{Besoins fonctionnels couverts par le système local.}\label{tab:fonctionnels}
+\end{table}
+
+\section{Besoins non fonctionnels et critères d'acceptation}
+La \emph{traçabilité} exige que l'information extraite puisse être ramenée au document, à la page et aux éléments textuels. La \emph{robustesse} suppose d'expliciter les cases absentes plutôt que de les convertir en zéro. La \emph{reproductibilité} nécessite des fixtures versionnées et une suite de tests. La \emph{confidentialité} motive l'exécution locale des traitements et une génération Ollama seulement optionnelle ; elle ne remplace toutefois ni authentification ni politique de conservation. Enfin, la \emph{maintenabilité} réclame des contrats stables entre le producteur générique et ses consommateurs.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{28mm}Y Y@{}}\toprule
+Qualité & Critère concret & Vérification disponible\\\midrule
+Provenance & Page physique, élément source et coordonnées conservés & Schémas, tests de géométrie et de contrat\\
+Absence explicite & Champ non renseigné = valeur nulle, calcul non vérifiable & Référence BOQ vide et tests de validation\\
+Reproductibilité & Entrée et attendu versionnés & Fixtures synthétiques, vérité terrain et \texttt{pytest}\\
+Réutilisation & OCR séparé des règles CDC/BOQ & Contrats \texttt{DocumentResult} et adaptateurs\\
+Disponibilité locale & Réouverture de l'analyse sans réexécuter le PDF & Stockage et tests API de rechargement\\
+Sécurité & Accès réservé à l'environnement local supervisé & Limite explicitée : authentification absente\\\bottomrule
+\end{tabularx}
+\caption{Critères de qualité et niveau de vérification observé.}\label{tab:nonfonctionnels}
+\end{table}
+
+\section{Acteurs, scénarios et frontière de confiance}
+L'utilisateur charge un CDC ; le serveur enregistre un identifiant opaque et l'interface affiche sections, faits, annexes et bordereaux. L'analyste peut ouvrir une preuve, interroger le document et saisir un prix dans un brouillon distinct. La revue peut approuver ou corriger certains faits financiers. L'analyste reste responsable de confronter les propositions à la source : aucune réponse générée n'est juridiquement validée. Un PDF chargé est une donnée non fiable, et l'application locale n'a pas de contrôle d'accès multi-utilisateur. Le critère d'acceptation est une démonstration supervisée, sans décision contractuelle automatique.

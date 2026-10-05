@@ -1,0 +1,28 @@
+\chapter{Exécution locale, limites et perspectives}\label{chap:deploiement}
+\section{Architecture exécutable}
+L'application expose une API FastAPI et des pages web statiques. La commande de développement documentée est \texttt{\detokenize{python -m uvicorn app.main:app --host 127.0.0.1 --port 8000}}. Les analyses V2 produisent un identifiant de stockage et une réponse réutilisable ; le visualiseur peut servir la page PDF pour inspection. La persistance locale permet de retrouver une analyse et son brouillon de prix après redémarrage du processus. FastAPI fournit ici le cadre des routes et de la validation des requêtes \cite{fastapi}.
+
+Le dépôt contient des fichiers de dépendances et un verrou Windows/Python 3.11, mais aucun \texttt{Dockerfile} versionné n'a été trouvé dans l'état inspecté. La documentation indique que l'installation Linux/Docker n'est pas vérifiée. La conteneurisation reste une perspective de reproductibilité \cite{docker}, qui demanderait aussi le provisionnement des poids OCR, des sauvegardes et des protections applicatives. La génération Ollama demeure locale et optionnelle ; des passages cités restent disponibles lorsqu'elle est absente.
+
+\section{Limites opérationnelles et scientifiques}
+Le premier obstacle scientifique est le manque d'un corpus de bordereaux réels remplis, indépendamment étiquetés. Le document réel inclus ne permet que de contrôler le tableau vide. Le second est la validation des scans : le test de Paddle réel est optionnel et ignoré dans l'environnement de rédaction, et le scan arabe exploratoire n'a pas d'annotations définitives. Les résultats CDC sont obtenus sur un corpus de développement qui a guidé les corrections, sans jeu final tenu à l'écart. Enfin, l'évaluation Ask Tender est courte et synthétique ; une citation correctement attachée ne prouve pas une réponse juste.
+
+Sur le plan logiciel, les tables multipages sans nouvel en-tête, les cellules fusionnées et l'OCR fragmenté restent des cas faibles du BOQ générique. Le chiffrage ne peut appliquer une TVA ou un arrondi légalement pertinents sans règle explicite du dossier. L'export du brouillon en CSV existe, mais le remplissage du PDF original n'est pas implémenté. La revue d'un fait conserve la correction et l'horodatage, sans identité authentifiée du relecteur ni historique complet des versions. Le stockage local ne constitue pas une solution multi-utilisateur sécurisée.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{34mm}Y Y@{}}\toprule
+Limite & Conséquence & Travail prioritaire\\\midrule
+Aucun BOQ réel rempli annoté & Précision des valeurs inconnue & Constituer un corpus diversifié et scorer par champ\\
+OCR réel non rejoué ici & Qualité scannée non établie & Provisionner les modèles, annoter scans mixtes\\
+Corpus CDC de développement & Risque d'ajustement aux exemples & Évaluer sur dossiers tenus à l'écart\\
+Récupération lexicale & Paraphrases hors carte moins fiables & Jugement humain de pertinence et couverture\\
+Absence d'authentification & Usage externe non sûr & Droits, journalisation, sauvegardes et rétention\\
+PDF final non rempli & Soumission encore manuelle & Export contrôlé après règles métier validées\\\bottomrule
+\end{tabularx}
+\caption{Limites à lever avant une exploitation au-delà d'une démonstration supervisée.}\label{tab:limites}
+\end{table}
+
+\section{Feuille de route fondée sur les erreurs}
+La première étape devrait être la collecte consentie de bordereaux remplis provenant de plusieurs émetteurs, avec étiquettes indépendantes pour la page, la ligne et chaque valeur. Les résultats seraient publiés séparément pour documents natifs, scans, gabarits connus et gabarits nouveaux. La deuxième étape serait un protocole OCR réel sur des PDF mixtes, avec version des modèles et mesure de la dégradation jusqu'aux champs métier ; un taux de reconnaissance isolé ne suffit pas si la page ou le montant reste mal attribué. La troisième étape concerne l'analyse : traiter les douze faits CDC manqués et les sept normalisations incorrectes à partir de classes d'erreur, puis confirmer les changements sur un jeu distinct.
+
+La quatrième étape renforcerait le workflow : revue humaine authentifiée, journal d'édition, seuils de confiance calibrés par famille documentaire et visibilité des champs non vérifiables. Pour une mise en service, il faudrait également sauvegarde et restauration, contrôle d'accès par dossier, règles de conservation, tests de charge et supervision des erreurs. L'export dans un formulaire BOQ officiel ne devrait venir qu'après validation des règles de taxe, d'arrondi et de la correspondance des colonnes par les responsables métier. Cette séquence privilégie la qualité des décisions et la traçabilité sur l'ajout prématuré de fonctionnalités.

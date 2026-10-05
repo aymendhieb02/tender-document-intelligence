@@ -1,0 +1,19 @@
+\chapter*{Remerciements}\addcontentsline{toc}{chapter}{Remerciements}
+Je remercie UDGroup -- Universal Digital Group pour l'accueil dans le cadre de ce stage et pour l'occasion d'aborder un problème concret de traitement documentaire. Cette mission m'a conduit à articuler extraction de texte, modélisation de la preuve, analyse métier et validation logicielle. Je remercie également les personnes ayant contribué aux échanges techniques et à la relecture des besoins. Le présent rapport restitue les réalisations vérifiables dans le dépôt du projet, ainsi que leurs limites.
+\clearpage
+\chapter*{Résumé}\addcontentsline{toc}{chapter}{Résumé}
+Les cahiers des charges mêlent texte narratif, articles, annexes et bordereaux. Leur exploitation ne se réduit pas à reconnaître les caractères d'un PDF : une information utile doit être replacée dans sa structure et reliée à la page qui la justifie. Ce stage chez UDGroup a porté sur une progression en deux étapes. La première établit un producteur générique de \DI{} pour PDF et images. Il sélectionne par page l'extraction native ou l'OCR, harmonise les coordonnées et publie un contrat de preuve composé de pages, d'éléments textuels, de géométrie et de diagnostics. La seconde applique cette base aux cahiers des charges : hiérarchie, exigences candidates, échéances, annexes, détection et lecture de bordereaux, interrogation documentaire, stockage local et espace de chiffrage avec revue humaine.
+
+L'évaluation distingue rigoureusement les documents réels, les exemples synthétiques et les observations de développement. Le document réel de référence est un bordereau vide : cinq lignes structurelles sont détectées, mais la précision d'extraction des prix sur des offres remplies n'est pas mesurable. Le corpus CDC annoté constitue un ensemble de développement, et la récupération Ask Tender est évaluée seulement sur de petites questions synthétiques. Cette transparence conduit à un résultat exploitable pour une démonstration locale supervisée, avec un programme clair de validation supplémentaire avant tout usage de production.
+
+\textbf{Mots-clés :} OCR ; Document Intelligence ; cahier des charges ; provenance ; bordereau ; extraction d'information ; évaluation.
+\clearpage
+\begin{otherlanguage}{english}
+\chapter*{Abstract}\addcontentsline{toc}{chapter}{Abstract}
+Tender specifications mix prose, clauses, annexes, and bills of quantities. Character recognition alone is insufficient: useful information needs a structural context and a traceable source page. This internship at UDGroup followed two engineering stages. First, a generic Document Intelligence producer handles PDFs and images, selects native text or OCR on each page, normalizes coordinates, and publishes evidence with text elements, geometry, and diagnostics. Second, tender-specific modules derive hierarchy, candidate requirements, deadlines, annexes, BOQ structures, evidence-grounded retrieval, local persistence, and a separate pricing draft with human review.
+
+The evaluation keeps real documents, synthetic fixtures, and development observations apart. The real BOQ reference is an empty template: five structural row slots are recovered, while numeric accuracy on completed tenders cannot be measured. The annotated CDC corpus is a development set; Ask Tender retrieval has only small synthetic question sets. The current result supports a supervised local demonstration and defines concrete validation work before production use.
+
+\textbf{Keywords:} OCR; Document Intelligence; tender specification; provenance; bill of quantities; information extraction; evaluation.
+\end{otherlanguage}
+\clearpage

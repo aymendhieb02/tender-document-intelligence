@@ -1,0 +1,20 @@
+\chapter{Traçabilité de l'évaluation}\label{app:trace}
+\section{Commandes et artefacts}
+La suite courante se lance à la racine du dépôt avec \texttt{pytest -q -rs}. L'état exact utilisé pour ce rapport est le commit \texttt{f292de8}. Les métriques CDC de développement sont archivées dans \path{benchmarks/cdc_real_v1/metrics_v2.json} ; les explications sont dans \path{docs/CDC_ANALYZER_V2_EVALUATION.md}. La vérité terrain du gabarit vide est \path{datasets/boq/male_municipal_maintenance_v1/ground_truth/reference_empty.json}. Les cas contrôlés correspondants sont sous \path{synthetic/}. Les observations chronométrées sont dans \path{docs/PERFORMANCE_REPORT.md}. Un état ultérieur du dépôt nécessite une nouvelle exécution avant de réutiliser les nombres du présent rapport.
+
+\section{Exemples de routes de consultation}
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{66mm}Y@{}}\toprule
+Route & Usage\\\midrule
+\texttt{\detokenize{POST /api/v2/cdc/analyze}} & Charge et analyse un document\\
+\texttt{\detokenize{GET /api/v2/cdc}} & Liste les analyses stockées\\
+\texttt{\detokenize{GET /api/v2/cdc/{id}}} & Rouvre une analyse par identifiant\\
+\texttt{\detokenize{POST /api/v2/cdc/{id}/ask}} & Interroge les preuves enregistrées\\
+\texttt{\detokenize{GET /api/v2/cdc/{id}/boq.csv}} & Exporte le BOQ extrait\\
+\texttt{\detokenize{GET .../boq/{n}/pricing}} & Ouvre un brouillon de chiffrage\\\bottomrule
+\end{tabularx}
+\caption{Sélection de routes V2 du parcours CDC ; les points de suspension abrègent le préfixe \texttt{/api/v2/cdc/\{id\}}.}\label{tab:routes}
+\end{table}
+
+\section{Lecture prudente des nombres}
+Les 9/9 sections et 27/27 annexes concernent les listes entièrement annotées du sous-ensemble de développement. Les 19/19 articles représentent seulement des exemples positifs. Les 14/26 exigences et 7/14 valeurs normalisées révèlent des erreurs non résolues. Les 5 lignes du document BOQ réel sont des emplacements vides ; aucune opération de type \texttt{\detokenize{prix \times quantité}} n'y est mesurable. Les temps sont des observations locales isolées. Cette grille de lecture doit accompagner toute présentation orale des résultats.

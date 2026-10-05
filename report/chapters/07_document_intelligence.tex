@@ -1,0 +1,98 @@
+\chapter{Tâche 1 : fondation OCR et Document Intelligence}\label{chap:di}
+\section{Objectif et contrat de sortie}
+Le besoin initial est de rendre exploitables des PDF et images de nature différente sans enfermer l'extraction dans un formulaire métier. Le producteur \texttt{\detokenize{DocumentProcessor}} accepte des PDF multipages et des images, y compris certaines images multiframe. Son résultat \texttt{\detokenize{DocumentResult}} contient un identifiant dérivé du contenu, le mode demandé, des \texttt{\detokenize{PageResult}} et des diagnostics. Chaque page conserve son numéro physique, ses dimensions, des \texttt{\detokenize{EvidenceElement}} et des regroupements géométriques prudents. Le contrat public est versionné 1.0 hors de la forme JSON ; des fixtures de schéma le verrouillent.
+
+Cette conception établit une frontière utile. Un élément peut contenir «~délai de livraison~» sans que le producteur n'en déduise une durée. La valeur métier naît plus loin, dans le CDC Analyzer. Inversement, un consommateur peut citer l'identifiant de l'élément original au lieu de recopier un texte qui aurait perdu sa page. La \autoref{fig:di-pipeline} expose les étapes réelles de la méthode \texttt{\detokenize{process}}.
+
+
+
+\section{Décision native ou OCR par page}
+La décision n'est pas prise pour tout le document. En mode \texttt{\detokenize{auto}}, le processeur extrait les mots PDF et vérifie une condition de lisibilité : au moins douze caractères non blancs, une proportion d'au moins 95\,\% de caractères imprimables et des boîtes de surface positive. Si la condition échoue, la page est rendue et confiée à l'OCR. Cette règle explicite accélère les PDF numériques et conserve la capacité de traiter un document mixte. Elle n'est pas un classifieur appris de qualité : une couche cachée erronée mais suffisamment longue peut être préférée à l'image, et une page native légitimement très courte peut déclencher l'OCR.
+
+\begin{figure}[H]\centering
+\begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=42mm,minimum height=9mm},arr/.style={-{Latex},thick,draw=espritred},node distance=6mm]
+\node[box] (a) {Fichier + contrôle des limites};
+\node[box,below=of a] (b) {Empreinte SHA-256 + itération pages};
+\node[box,below=of b] (c) {Mots natifs + choix de chemin};
+\node[box,below left=8mm and 8mm of c] (d) {Texte natif};
+\node[box,below right=8mm and 8mm of c] (e) {Rendu + OCR};
+\node[box,below=25mm of c] (f) {Ordre, géométrie, diagnostics};
+\node[box,below=of f] (g) {DocumentResult};
+\draw[arr] (a)--(b);\draw[arr] (b)--(c);\draw[arr] (c)--(d);\draw[arr] (c)--(e);\draw[arr] (d)--(f);\draw[arr] (e)--(f);\draw[arr] (f)--(g);
+\end{tikzpicture}
+\caption{Pipeline de \texttt{\detokenize{DocumentProcessor}} d'après le code et le contrat V1.}\label{fig:di-pipeline}
+\end{figure}
+
+Les modes \texttt{\detokenize{native}}, \texttt{\detokenize{ocr}} et \texttt{\detokenize{hybrid}} rendent la stratégie contrôlable. \texttt{\detokenize{native}} ne reconnaît pas les images ; \texttt{\detokenize{ocr}} ignore les mots natifs ; \texttt{\detokenize{hybrid}} conserve deux ensembles de preuves identifiés et signale qu'ils ne sont pas fusionnés. La \autoref{fig:choix-page} résume cette décision. Un résultat hybride ne doit donc pas être compté comme une source textuelle dédupliquée.
+
+\begin{figure}[H]\centering
+\begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=32mm,minimum height=9mm},dec/.style={draw=ink,diamond,aspect=2,fill=white,inner sep=1pt},arr/.style={-{Latex},thick,draw=espritred},node distance=11mm]
+\node[box] (a) {Page PDF};
+\node[dec,below=of a] (b) {Mode demandé ?};
+\node[box,below left=15mm and 22mm of b] (n) {Natif};
+\node[box,below right=15mm and 22mm of b] (o) {OCR};
+\node[dec,below=20mm of b] (u) {\texttt{\detokenize{auto}} : mots utilisables ?};
+\draw[arr] (a)--(b);\draw[arr] (b)--node[left]{\scriptsize native}(n);\draw[arr] (b)--node[right]{\scriptsize ocr}(o);\draw[arr] (b)--node[right]{\scriptsize auto}(u);\draw[arr] (u)--node[below]{\scriptsize oui}(n);\draw[arr] (u)--node[below]{\scriptsize non}(o);
+\end{tikzpicture}
+\caption{Choix explicite du chemin pour une page ; le mode hybride garde les deux sources.}\label{fig:choix-page}
+\end{figure}
+
+\section{Reconnaissance et prétraitement}
+Le chemin OCR rasterise la page, puis utilise \texttt{\detokenize{OCRRecognizer}}. Les adaptateurs réemploient les fonctions de reconnaissance et de prétraitement de l'infrastructure historique, en sélectionnant une politique de page entière plutôt que des régions fixes de facture. Le dépôt prévoit PaddleOCR avec des modèles PP-OCRv4 mobiles et un repli Tesseract si celui-ci est configuré. Il n'envoie pas le contenu à une API d'inférence externe. Une vérification réelle de la qualité OCR requiert pourtant la présence locale du paquet et des poids ; elle n'a pas été exécutée dans l'environnement de rédaction. Les tests actuels garantissent les contrats et plusieurs cas déterministes, pas une précision de lecture des scans.
+
+Le prétraitement peut redimensionner et redresser l'image. Le point délicat est géométrique : le moteur reconnaît sur l'image transformée, alors que l'interface doit surligner le document rendu. Le traitement expose donc la transformation affine et applique son inverse aux quatre coins de la boîte reconnue. Pour les mots natifs, il applique rotation PDF et échelle de rendu. L'algorithme publie ensuite une enveloppe rectangulaire dans le repère commun \texttt{\detokenize{rendered_page_pixels}}, origine en haut à gauche. La boîte source et la matrice sont conservées ; une enveloppe après rotation n'est pas parfaitement inversible.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=44mm,minimum height=10mm},arr/.style={-{Latex},thick,draw=espritred},node distance=8mm]
+\node[box] (pdf) {PDF : points non tournés};
+\node[box,below=of pdf] (ocr) {OCR : pixels après prétraitement};
+\node[box,right=28mm of pdf] (page) {Repère page rendue\\pixels, origine haut gauche};
+\draw[arr] (pdf)--node[above]{\scriptsize rotation + échelle}(page);
+\draw[arr] (ocr)--node[below]{\scriptsize inverse affine}(page);
+\end{tikzpicture}
+\caption{Normalisation des boîtes natives et OCR vers le même espace d'affichage.}\label{fig:coordonnees}
+\end{figure}
+
+\section{Modèle de preuve et géométrie}
+Un \texttt{\detokenize{EvidenceElement}} conserve un identifiant, un texte brut, un numéro de page, une source, une boîte publique, la boîte source si disponible et la transformation. Une confiance est gardée lorsqu'elle vient du moteur ; elle reste nulle pour le texte natif. \texttt{\detokenize{PageDiagnostics}} expose, entre autres, le chemin choisi, l'usage du repli, les avertissements et le temps observé. Le schéma évite ainsi d'inventer une confiance native ou une boîte manquante.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{31mm}Y Y@{}}\toprule
+Entité & Information transmise & Ce qu'elle ne promet pas\\\midrule
+\texttt{DocumentResult} & Identité du fichier, mode, pages, diagnostics & Exactitude métier ou stabilité éternelle des IDs\\
+\texttt{PageResult} & Numéro physique, taille, éléments, géométrie & Ordre de lecture humain garanti\\
+\texttt{EvidenceElement} & Texte, source, coordonnées, confiance éventuelle & Sens juridique ou montant validé\\
+\texttt{PageGeometry} & Lignes, cellules candidates, colonnes alignées & Reconstruction sémantique d'un tableau\\\bottomrule
+\end{tabularx}
+\caption{Responsabilités et limites du contrat de preuve.}\label{tab:schema-di}
+\end{table}
+
+La géométrie groupe les éléments par chevauchement vertical et alignements. Une «~cellule candidate~» peut n'être qu'un mot PDF ou une ligne OCR ; le code ne lui attribue pas encore une colonne métier. Cette prudence évite qu'un paragraphe aligné soit annoncé comme un tableau de prix. Les consommateurs peuvent utiliser les IDs pour reconstruire une ligne ou associer une valeur à son fragment exact.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[every node/.style={font=\small,align=left},box/.style={draw=ink,rounded corners,fill=pale,minimum width=38mm,minimum height=13mm},arr/.style={-{Latex},thick,draw=espritred},node distance=12mm]
+\node[box] (d) {DocumentResult\\document\_id, mode};
+\node[box,right=of d] (p) {PageResult\\page\_number, dimensions};
+\node[box,right=of p] (e) {EvidenceElement\\texte, source, bbox};
+\node[box,below=of p] (g) {PageGeometry\\groupes + element\_ids};
+\draw[arr] (d)--node[above]{\scriptsize pages}(p);\draw[arr] (p)--node[above]{\scriptsize elements}(e);\draw[arr] (p)--(g);\draw[arr] (g)-|(e);
+\end{tikzpicture}
+\caption{Relations principales du contrat Document Intelligence.}\label{fig:schema-di}
+\end{figure}
+
+\section{Difficultés, vérification et limites}
+Les tests du producteur couvrent notamment la sélection de chemin, le contrat sérialisé, les rotations PDF, la provenance et l'absence de géométrie. La documentation relève une difficulté de lecture des PDF arabes où l'ordre natif diffère de l'ordre visuel. La fusion naïve des mots ferait perdre leur ordre source ; le contrat conserve \texttt{\detokenize{native_order}} et la géométrie. Une autre difficulté est la coexistence d'une couche native faible avec une image lisible : l'heuristique reste observable dans les diagnostics et l'utilisateur peut forcer \texttt{\detokenize{ocr}} ou \texttt{\detokenize{hybrid}}.
+
+\begin{table}[H]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{28mm}Y Y@{}}\toprule
+Situation & Réponse actuelle & Risque restant\\\midrule
+PDF tourné ou recadré & Matrice conservée et boîte publique dans le repère rendu & Enveloppe rectangulaire moins précise qu'un polygone\\
+Page sans boîte exploitable & \texttt{\detokenize{bbox=null}}, avertissement \texttt{\detokenize{missing_geometry}} & Surlignage absent\\
+Couche native trompeuse & Modes forcés \texttt{\detokenize{ocr}} et \texttt{\detokenize{hybrid}} & \texttt{\detokenize{auto}} peut choisir le mauvais chemin\\
+Deux sources en hybride & IDs distincts et avertissement & Doublons non fusionnés\\
+Scan arabe de développement & Exécution OCR historique documentée & Résultat bruité, absence d'étiquettes validées\\\bottomrule
+\end{tabularx}
+\caption{Réponses d'ingénierie et limites de la fondation documentaire.}\label{tab:di-erreurs}
+\end{table}
+
+Sur le PDF de référence de 30 pages et à texte natif, une exécution locale documentée donne environ 530~ms pour la seule étape DI ; elle ne mesure pas le cas OCR. Le \autoref{chap:evaluation} détaille ce protocole et évite d'en faire une garantie de service. La principale valeur de cette première tâche est donc moins un taux de reconnaissance revendiqué qu'une interface de preuve stable permettant plusieurs analyses métiers.
