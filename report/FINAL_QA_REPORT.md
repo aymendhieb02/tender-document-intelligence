@@ -1,39 +1,30 @@
-# Contrôle final du rapport de stage
+# Contrôle final du rapport de stage révisé
 
-Date : 05/10/2026. Source produit auditée : `f292de8` (`main`). Titre final : **Conception et développement d'une plateforme intelligente de traitement documentaire basée sur l'OCR et l'analyse automatisée des cahiers des charges**.
+Date : 05/10/2026. Source applicative auditée : f292de8 ; version initiale du rapport préservée au commit 2fe989e. Titre final : **Conception et développement d'une plateforme intelligente de traitement documentaire basée sur l'OCR et l'analyse automatisée des cahiers des charges**.
 
-## Livrable et composition
+## Livrable
 
-PDF : `report/build/rapport_stage_aymen_dhieb_udgroup.pdf` — **36 pages A4**, 905 795 octets après compilation propre. Répartition physique : page de garde 1 ; remerciements/résumés 2–4 ; tables et abréviations 5–9 ; introduction 10 ; chapitre 1 (UDGroup) 11–12 ; chapitre 2 (besoins) 13–14 ; chapitre 3 (choix techniques) 15–16 ; chapitre 4 (Document Intelligence) 17–20 ; chapitre 5 (Tender Intelligence) 21–27 ; chapitre 6 (évaluation) 28–31 ; chapitre 7 (déploiement et limites) 32–33 ; conclusion 34 ; références 35 ; annexe 36.
+PDF : report/build/rapport_stage_aymen_dhieb_udgroup.pdf — **39 pages A4, 963 998 octets**. Pages physiques : couverture 1 ; remerciements/résumés 2–4 ; tables et abréviations 5–9 ; introduction 10 ; chapitre 1 (mission et méthode) 11–13 ; chapitre 2 (besoins et parcours) 14–16 ; chapitre 3 (état de l'art) 17–19 ; chapitre 4 (Document Intelligence) 20–23 ; chapitre 5 (Tender Intelligence) 24–30 ; chapitre 6 (évaluation) 31–35 ; chapitre 7 (limites) 36 ; conclusion 37 ; références 38 ; annexe 39.
 
-**18 figures** : 14 schémas TikZ originaux, 3 captures authentiques de l'interface sur fixture synthétique et 1 extrait vectoriel du véritable formulaire BOQ vide. **13 tableaux** et **7 références bibliographiques** vérifiées (site officiel UDGroup, documentations officielles et article arXiv). Trois captures ont été utilisées ; aucune capture préexistante d'un autre projet n'a été réemployée. La page de garde est typographique : aucun logo ESPRIT non vérifié n'a été emprunté.
+**14 figures** : 10 schémas vectoriels originaux, 3 captures authentiques de l'interface sur fixture synthétique, 1 extrait vectoriel du gabarit BOQ réel vide. **15 tableaux** et **14 références citées**. La page de garde reste typographique, car aucun logo ESPRIT officiel d'impression n'a été fourni.
 
-## Vérification technique
+## Vérification technique et visuelle
 
-- `latexmk -C` puis compilation complète `latexmk -pdf` depuis `report/` : réussite, Biber exécuté, listes et références résolues.
-- Journal LaTeX final : **0 erreur fatale, 0 référence/citation non définie, 0 boîte débordante**. Il reste 14 avis `Underfull \hbox`, liés à la justification de cellules de tableaux et inspectés visuellement ; aucun texte coupé n'a été observé.
-- PDF : 36 pages, 0 page vide, 0 caractère de remplacement dans le texte extrait. Couverture, sommaire, ouvertures de chapitres, tableau de la page BOQ réelle, captures, références et annexe ont été rendus et examinés avec Poppler.
-- L'éditeur LaTeX intégré de Codex n'a pas pu initialiser ses répertoires standards sur cet hôte. Le PDF vérifié a été produit par MiKTeX local ; les sources restent éditables et une demande d'ouverture de `main.tex` a été envoyée à Codex.
-- Produit inchangé. `pytest -q -rs` final : **305 réussis, 0 échec, 1 ignoré, 1 avertissement, 33,40 s**. Ignoré : Paddle réel sans modèles locaux ; avertissement : dépréciation Starlette/httpx TestClient.
+- Construction à partir d'un état propre : latexmk -C, puis latexmk -pdf avec Biber. Code de sortie 0.
+- Journal final : 0 erreur fatale, 0 référence ou citation non définie, 0 boîte débordante. Les avis de boîtes sous-remplies dans certains tableaux ont été inspectés visuellement, sans texte coupé.
+- PDF : 39 pages, aucune page vide, aucun caractère de remplacement, aucun indice « Ã » dans le texte extrait.
+- Toutes les pages rendues avec Poppler et examinées en planche contact ; couverture, méthode, organisation, chronologie, contributions, architecture, parcours, comparaison d'approches, OCR, Tender, évaluation, bibliographie et annexe contrôlés en détail.
+- L'ordre du parcours « consultation → revue/chiffrage → sauvegarde » a été corrigé après inspection. Le texte de l'annexe sur prix et quantité a été reformulé pour éviter la séquence d'extraction suspecte.
+- Compilateur intégré Codex indisponible sur cet hôte (« Unable to find standard directories for platform ») ; PDF livré produit et vérifié avec MiKTeX local.
 
-## Contrôle des faits
+## Test de l'application
 
-Le formulaire réel de 30 pages est identifié comme **gabarit vide** avec cinq lignes structurelles page 25 ; aucun score de prix sur offre réelle remplie n'est revendiqué. Les métriques CDC sont rattachées à un corpus de développement, les tests Ask Tender à des questions synthétiques, et les latences à une seule mesure locale. L'histoire Git visible commence le 28/09/2026, après la période administrative du stage ; le rapport évite de dater chaque tâche à juillet–août. Une affirmation incorrecte de Dockerfile a été retirée lors de l'audit. Aucun nom de superviseur, déploiement de production, gain métier ou taux OCR non attesté n'a été ajouté.
+Produit inchangé. pytest -q -rs réexécuté le 05/10/2026 : **305 réussis, 0 échec, 1 ignoré, 1 avertissement, 33,05 s**. L'ignoré nécessite RUN_REAL_OCR=1 et les modèles Paddle locaux ; l'avertissement est une dépréciation Starlette/httpx TestClient. Ces résultats testent le logiciel, non la précision de l'IA.
 
-## Limites et actifs manquants
+## Contrôle scientifique
 
-Voir `report/MISSING_ASSETS.md`. Les limites principales sont l'absence de BOQ réels remplis et annotés, de validation OCR scannée rejouée, de jeu CDC tenu à l'écart, et de contrôle d'accès multi-utilisateur. Le rapport reste livrable comme document académique honnête et vérifiable.
+Le vrai formulaire de référence compte 30 pages ; le BOQ de sa page physique 25 est vide. Aucun score de prix extraits sur une offre réelle remplie n'est affirmé. Les métriques CDC appartiennent à un corpus de développement, les tests Ask Tender à des questions synthétiques et les latences à une seule exécution locale. La première trace Git visible date du 28/09/2026, après les deux mois administratifs du stage : ni les figures ni le texte n'inventent une chronologie hebdomadaire. Aucun nom de superviseur, gain métier, déploiement de production, pratique Scrum ou tableau Notion non documenté n'a été ajouté.
 
-## Appréciation éditoriale
+## Verdict
 
-Scores de revue éditoriale (jugement, **pas** métriques de précision du produit) : structure 9/10 ; traçabilité des affirmations 9/10 ; analyse technique 8/10 ; évaluation scientifique 8/10 ; lisibilité visuelle 8/10 ; reproductibilité 9/10 ; ensemble **8,5/10**.
-
-Améliorations les plus utiles avant une soutenance ou une publication élargie :
-
-1. Faire relire le récit du stage par l'étudiant et l'entreprise pour confirmer l'attribution temporelle des tâches.
-2. Ajouter, avec autorisation, des BOQ réels remplis et une annotation indépendante afin de mesurer les valeurs extraites.
-3. Rejouer l'OCR sur scans mixtes/arabes avec versions de modèles et vérité terrain documentées.
-4. Compléter la page de garde avec les noms d'encadrants et le logo officiel seulement si les informations sont fournies et validées.
-5. Évaluer Ask Tender et les exigences sur un corpus tenu à l'écart, avec jugement humain des citations et erreurs par catégorie.
-
-Verdict : **rapport prêt à être remis pour relecture académique**, avec limites scientifiques explicitement exposées et PDF reproductible.
+Le rapport est **prêt pour relecture académique**, avec des limites méthodologiques mises en évidence. Voir REVISION_REPORT.md pour le détail des modifications, MISSING_ASSETS.md pour les pièces utiles et FINAL_MULTIPERSPECTIVE_REVIEW.md pour huit évaluations critiques.

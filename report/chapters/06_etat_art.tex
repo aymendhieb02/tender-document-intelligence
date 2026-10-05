@@ -19,6 +19,21 @@ pytest & Régressions et tests API & Vérification déterministe reproductible\\
 \caption{Technologies effectivement mobilisées ; les performances ne sont pas comparées entre produits.}\label{tab:choix}
 \end{table}
 
+\section{Trois architectures possibles pour comprendre un dossier}
+Une première famille associe OCR, expressions régulières et règles de structure. Elle permet de contrôler localement chaque transformation et de conserver une page de provenance, mais la couverture des formulations inédites dépend du travail explicite de normalisation. Une deuxième famille apprend conjointement texte, géométrie et image : LayoutLM a montré l'intérêt du placement des mots pour l'extraction documentaire \cite{layoutlm}, et LayoutLMv2 ajoute des interactions visuelles plus riches \cite{layoutlmv2}. LayoutXLM étend ce principe au multilingue, mais son benchmark XFUND publié ne contient pas l'arabe ; son résultat ne peut donc pas être transposé directement au scan arabe du présent projet \cite{layoutxlm}. Donut étudie même une voie sans OCR séparé, susceptible d'éviter la propagation de certaines erreurs de reconnaissance, au prix d'une autre chaîne de modèles et de données \cite{donut}.
+
+Ces travaux constituent des alternatives scientifiques, pas des composants installés dans le dépôt. Une analyse de bout en bout par modèle de vision-langage pourrait mieux couvrir des mises en page nouvelles et des questions ouvertes ; elle demanderait toutefois un protocole de validation des valeurs, de leur localisation et des ressources d'inférence adapté aux dossiers confidentiels. La voie choisie ici est hybride au sens \emph{architecture de preuve + interprétation spécialisée + génération optionnelle}, et non au sens d'un modèle multimodal entraîné. La \autoref{tab:approches} explicite ce compromis sans supposer qu'une méthode domine universellement.
+
+\begin{table}[htbp]\centering\tighttable
+\begin{tabularx}{\textwidth}{@{}p{30mm}Y Y Y@{}}\toprule
+Approche & Force & Limite à mesurer & Adéquation au prototype\\\midrule
+OCR et règles seules & Locales, déterministes, auditables & Variantes de langue et de structure peu couvertes & Base utile, insuffisante pour tous les CDC\\
+Analyse neuronale de page ou de bout en bout & Interactions texte--image--layout, souplesse potentielle & Données annotées, calcul et attribution précise à contrôler & Piste de comparaison future, non évaluée ici\\
+Preuve structurée puis modules métier & Source explicite, contrats réutilisables, revue humaine & Ingénierie des schémas et heuristiques, généralisation à tester & Choix implémenté pour un prototype vérifiable\\\bottomrule
+\end{tabularx}
+\caption{Comparaison raisonnée d'architectures documentaires ; aucune supériorité chiffrée n'est revendiquée.}\label{tab:approches}
+\end{table}
+
 \section{De l'extraction à l'interprétation documentaire}
 La \DI{} désigne ici la transformation d'un fichier en éléments textuels localisés et structurés, puis leur exploitation par un analyseur métier. La géométrie aide à regrouper les fragments d'une même ligne et à repérer des colonnes potentielles, mais elle ne constitue pas une compréhension automatique du tableau. Le producteur générique ne crée pas de «~prix~» : ce sens est ajouté par le consommateur BOQ après détection d'un en-tête et association de cellules. La même séparation s'applique aux obligations : un titre d'article ne devient pas une exigence seulement parce qu'il est en gras ou numéroté.
 
@@ -27,16 +42,7 @@ Les règles déterministes ont des avantages dans ce contexte : elles sont inspe
 \section{Récupération, génération et preuve}
 La littérature RAG distingue l'accès à des passages et la génération conditionnée par ces passages \cite{rag}. Dans l'application, l'interrogation se décompose en normalisation de la question, recherche parmi des preuves structurées ou textuelles, classement, puis production d'une réponse courte. Une génération via Ollama peut être tentée localement, mais son indisponibilité laisse une réponse fondée sur les passages récupérés. Il serait excessif de décrire le mécanisme comme une recherche sémantique vectorielle ou de déduire la fidélité d'une réponse de la seule présence de citations.
 
-\begin{figure}[htbp]\centering
-\begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=36mm,minimum height=10mm},node distance=7mm,arr/.style={-{Latex},thick,draw=espritred}]
-\node[box] (ocr) {OCR / texte natif\\éléments observés};
-\node[box,right=of ocr] (di) {DocumentResult\\preuves sans métier};
-\node[box,right=of di] (cdc) {TenderDocument\\candidats métier};
-\node[box,below=of cdc] (qa) {Réponse / tableau\\avec renvoi source};
-\draw[arr] (ocr)--(di);\draw[arr] (di)--(cdc);\draw[arr] (cdc)--(qa);
-\end{tikzpicture}
-\caption{Frontière entre reconnaissance, preuve normalisée et interprétation métier.}\label{fig:frontiere}
-\end{figure}
+La séparation entre reconnaissance, modèle de preuve et analyse métier est maintenant représentée dans la figure d'architecture globale (\autoref{fig:systeme}) plutôt que répétée sous une forme plus petite.
 
 \section{Approche de validation}
-Une suite logicielle peut vérifier les transformations, les calculs et les routes sans mesurer la qualité sur des documents inconnus. La présente étude sépare donc trois plans : conformité du code à ses contrats, comparaison avec des annotations de développement, et démonstration d'un parcours local. Cette séparation protège des conclusions abusives. Une précision de 100\,\% sur quelques listes d'annexes entièrement annotées ne vaut pas précision de toutes les informations d'un appel d'offres ; un top~1 sur des questions synthétiques ne vaut pas exactitude générale des réponses.
+Une suite logicielle peut vérifier les transformations, les calculs et les routes sans mesurer la qualité sur des documents inconnus. La présente étude sépare donc trois plans : conformité du code à ses contrats, comparaison avec des annotations de développement, et démonstration d'un parcours local. En recherche d'information, le rang d'un passage pertinent et la justesse de la réponse finale sont également des objets différents \cite{irbook}. Cette séparation protège des conclusions abusives. Une précision de 100\,\% sur quelques listes d'annexes entièrement annotées ne vaut pas précision de toutes les informations d'un appel d'offres ; un top~1 sur des questions synthétiques ne vaut pas exactitude générale des réponses.

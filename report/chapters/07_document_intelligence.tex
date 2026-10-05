@@ -7,7 +7,7 @@ Cette conception établit une frontière utile. Un élément peut contenir «~d�
 
 
 \section{Décision native ou OCR par page}
-La décision n'est pas prise pour tout le document. En mode \texttt{\detokenize{auto}}, le processeur extrait les mots PDF et vérifie une condition de lisibilité : au moins douze caractères non blancs, une proportion d'au moins 95\,\% de caractères imprimables et des boîtes de surface positive. Si la condition échoue, la page est rendue et confiée à l'OCR. Cette règle explicite accélère les PDF numériques et conserve la capacité de traiter un document mixte. Elle n'est pas un classifieur appris de qualité : une couche cachée erronée mais suffisamment longue peut être préférée à l'image, et une page native légitimement très courte peut déclencher l'OCR.
+La solution la plus simple aurait été de lancer l'OCR sur toutes les pages. Elle aurait pourtant ignoré le texte déjà disponible dans les PDF numériques, ajouté un coût de calcul et pu introduire des erreurs de reconnaissance. La décision est donc prise par page. En mode \texttt{\detokenize{auto}}, le processeur extrait les mots PDF et vérifie une condition de lisibilité : au moins douze caractères non blancs, une proportion d'au moins 95\,\% de caractères imprimables et des boîtes de surface positive. Si la condition échoue, la page est rendue et confiée à l'OCR. Cette règle explicite accélère les PDF numériques et conserve la capacité de traiter un document mixte. Elle n'est pas un classifieur appris de qualité : une couche cachée erronée mais suffisamment longue peut être préférée à l'image, et une page native légitimement très courte peut déclencher l'OCR.
 
 \begin{figure}[H]\centering
 \begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=42mm,minimum height=9mm},arr/.style={-{Latex},thick,draw=espritred},node distance=6mm]
@@ -23,19 +23,7 @@ La décision n'est pas prise pour tout le document. En mode \texttt{\detokenize{
 \caption{Pipeline de \texttt{\detokenize{DocumentProcessor}} d'après le code et le contrat V1.}\label{fig:di-pipeline}
 \end{figure}
 
-Les modes \texttt{\detokenize{native}}, \texttt{\detokenize{ocr}} et \texttt{\detokenize{hybrid}} rendent la stratégie contrôlable. \texttt{\detokenize{native}} ne reconnaît pas les images ; \texttt{\detokenize{ocr}} ignore les mots natifs ; \texttt{\detokenize{hybrid}} conserve deux ensembles de preuves identifiés et signale qu'ils ne sont pas fusionnés. La \autoref{fig:choix-page} résume cette décision. Un résultat hybride ne doit donc pas être compté comme une source textuelle dédupliquée.
-
-\begin{figure}[H]\centering
-\begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=32mm,minimum height=9mm},dec/.style={draw=ink,diamond,aspect=2,fill=white,inner sep=1pt},arr/.style={-{Latex},thick,draw=espritred},node distance=11mm]
-\node[box] (a) {Page PDF};
-\node[dec,below=of a] (b) {Mode demandé ?};
-\node[box,below left=15mm and 22mm of b] (n) {Natif};
-\node[box,below right=15mm and 22mm of b] (o) {OCR};
-\node[dec,below=20mm of b] (u) {\texttt{\detokenize{auto}} : mots utilisables ?};
-\draw[arr] (a)--(b);\draw[arr] (b)--node[left]{\scriptsize native}(n);\draw[arr] (b)--node[right]{\scriptsize ocr}(o);\draw[arr] (b)--node[right]{\scriptsize auto}(u);\draw[arr] (u)--node[below]{\scriptsize oui}(n);\draw[arr] (u)--node[below]{\scriptsize non}(o);
-\end{tikzpicture}
-\caption{Choix explicite du chemin pour une page ; le mode hybride garde les deux sources.}\label{fig:choix-page}
-\end{figure}
+Les modes \texttt{\detokenize{native}}, \texttt{\detokenize{ocr}} et \texttt{\detokenize{hybrid}} rendent la stratégie contrôlable. \texttt{\detokenize{native}} ne reconnaît pas les images ; \texttt{\detokenize{ocr}} ignore les mots natifs ; \texttt{\detokenize{hybrid}} conserve deux ensembles de preuves identifiés et signale qu'ils ne sont pas fusionnés. Un résultat hybride ne doit donc pas être compté comme une source textuelle dédupliquée. Le diagnostic par page permet de revenir sur une décision \texttt{\detokenize{auto}} suspecte ; il ne corrige pas automatiquement une couche texte trompeuse.
 
 \section{Reconnaissance et prétraitement}
 Le chemin OCR rasterise la page, puis utilise \texttt{\detokenize{OCRRecognizer}}. Les adaptateurs réemploient les fonctions de reconnaissance et de prétraitement de l'infrastructure historique, en sélectionnant une politique de page entière plutôt que des régions fixes de facture. Le dépôt prévoit PaddleOCR avec des modèles PP-OCRv4 mobiles et un repli Tesseract si celui-ci est configuré. Il n'envoie pas le contenu à une API d'inférence externe. Une vérification réelle de la qualité OCR requiert pourtant la présence locale du paquet et des poids ; elle n'a pas été exécutée dans l'environnement de rédaction. Les tests actuels garantissent les contrats et plusieurs cas déterministes, pas une précision de lecture des scans.
@@ -54,7 +42,7 @@ Le prétraitement peut redimensionner et redresser l'image. Le point délicat es
 \end{figure}
 
 \section{Modèle de preuve et géométrie}
-Un \texttt{\detokenize{EvidenceElement}} conserve un identifiant, un texte brut, un numéro de page, une source, une boîte publique, la boîte source si disponible et la transformation. Une confiance est gardée lorsqu'elle vient du moteur ; elle reste nulle pour le texte natif. \texttt{\detokenize{PageDiagnostics}} expose, entre autres, le chemin choisi, l'usage du repli, les avertissements et le temps observé. Le schéma évite ainsi d'inventer une confiance native ou une boîte manquante.
+Une simple chaîne de texte aurait réduit le coût de sérialisation, mais elle aurait perdu la page, la zone et le chemin de reconnaissance. Un \texttt{\detokenize{EvidenceElement}} conserve un identifiant, un texte brut, un numéro de page, une source, une boîte publique, la boîte source si disponible et la transformation. Une confiance est gardée lorsqu'elle vient du moteur ; elle reste nulle pour le texte natif. \texttt{\detokenize{PageDiagnostics}} expose, entre autres, le chemin choisi, l'usage du repli, les avertissements et le temps observé. Le schéma évite ainsi d'inventer une confiance native ou une boîte manquante. Son coût est un contrat plus riche à maintenir et à tester à chaque adaptateur.
 
 \begin{table}[htbp]\centering\tighttable
 \begin{tabularx}{\textwidth}{@{}p{31mm}Y Y@{}}\toprule
@@ -68,17 +56,6 @@ Entité & Information transmise & Ce qu'elle ne promet pas\\\midrule
 \end{table}
 
 La géométrie groupe les éléments par chevauchement vertical et alignements. Une «~cellule candidate~» peut n'être qu'un mot PDF ou une ligne OCR ; le code ne lui attribue pas encore une colonne métier. Cette prudence évite qu'un paragraphe aligné soit annoncé comme un tableau de prix. Les consommateurs peuvent utiliser les IDs pour reconstruire une ligne ou associer une valeur à son fragment exact.
-
-\begin{figure}[htbp]\centering
-\begin{tikzpicture}[every node/.style={font=\small,align=left},box/.style={draw=ink,rounded corners,fill=pale,minimum width=38mm,minimum height=13mm},arr/.style={-{Latex},thick,draw=espritred},node distance=12mm]
-\node[box] (d) {DocumentResult\\document\_id, mode};
-\node[box,right=of d] (p) {PageResult\\page\_number, dimensions};
-\node[box,right=of p] (e) {EvidenceElement\\texte, source, bbox};
-\node[box,below=of p] (g) {PageGeometry\\groupes + element\_ids};
-\draw[arr] (d)--node[above]{\scriptsize pages}(p);\draw[arr] (p)--node[above]{\scriptsize elements}(e);\draw[arr] (p)--(g);\draw[arr] (g)-|(e);
-\end{tikzpicture}
-\caption{Relations principales du contrat Document Intelligence.}\label{fig:schema-di}
-\end{figure}
 
 \section{Difficultés, vérification et limites}
 Les tests du producteur couvrent notamment la sélection de chemin, le contrat sérialisé, les rotations PDF, la provenance et l'absence de géométrie. La documentation relève une difficulté de lecture des PDF arabes où l'ordre natif diffère de l'ordre visuel. La fusion naïve des mots ferait perdre leur ordre source ; le contrat conserve \texttt{\detokenize{native_order}} et la géométrie. Une autre difficulté est la coexistence d'une couche native faible avec une image lisible : l'heuristique reste observable dans les diagnostics et l'utilisateur peut forcer \texttt{\detokenize{ocr}} ou \texttt{\detokenize{hybrid}}.

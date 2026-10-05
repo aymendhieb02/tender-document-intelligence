@@ -2,19 +2,27 @@
 \section{Du fichier à l'information vérifiable}
 Un même dossier d'appel d'offres peut mélanger pages narratives, formulaires, annexes et tableaux. Les mots reconnus ne suffisent pas : il faut distinguer une date limite d'une date de publication, une garantie provisoire d'une garantie définitive et un montant du document d'un montant calculé par l'utilisateur. L'enjeu est double. D'une part, automatiser les opérations répétitives de localisation et de structuration. D'autre part, réduire le risque d'interprétation silencieuse en conservant la page, la zone et le texte à l'origine de chaque candidat.
 
-La question d'ingénierie est donc : \emph{comment produire, à partir de PDF et d'images hétérogènes, un espace d'analyse des CDC qui aide à repérer les informations utiles sans masquer l'incertitude de l'extraction ?} Elle se décompose en acquisition, normalisation de preuves, interprétation métier, restitution et validation. La \autoref{fig:systeme} place ces responsabilités dans le flux observé.
+La question d'ingénierie est donc : \emph{comment produire, à partir de PDF et d'images hétérogènes, un espace d'analyse des CDC qui aide à repérer les informations utiles sans masquer l'incertitude de l'extraction ?} Elle se décompose en acquisition, normalisation de preuves, interprétation métier, restitution et validation. La \autoref{fig:systeme} expose les contrats entre ces responsabilités et les outils de décision.
 
 \begin{figure}[htbp]\centering
-\begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=30mm,minimum height=13mm},arr/.style={-{Latex},thick,draw=espritred},node distance=9mm]
-\node[box] (file) {PDF / image};
-\node[box,right=of file] (di) {Producteur\\de preuves};
-\node[box,right=of di] (cdc) {Analyse\\CDC / BOQ};
-\node[box,below=of cdc] (store) {Stockage\\local};
-\node[box,left=of store] (ask) {Ask Tender\\et citations};
-\node[box,left=of ask] (ui) {Workspace\\et revue};
-\draw[arr] (file)--(di);\draw[arr] (di)--(cdc);\draw[arr] (cdc)--(store);\draw[arr] (store)--(ask);\draw[arr] (ask)--(ui);\draw[arr] (store.west) -| (ui.south);
+\begin{tikzpicture}[x=1mm,y=1mm,every node/.style={font=\small},>=Latex]
+\foreach \y/\num/\title/\detail in {
+  80/01/{ENTRÉE}/{PDF natif, PDF scanné ou image ; contrôle des limites},
+  60/02/{DOCUMENT INTELLIGENCE}/{Extraction native ou OCR par page ; prétraitement, géométrie, diagnostics},
+  40/03/{CONTRAT DE PREUVE}/{DocumentResult / PageResult / EvidenceElement ; page, boîte, origine},
+  20/04/{TENDER INTELLIGENCE}/{CDC, exigences, délais, finances, annexes et lignes BOQ},
+  0/05/{AIDE À LA DÉCISION}/{Tender Workspace, Ask Tender, source, revue, chiffrage et stockage local}
+}{
+  \fill[pale] (0,\y) rectangle (150,\y+15);
+  \draw[ink] (0,\y) rectangle (150,\y+15);
+  \fill[espritred] (0,\y) rectangle (8,\y+15);
+  \node[text=white,font=\scriptsize\bfseries] at (4,\y+7.5) {\num};
+  \node[anchor=west,font=\scriptsize\bfseries,text=ink] at (12,\y+10.5) {\title};
+  \node[anchor=west,font=\scriptsize,text=slate] at (12,\y+4.5) {\detail};
+}
+\foreach \y in {16,36,56,76} {\draw[->,thick,espritred] (75,\y+3)--(75,\y-1);}
 \end{tikzpicture}
-\caption{Chaîne d'analyse et de restitution attestée par les modules du dépôt.}\label{fig:systeme}
+\caption{Architecture globale : la preuve reste un contrat explicite entre reconnaissance documentaire, interprétation métier et actions de l'analyste.}\label{fig:systeme}
 \end{figure}
 
 \section{Besoins fonctionnels}
@@ -45,7 +53,7 @@ Provenance & Page physique, élément source et coordonnées conservés & Schém
 Absence explicite & Champ non renseigné = valeur nulle, calcul non vérifiable & Référence BOQ vide et tests de validation\\
 Reproductibilité & Entrée et attendu versionnés & Fixtures synthétiques, vérité terrain et \texttt{pytest}\\
 Réutilisation & OCR séparé des règles CDC/BOQ & Contrats \texttt{DocumentResult} et adaptateurs\\
-Disponibilité locale & Réouverture de l'analyse sans réexécuter le PDF & Stockage et tests API de rechargement\\
+Usage local & Réouverture de l'analyse sans réexécuter le PDF & Stockage et tests API de rechargement\\
 Sécurité & Accès réservé à l'environnement local supervisé & Limite explicitée : authentification absente\\\bottomrule
 \end{tabularx}
 \caption{Critères de qualité et niveau de vérification observé.}\label{tab:nonfonctionnels}
@@ -53,3 +61,21 @@ Sécurité & Accès réservé à l'environnement local supervisé & Limite expli
 
 \section{Acteurs, scénarios et frontière de confiance}
 L'utilisateur charge un CDC ; le serveur enregistre un identifiant opaque et l'interface affiche sections, faits, annexes et bordereaux. L'analyste peut ouvrir une preuve, interroger le document et saisir un prix dans un brouillon distinct. La revue peut approuver ou corriger certains faits financiers. L'analyste reste responsable de confronter les propositions à la source : aucune réponse générée n'est juridiquement validée. Un PDF chargé est une donnée non fiable, et l'application locale n'a pas de contrôle d'accès multi-utilisateur. Le critère d'acceptation est une démonstration supervisée, sans décision contractuelle automatique.
+
+La \autoref{fig:parcours} reformule le système du point de vue de l'employé. Chaque résultat important mène à la page source ; la correction et le prix saisi sont des actions humaines, séparées de la valeur extraite. L'enregistrement local permet de reprendre une analyse, sans présumer d'un circuit officiel de soumission.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[x=1mm,y=1mm,>=Latex,every node/.style={font=\scriptsize,align=center}]
+\foreach \x/\n/\t in {0/1/{Importer\\le CDC},39/2/{Lire structure,\\exigences et délais},78/3/{Ouvrir la page\\et la preuve},117/4/{Consulter BOQ\\et Ask Tender}} {
+  \node[draw=ink,rounded corners=2pt,fill=pale,minimum width=34mm,minimum height=19mm] (top\n) at (\x+17,23) {\textcolor{espritred}{\bfseries\n}\quad\t};
+}
+\draw[->,thick,espritred] (34,23)--(39,23);
+\draw[->,thick,espritred] (73,23)--(78,23);
+\draw[->,thick,espritred] (112,23)--(117,23);
+\node[draw=ink,rounded corners=2pt,fill=white,minimum width=67mm,minimum height=14mm] (save) at (38,0) {Sauvegarder et rouvrir l'analyse locale};
+\node[draw=espritred,rounded corners=2pt,fill=white,minimum width=67mm,minimum height=14mm] (action) at (113,0) {Revoir ou corriger ; chiffrer si nécessaire};
+\draw[->,thick,espritred] (134,13)--(134,8);
+\draw[->,thick,espritred] (79,0)--(72,0);
+\end{tikzpicture}
+\caption{Parcours métier de l'analyste d'appel d'offres dans le prototype local ; les valeurs restent à vérifier dans le document source.}\label{fig:parcours}
+\end{figure}

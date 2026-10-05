@@ -6,15 +6,25 @@ La reconnaissance optique de caractères (OCR) transforme une image de texte en 
 L'objectif du stage, réalisé chez UDGroup du 1\textsuperscript{er} juillet au 31 août 2026, est présenté en deux tâches complémentaires. La première construit une fondation générique pour documents PDF et images : chargement, extraction native ou OCR, coordonnées, ordre de lecture, géométrie et diagnostics. La seconde transforme ces preuves en information de marché : sections, articles, exigences, informations temporelles et financières, annexes, bordereaux et réponses accompagnées de citations. La \autoref{fig:evolution} résume cette progression.
 
 \begin{figure}[htbp]\centering
-\begin{tikzpicture}[node distance=5mm, every node/.style={font=\small}, box/.style={draw=ink,rounded corners=2pt,fill=pale,minimum width=0.79\textwidth,minimum height=8mm,align=center},arr/.style={-{Latex[length=2mm]},thick,draw=espritred}]
-\node[box] (a) {PDF ou image : texte natif, scan et tableaux};
-\node[box,below=of a] (b) {Document Intelligence : pages, éléments, géométrie, origine};
-\node[box,below=of b] (c) {Analyse CDC : hiérarchie, exigences, faits, annexes};
-\node[box,below=of c] (d) {BOQ et Ask Tender : lignes, contrôles, passages cités};
-\node[box,below=of d] (e) {Espace de travail : inspection, chiffrage séparé, revue};
-\draw[arr] (a)--(b);\draw[arr] (b)--(c);\draw[arr] (c)--(d);\draw[arr] (d)--(e);
+\begin{tikzpicture}[x=1mm,y=1mm,every node/.style={font=\scriptsize,align=center}]
+\foreach \x/\n/\head/\body in {
+  0/1/{OCR}/{Lire l'image},
+  38/2/{Document Intelligence}/{Structurer la preuve},
+  76/3/{Analyse CDC}/{Repérer les clauses},
+  114/4/{BOQ}/{Lire les tableaux}
+}{
+  \node[draw=ink,fill=pale,rounded corners=2pt,minimum width=35mm,minimum height=21mm] at (\x+17.5,25) {\textcolor{espritred}{\bfseries 0\n}\quad\head\\\body};
+}
+\foreach \x/\n/\head/\body in {
+  19/5/{Ask Tender}/{Retrouver la source},
+  57/6/{Workspace}/{Consulter et reprendre},
+  95/7/{Revue et prix}/{Agir sans écraser la source}
+}{
+  \node[draw=ink,fill=white,rounded corners=2pt,minimum width=35mm,minimum height=21mm] at (\x+17.5,0) {\textcolor{espritred}{\bfseries 0\n}\quad\head\\\body};
+}
+\draw[very thick,espritred] (0,11)--(149,11);
 \end{tikzpicture}
-\caption{Progression fonctionnelle du document brut vers une aide à l'analyse vérifiable.}\label{fig:evolution}
+\caption{Progression conceptuelle du projet. L'ordre pédagogique ne date pas les étapes dans les deux mois administratifs du stage.}\label{fig:evolution}
 \end{figure}
 
 Ce rapport repose sur le code, les tests, les artefacts d'évaluation et l'historique Git accessibles à sa rédaction. Les premiers commits visibles datent du 28 septembre 2026, après la période administrative du stage. Leur ordre éclaire l'évolution technique sans dater précisément chaque fonction pendant juillet--août. Les résultats synthétiques sont désignés comme tels et le BOQ réel vide n'est jamais utilisé comme preuve de précision numérique. Les chapitres suivent les deux tâches, puis examinent leur évaluation et leurs limites.

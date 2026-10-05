@@ -32,4 +32,4 @@ La couche OCR historique apparaît dans le dépôt comme infrastructure réutili
 
 ## Vérification présente
 
-`pytest -q -rs` exécuté le 5 octobre 2026 : **305 réussis, 1 ignoré, 1 avertissement, 0 échec, 33,40 s**. Le test Paddle réel requiert `RUN_REAL_OCR=1` et les modèles locaux. L'avertissement vient de la compatibilité Starlette/httpx TestClient. Ces nombres sont un état du dépôt au moment de la rédaction, et non une mesure de performance du produit ou une preuve que toutes les fonctions ont été réalisées avant le 31 août.
+`pytest -q -rs` réexécuté lors de la seconde revue le 5 octobre 2026 : **305 réussis, 1 ignoré, 1 avertissement, 0 échec, 33,05 s**. Le test Paddle réel requiert `RUN_REAL_OCR=1` et les modèles locaux. L'avertissement vient de la compatibilité Starlette/httpx TestClient. Ces nombres sont un état du dépôt au moment de la rédaction, et non une mesure de performance du produit ou une preuve que toutes les fonctions ont été réalisées avant le 31 août.

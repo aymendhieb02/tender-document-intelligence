@@ -2,6 +2,25 @@
 \section{Protocole : trois niveaux de preuve}
 L'évaluation n'agrège pas toutes les vérifications en un score global. Un test unitaire contrôle une règle sur une entrée connue ; un benchmark annoté compare une sortie à une référence limitée ; un parcours de bout en bout vérifie l'enchaînement de l'interface et de la persistance. Aucun de ces niveaux, pris isolément, ne démontre l'exactitude d'un système sur la population entière des appels d'offres. Les jeux sont donc décrits avec leur origine et leur statut d'annotation.
 
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[x=1mm,y=1mm,every node/.style={font=\scriptsize,align=left}]
+\foreach \y/\w/\status/\title in {
+  0/146/{Disponible}/{Tests unitaires et intégration sur entrées connues},
+  10/137/{Disponible}/{Fixtures synthétiques et parcours local},
+  20/128/{Partiel}/{Annotations CDC de développement ; BOQ réel vide},
+  30/119/{À construire}/{Corpus réel rempli et tenu à l'écart},
+  40/110/{Non établi}/{Validation indépendante à l'échelle d'exploitation}
+}{
+  \fill[pale] (0,\y) rectangle (\w,\y+8);
+  \draw[ink] (0,\y) rectangle (\w,\y+8);
+  \fill[espritred] (0,\y) rectangle (27,\y+8);
+  \node[text=white,anchor=west] at (2,\y+4) {\status};
+  \node[anchor=west] at (30,\y+4) {\title};
+}
+\end{tikzpicture}
+\caption{Maturité des preuves d'évaluation : la largeur décroissante signale le travail restant, sans convertir les niveaux en score de précision.}\label{fig:maturite}
+\end{figure}
+
 Le corpus de développement CDC V2 comprend sept documents traités du PDF à l'analyse ; six disposent d'étiquettes de source vérifiées pour les catégories scorées. Un scan arabe de 37 pages a été exécuté historiquement avec OCR, mais ses annotations restent provisoires et il est exclu des scores. Pour le BOQ, une référence réelle vide sert à mesurer seulement la structure. Les formulaires synthétiques contrôlent les cas numériques et géométriques. Enfin, la récupération Ask Tender est éprouvée sur de petites questions synthétiques revues. La \autoref{tab:cohortes} explicite ce découpage.
 
 \begin{table}[htbp]\centering\tighttable
@@ -17,7 +36,7 @@ Ask Tender synthétique & 4 puis 7 questions & Rang de la page attendue & Qualit
 \end{table}
 
 \section{Tests du logiciel et contrat documentaire}
-La commande \texttt{\detokenize{pytest -q -rs}}, exécutée le 5 octobre 2026 sur l'état \texttt{\detokenize{f292de8}}, donne \textbf{305 tests réussis, aucun échec, un test ignoré et un avertissement} en 33,40~s. Le test ignoré est la vérification réelle Paddle nécessitant \texttt{\detokenize{RUN_REAL_OCR=1}} et des modèles locaux. L'avertissement concerne la dépréciation de la combinaison Starlette/httpx utilisée par TestClient. Les tests couvrent notamment le contrat DI, la rotation des pages, les adaptateurs, l'analyse CDC, les cas BOQ, les routes V2 et la persistance. Ils ne sont pas un taux de réussite documentaire : beaucoup reposent sur des fixtures conçues pour reproduire un comportement attendu.
+La commande \texttt{\detokenize{pytest -q -rs}}, réexécutée le 5 octobre 2026 sur le code applicatif inchangé depuis \texttt{\detokenize{f292de8}}, donne \textbf{305 tests réussis, aucun échec, un test ignoré et un avertissement} en 33,05~s. Le test ignoré est la vérification réelle Paddle nécessitant \texttt{\detokenize{RUN_REAL_OCR=1}} et des modèles locaux. L'avertissement concerne la dépréciation de la combinaison Starlette/httpx utilisée par TestClient. Les tests couvrent notamment le contrat DI, la rotation des pages, les adaptateurs, l'analyse CDC, les cas BOQ, les routes V2 et la persistance. Ils ne sont pas un taux de réussite documentaire : beaucoup reposent sur des fixtures conçues pour reproduire un comportement attendu.
 
 La conformité OCR du parcours natif est particulièrement importante pour l'étude : la référence réelle possède du texte sélectionnable sur ses 30 pages. Le diagnostic de la mesure locale indique zéro page OCR et zéro repli. Le nombre d'éléments de preuve rapporté par cette exécution est 10\,451 ; il s'agit d'éléments textuels du PDF, pas de champs métier correctement extraits. Les tests de schéma protègent la sérialisation \texttt{\detokenize{DocumentResult}} et l'identité des références de preuve à travers les consommateurs.
 
@@ -44,16 +63,6 @@ Le changement V2 cible des erreurs identifiées : titres arabes non reconnus, fr
 Le mécanisme d'évaluation BOQ V2 distingue \texttt{\detokenize{real_completed}}, \texttt{\detokenize{real_empty_template}} et \texttt{\detokenize{synthetic}}. Dans la cohorte réelle vide, la présence du tableau, sa page candidate et son nombre de lignes sont corrects chacun sur l'unique document. Les cinq numéros d'article sont retrouvés et 25 cellules explicitement vides de quantité ou de montant demeurent vides. Ces comptes portent sur \emph{un seul gabarit vide}. Aucune précision, rappel ou erreur absolue des montants sur un bordereau réel rempli ne peut être annoncé. Les tests synthétiques vérifient notamment les formes numériques françaises, les lignes à valeur absente, l'erreur arithmétique, un décalage géométrique et les calculs du brouillon.
 
 Un exemple de chiffrage de démonstration calcule 1000 multiplié par 12,500 pour obtenir 12\,500,000 HT ; un taux de 19\,\% saisi \emph{dans ce scénario synthétique} donne 2\,375,000 de taxe et 14\,875,00000 TTC. Ces valeurs ne viennent pas du PDF de référence. Elles vérifient l'arithmétique, la persistance après redémarrage et l'affichage, sans établir un devis réel.
-
-\begin{figure}[htbp]\centering
-\begin{tikzpicture}[every node/.style={font=\small,align=center},box/.style={draw=ink,rounded corners,fill=pale,minimum width=44mm,minimum height=14mm},arr/.style={-{Latex},draw=espritred,thick},node distance=9mm]
-\node[box] (real) {Réel rempli\\0 document : non mesurable};
-\node[box,right=of real] (empty) {Réel vide\\1 gabarit : structure};
-\node[box,below=of empty] (synthetic) {Synthétique\\parsing et calcul contrôlés};
-\draw[arr] (real)--node[above]{\scriptsize cohortes distinctes}(empty);\draw[arr] (empty)--(synthetic);
-\end{tikzpicture}
-\caption{Trois cohortes BOQ qui ne doivent pas être fusionnées en une « précision » unique.}\label{fig:cohortes}
-\end{figure}
 
 \section{Ask Tender et parcours utilisateur}
 Quatre questions synthétiques initiales placent la page attendue parmi les trois premières réponses dans 4/4 cas. La mise à jour suivante couvre sept autres questions synthétiques ; leur page attendue arrive en tête dans 7/7 cas, et donc également dans les trois et sept premières places. Le protocole évalue la \emph{présence de la bonne page dans le classement}, pas la véracité complète d'une réponse rédigée. Sur le document de référence, une formulation du délai de dépôt a remonté des pages liées au sujet, mais des questions larges peuvent aussi favoriser un passage voisin.

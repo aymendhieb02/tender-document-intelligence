@@ -1,6 +1,6 @@
 # Rapport de stage — Aymen Dhieb / UDGroup
 
-Source LaTeX modulaire dans `main.tex`, `config/`, `chapters/`, `bibliography/`, `figures/` et `screenshots/`. Les notes de vérification préalable sont dans `research/`. Le PDF livré est `build/rapport_stage_aymen_dhieb_udgroup.pdf`.
+Source LaTeX modulaire dans `main.tex`, `config/`, `chapters/`, `bibliography/`, `figures/` et `screenshots/`. Les notes de vérification préalable sont dans `research/`. Le PDF livré est `build/rapport_stage_aymen_dhieb_udgroup.pdf`. La seconde revue est documentée dans `REVISION_REPORT.md`, `FINAL_QA_REPORT.md` et `FINAL_MULTIPERSPECTIVE_REVIEW.md`.
 
 ## Compilation
 
