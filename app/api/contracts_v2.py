@@ -38,6 +38,7 @@ class ErrorEnvelopeV1(BaseModel):
 class DocumentIdentityV2(BaseModel):
     document_id: str
     document_url: str
+    filename: str | None = None
     source_type: Literal["pdf", "image"]
     page_count: int = Field(ge=1)
 
@@ -95,6 +96,7 @@ class TenderAnalysisResponseV2(BaseModel):
     tender_document: TenderDocument
     modules: TenderModulesV2
     diagnostics: list[str] = Field(default_factory=list)
+    quality_signals: list[dict[str, Any]] = Field(default_factory=list)
 
 
 def _evidence_references(value: Any) -> list[EvidenceReferenceV2]:
@@ -197,10 +199,29 @@ def build_tender_analysis_v2(
     module_diagnostics = integrated["financial_diagnostics"]
     financial_availability: ModuleAvailability = "partial" if module_diagnostics else "available"
 
+    quality_signals = []
+    if document_result is not None and hasattr(document_result, "pages"):
+        native_pages = sum(not page.diagnostics.ocr_used for page in document_result.pages)
+        ocr_pages = sum(page.diagnostics.ocr_used for page in document_result.pages)
+        low_ocr_pages = sum(page.diagnostics.ocr_used and any(
+            element.confidence is not None and element.confidence < .60 for element in page.elements)
+            for page in document_result.pages)
+        quality_signals.extend(({"code": "native_pages", "count": native_pages},
+                                {"code": "ocr_pages", "count": ocr_pages},
+                                {"code": "ocr_low_confidence_pages", "count": low_ocr_pages}))
+    if boq.availability == "available":
+        documents = [item.get("result", item) for item in (boq.data or [])]
+        empty = all(not any(row.get("quantity", {}).get("normalized_value") is not None for row in doc.get("rows", []))
+                    for doc in documents)
+        quality_signals.append({"code": "boq_empty_template" if empty else "boq_detected", "count": len(documents)})
+    elif boq.availability in {"unavailable", "not_run"}:
+        quality_signals.append({"code": "boq_unavailable", "count": 0})
+    quality_signals.append({"code": "ask_evidence_available", "count": len(references)})
     return TenderAnalysisResponseV2(
         document=DocumentIdentityV2(
             document_id=payload["document_id"],
             document_url=payload["document_url"],
+            filename=filename,
             source_type=payload["source_type"],
             page_count=payload["page_count"],
         ),
@@ -230,4 +251,5 @@ def build_tender_analysis_v2(
             diagnostics=ModuleResultV2(availability="available", data=workflow_diagnostics),
         ),
         diagnostics=workflow_diagnostics,
+        quality_signals=quality_signals,
     )

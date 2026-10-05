@@ -25,6 +25,15 @@
 .recent-empty strong { font-size: 12px; font-weight: 620; }
 .recent-empty p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
 .library-results { margin-top: 22px; }
+.library-search-label { display: block; margin-top: 20px; margin-bottom: 6px; font-size: 12px; font-weight: 650; }
+.library-search { width: min(100%, 460px); padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 5px; font: inherit; }
+.library-actions { display: flex; gap: 8px; align-items: center; }
+.fact-review { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.fact-review label { display: grid; gap: 4px; font-size: 11px; color: var(--muted); }
+.fact-review select,.fact-review input { min-height: 34px; padding: 6px 8px; border: 1px solid var(--line-strong); border-radius: 4px; font: inherit; color: var(--ink); }
+.fact-review small { width: 100%; color: var(--muted); }
+.quality-signals { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0; }
+.quality-signals span { padding: 5px 8px; border-radius: 4px; background: var(--surface-soft, #f4f6f8); color: var(--ink-secondary); font-size: 11px; }
 .library-list { display: grid; gap: 10px; }
 .library-item { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 16px 18px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); }
 .library-item h2 { margin: 0 0 5px; font-size: 14px; overflow-wrap: anywhere; }
@@ -126,6 +135,23 @@
 .ask-evidence-link { border: 0; padding: 0; background: none; color: var(--accent-strong); font: inherit; font-weight: 650; text-align: left; cursor: pointer; }
 .ask-evidence-link:hover { text-decoration: underline; }
 .ask-evidence li p { margin: 4px 0 10px; color: var(--text); line-height: 1.5; }
+.pricing-workspace .view-heading { flex-wrap: wrap; }
+.pricing-legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px; }
+.pricing-legend span { padding: 5px 7px; border-radius: 4px; background: #edf3f3; color: #52676e; font-size: 10px; }
+.pricing-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 10px 0 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 5px; background: #fff; font-size: 11px; }
+.pricing-summary [data-pricing-save] { margin-left: auto; color: var(--accent-strong); }
+.pricing-table { min-width: 800px; }
+.pricing-table th small { display: block; margin-top: 2px; color: #8a989e; font-size: 9px; font-weight: 450; }
+.pricing-table td { vertical-align: top; }
+.pricing-input { box-sizing: border-box; width: 98px; max-width: 100%; min-height: 32px; padding: 5px 7px; border: 1px solid var(--line-strong); border-radius: 4px; font: inherit; font-size: 11px; }
+.pricing-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pricing-row-issue { display: block; max-width: 180px; margin-top: 4px; color: #9b5148; line-height: 1.3; }
+.pricing-totals { display: grid; gap: 8px; margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 5px; background: #fff; }
+.pricing-totals > div { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; }
+.pricing-totals strong { font-variant-numeric: tabular-nums; }
+.pricing-tax label { color: var(--ink-secondary); }
+.pricing-tax small { width: 100%; color: #9b5148; }
+.pricing-issues { margin: 4px 0 0; color: #9b5148; font-size: 11px; }
 .analysis-view { min-height: 0; flex: 1; overflow: auto; padding: 18px 16px 22px; }
 .view-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 17px; }
 .view-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }

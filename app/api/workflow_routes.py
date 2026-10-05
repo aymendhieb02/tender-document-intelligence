@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import logging
+import hashlib
+import json
+from datetime import datetime, timezone
 from time import perf_counter
 from typing import Any
+from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
@@ -17,6 +21,7 @@ from app.cdc_analysis import CDCAnalyzer
 from app.document_intelligence import DocumentProcessor
 from app.document_intelligence.schemas import DocumentResult
 from app.boq import BOQDocument, export_boq_csv, extract_boq_candidates
+from app.boq.pricing import PricingUpdate, build_pricing_draft, pricing_csv, source_fingerprint
 from app.invoice.document_result_adapter import DocumentResultInvoiceAdapter
 from app.ask_tender.service import AskRequest, AskResponse, answer_question
 from app.services.pipeline_runner import process_document_file
@@ -257,6 +262,92 @@ def list_tender_results() -> list[dict]:
     return document_store.list_analyses()
 
 
+@router.delete("/v2/cdc/{document_id}")
+def delete_tender_result(document_id: str) -> dict:
+    if not document_store.delete_analysis(document_id):
+        raise WorkflowError("analysis_not_found", "cdc", "The saved analysis is unavailable.",
+                            status_code=404, recoverable=True)
+    return {"document_id": document_id, "deleted": True}
+
+
+class FactReviewUpdate(BaseModel):
+    status: str
+    corrected_value: str | None = Field(default=None, max_length=1000)
+
+
+def _review_facts(saved: dict) -> list[dict]:
+    response = TenderAnalysisResponseV2.model_validate(saved["response"])
+    summary = response.modules.summary.data or {}
+    identity = summary.get("identity", {}) if isinstance(summary, dict) else {}
+    facts = []
+    for key in ("title", "reference", "contracting_organization"):
+        item = identity.get(key)
+        if isinstance(item, dict) and (item.get("value") or item.get("raw_text")):
+            facts.append({"key": f"identity:{key}", "category": key,
+                          "machine_value": item.get("value") or item.get("raw_text"),
+                          "evidence": item.get("evidence") or item.get("source_evidence") or []})
+    for item in response.modules.financial_deadline_intelligence.data or []:
+        if isinstance(item, dict) and item.get("id"):
+            facts.append({"key": f"financial:{item['id']}", "category": item.get("category"),
+                          "machine_value": item.get("raw"), "evidence": item.get("evidence") or []})
+    return facts
+
+
+def _review_context(document_id: str) -> tuple[list[dict], dict]:
+    saved = document_store.get_analysis(document_id)
+    if saved is None:
+        raise WorkflowError("analysis_not_found", "review", "The saved analysis is unavailable.",
+                            status_code=404, recoverable=True)
+    try:
+        facts = _review_facts(saved)
+    except Exception as exc:
+        raise WorkflowError("saved_analysis_invalid", "review", "The saved analysis is invalid.",
+                            status_code=422, recoverable=True) from exc
+    return facts, document_store.get_review(document_id)
+
+
+def _review_view(facts: list[dict], saved_review: dict) -> dict:
+    records = saved_review.get("facts", {})
+    result = []
+    for fact in facts:
+        fingerprint = hashlib.sha256(json.dumps(fact, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+        record = records.get(fact["key"], {})
+        if record.get("source_fingerprint") != fingerprint:
+            record = {}
+        result.append({**fact, "source_fingerprint": fingerprint,
+                       "status": record.get("status", "unreviewed"),
+                       "corrected_value": record.get("corrected_value"),
+                       "updated_at": record.get("updated_at")})
+    return {"schema_version": 1, "facts": result}
+
+
+@router.get("/v2/cdc/{document_id}/review")
+def get_tender_review(document_id: str) -> dict:
+    facts, review = _review_context(document_id)
+    return _review_view(facts, review)
+
+
+@router.put("/v2/cdc/{document_id}/review/{fact_key:path}")
+def save_tender_review(document_id: str, fact_key: str, update: FactReviewUpdate) -> dict:
+    facts, review = _review_context(document_id)
+    current = next((item for item in _review_view(facts, review)["facts"] if item["key"] == fact_key), None)
+    if current is None:
+        raise WorkflowError("review_fact_not_found", "review", "The fact is unavailable.",
+                            status_code=404, recoverable=True)
+    if update.status not in {"unreviewed", "approved", "corrected"} or (
+            update.status == "corrected" and not (update.corrected_value or "").strip()) or (
+            update.status != "corrected" and update.corrected_value):
+        raise WorkflowError("review_invalid", "review", "The review status or correction is invalid.",
+                            status_code=422, recoverable=True)
+    records = review.get("facts", {})
+    records[fact_key] = {"source_fingerprint": current["source_fingerprint"],
+                         "status": update.status,
+                         "corrected_value": update.corrected_value.strip() if update.status == "corrected" else None,
+                         "updated_at": datetime.now(timezone.utc).isoformat()}
+    document_store.save_review(document_id, {"schema_version": 1, "facts": records})
+    return next(item for item in _review_view(facts, {"facts": records})["facts"] if item["key"] == fact_key)
+
+
 @router.get("/v2/cdc/{document_id}", response_model=TenderAnalysisResponseV2)
 def get_tender_result(document_id: str) -> TenderAnalysisResponseV2:
     """Reload a completed local analysis without parsing or OCRing its source again."""
@@ -285,6 +376,73 @@ def export_saved_boq_csv(document_id: str) -> Response:
     documents = [BOQDocument.model_validate(item.get("result", item)) for item in result.modules.boq.data]
     return Response(content=export_boq_csv(documents), media_type="text/csv; charset=utf-8",
                     headers={"Content-Disposition": 'attachment; filename="boq-export.csv"'})
+
+
+def _pricing_context(document_id: str, boq_index: int) -> tuple[BOQDocument, dict | None]:
+    saved = document_store.get_analysis(document_id)
+    if saved is None:
+        raise WorkflowError("analysis_not_found", "boq_pricing", "L'analyse enregistrée est introuvable.",
+                            status_code=404, recoverable=True)
+    try:
+        response = TenderAnalysisResponseV2.model_validate(saved["response"])
+        data = response.modules.boq.data if response.modules.boq.availability == "available" else None
+        if data is None or boq_index < 0 or boq_index >= len(data):
+            raise IndexError("BOQ index unavailable")
+        boq = BOQDocument.model_validate(data[boq_index].get("result", data[boq_index]))
+    except IndexError as exc:
+        raise WorkflowError("boq_unavailable", "boq_pricing", "Ce bordereau est indisponible.",
+                            status_code=404, recoverable=True) from exc
+    except Exception as exc:
+        raise WorkflowError("saved_analysis_invalid", "boq_pricing", "Le bordereau enregistré est illisible.",
+                            status_code=422, recoverable=True) from exc
+    pricing = document_store.get_pricing(document_id, boq_index)
+    if pricing and pricing.get("source_fingerprint") != source_fingerprint(boq):
+        raise WorkflowError("pricing_source_changed", "boq_pricing",
+                            "Le bordereau source a changé; le brouillon doit être revu.",
+                            status_code=409, recoverable=True)
+    return boq, pricing
+
+
+def _pricing_result(document_id: str, boq_index: int, boq: BOQDocument, pricing: dict | None) -> dict:
+    try:
+        update = PricingUpdate.model_validate(pricing["inputs"]) if pricing else PricingUpdate()
+        return build_pricing_draft(boq, document_id, boq_index, update,
+                                   updated_at=pricing.get("updated_at") if pricing else None)
+    except (ValueError, KeyError, TypeError) as exc:
+        raise WorkflowError("pricing_invalid", "boq_pricing", "Le brouillon de chiffrage est invalide.",
+                            status_code=422, recoverable=True) from exc
+
+
+@router.get("/v2/cdc/{document_id}/boq/{boq_index}/pricing")
+def get_boq_pricing(document_id: str, boq_index: int) -> dict:
+    boq, pricing = _pricing_context(document_id, boq_index)
+    return _pricing_result(document_id, boq_index, boq, pricing)
+
+
+@router.put("/v2/cdc/{document_id}/boq/{boq_index}/pricing")
+def save_boq_pricing(document_id: str, boq_index: int, update: PricingUpdate) -> dict:
+    boq, _ = _pricing_context(document_id, boq_index)
+    updated_at = datetime.now(timezone.utc).isoformat()
+    try:
+        draft = build_pricing_draft(boq, document_id, boq_index, update, updated_at=updated_at)
+    except ValueError as exc:
+        raise WorkflowError("pricing_invalid", "boq_pricing", str(exc),
+                            status_code=422, recoverable=True) from exc
+    document_store.save_pricing(document_id, boq_index, {
+        "schema_version": 1, "source_fingerprint": draft["source_fingerprint"],
+        "draft_id": draft["draft_id"], "updated_at": updated_at,
+        "status": draft["status"], "priced_rows": draft["priced_rows"],
+        "total_rows": draft["total_rows"], "inputs": update.model_dump(mode="json"),
+    })
+    return draft
+
+
+@router.get("/v2/cdc/{document_id}/boq/{boq_index}/pricing.csv")
+def export_boq_pricing(document_id: str, boq_index: int) -> Response:
+    boq, pricing = _pricing_context(document_id, boq_index)
+    draft = _pricing_result(document_id, boq_index, boq, pricing)
+    return Response(content=pricing_csv(draft), media_type="text/csv; charset=utf-8",
+                    headers={"Content-Disposition": 'attachment; filename="boq-pricing.csv"'})
 
 
 @router.post("/v2/cdc/{document_id}/ask", response_model=AskResponse)

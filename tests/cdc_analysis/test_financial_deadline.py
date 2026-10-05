@@ -38,6 +38,8 @@ def test_dt_tnd_and_provisional_guarantee_use_decimal():
 
 def test_durations_validity_execution_and_warranty():
     fs = normalize_financial_deadlines("Validité de l'offre: cent vingt jours. Délai d'exécution de 3 mois. Garantie de 2 ans.")
+    assert any(f.raw == "cent vingt jours" for f in fs)
+    assert any(f.raw == "3 mois" for f in fs)
     assert next(f for f in fs if f.category == "offer_validity").normalized == {"value": Decimal("120"), "unit": "DAY"}
     assert next(f for f in fs if f.category == "execution_period").normalized == {"value": Decimal("3"), "unit": "MONTH"}
     assert next(f for f in fs if f.category == "warranty_period").normalized == {"value": Decimal("2"), "unit": "YEAR"}

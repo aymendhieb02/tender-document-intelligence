@@ -93,6 +93,27 @@ def test_generic_boq_rejects_heading_without_positioned_column_evidence():
     assert not extract_generic_boq(source).detected
 
 
+def test_generic_boq_multiline_header_wrapped_designation_and_repeated_header():
+    # Synthetic positioned evidence, not a measured real-world accuracy claim.
+    items = [("Devis estimatif", 250, 80, .99),
+             ("Article", 100, 200, .99), ("Désignation", 300, 200, .99),
+             ("Quantité", 570, 200, .99), ("Prix", 720, 200, .99),
+             ("unitaire HT", 720, 225, .99), ("Montant HT", 870, 200, .99),
+             ("01", 100, 300, .99), ("Entretien des", 300, 300, .99),
+             ("2", 570, 300, .99), ("routes", 300, 327, .99),
+             ("Article", 100, 420, .99), ("Désignation", 300, 420, .99),
+             ("Quantité", 570, 420, .99), ("Prix unitaire HT", 720, 420, .99),
+             ("Montant HT", 870, 420, .99),
+             ("02", 100, 500, .99), ("Réfection", 300, 500, .99),
+             ("3", 570, 500, .99)]
+    result = extract_generic_boq(page(items))
+    assert result.detected
+    assert result.detection["price_basis"] == "ht"
+    assert len(result.rows) == 2
+    assert result.rows[0].designation.normalized_value == "Entretien des routes"
+    assert len(result.rows[0].designation.evidence) == 2
+
+
 ANCHORS = [("Annexe 05", 80, 80, .99), ("BORDEREAU DES PRIX", 300, 130, .99),
     ("DEVIS ESTIMATIF", 300, 155, .99), ("Prix HTVA", 700, 250, .99), ("Prix TTC", 880, 250, .99)]
 

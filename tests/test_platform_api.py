@@ -27,6 +27,22 @@ def make_pdf(path: Path, lines: list[str]) -> bytes:
     return path.read_bytes()
 
 
+def make_pricing_pdf() -> bytes:
+    """Synthetic single-row HT table with an explicitly supplied quantity."""
+    pdf = fitz.open()
+    page = pdf.new_page()
+    page.insert_text((70, 80), "Devis estimatif")
+    columns = [(40, "Article"), (120, "Designation"), (280, "Unite"),
+               (350, "Quantite"), (425, "Prix unitaire HT"), (520, "Montant HT")]
+    for x, label in columns:
+        page.insert_text((x, 160), label)
+    for x, value in [(40, "01"), (120, "Produit A"), (280, "U"), (350, "1000")]:
+        page.insert_text((x, 205), value)
+    data = pdf.tobytes()
+    pdf.close()
+    return data
+
+
 def test_application_startup_and_workflow_routes():
     root = client.get("/")
     assert root.status_code == 200
@@ -39,6 +55,12 @@ def test_application_startup_and_workflow_routes():
     assert "/api/cdc/male/export.csv" in routes
     assert "/api/v2/cdc/analyze" in routes
     assert "/api/v2/cdc/male/analyze" in routes
+
+
+def test_default_cors_does_not_allow_arbitrary_cross_origin():
+    response = client.get("/health", headers={"Origin": "https://untrusted.example"})
+    assert response.status_code == 200
+    assert "access-control-allow-origin" not in response.headers
 
 
 def test_invalid_upload_has_stable_error_envelope():
@@ -81,6 +103,8 @@ def test_v2_cdc_envelope_is_typed_and_does_not_change_v1_payload():
     assert contract.modules.compliance.reason == "not_in_wave_1"
     assert contract.modules.boq.availability == "available"
     assert contract.modules.boq.data[0]["result"]["extractor_family"] == "MALE_MUNICIPAL_MAINTENANCE_BOQ_V1"
+    assert {item["code"]: item["count"] for item in contract.quality_signals}["native_pages"] == 30
+    assert {item["code"]: item["count"] for item in contract.quality_signals}["boq_empty_template"] == 1
 
     references = contract.modules.evidence.data
     assert references
@@ -121,6 +145,52 @@ def test_generic_boq_is_available_in_cdc_response_and_saved_csv(tmp_path):
     rows = list(csv.DictReader(StringIO(saved.text)))
     assert len(rows) == 2
     assert rows[1]["quantity"] == ""
+
+
+def test_pricing_draft_persists_separately_and_survives_store_reload(tmp_path, monkeypatch):
+    from app.api import workflow_routes
+    from app.api.document_store import LocalDocumentStore
+
+    workspace = tmp_path / "pricing-workspace"
+    monkeypatch.setattr(workflow_routes, "document_store", LocalDocumentStore(workspace))
+    uploaded = client.post("/api/v2/cdc/analyze", files={
+        "file": ("synthetic-pricing.pdf", make_pricing_pdf(), "application/pdf")})
+    assert uploaded.status_code == 200, uploaded.text
+    original = uploaded.json()
+    document_id = original["document"]["document_url"].rsplit("/", 1)[-1]
+    route = f"/api/v2/cdc/{document_id}/boq/0/pricing"
+    empty = client.get(route)
+    assert empty.status_code == 200
+    assert empty.json()["status"] == "not_started"
+    assert empty.json()["rows"][0]["source"]["quantity"]["normalized_value"] == "1000"
+    saved = client.put(route, json={"rows": [{"index": 0, "unit_price_ht": "12.500"}]})
+    assert saved.status_code == 200, saved.text
+    assert saved.json()["rows"][0]["computed"]["line_total_ht"]["value"] == "12500.000"
+    assert saved.json()["status"] == "complete"
+    draft_id = saved.json()["draft_id"]
+    monkeypatch.setattr(workflow_routes, "document_store", LocalDocumentStore(workspace))
+    monkeypatch.setattr(workflow_routes, "DocumentProcessor", lambda: (_ for _ in ()).throw(
+        AssertionError("Pricing must not reprocess the PDF")))
+    reopened = client.get(route)
+    assert reopened.status_code == 200
+    assert reopened.json()["draft_id"] == draft_id
+    assert reopened.json()["rows"][0]["input"]["unit_price_ht"] == "12.500"
+    assert reopened.json()["totals"]["total_ht"]["value"] == "12500.000"
+    assert client.get(f"/api/v2/cdc/{document_id}").json() == original
+    library = client.get("/api/v2/cdc").json()
+    assert library[0]["pricing_status"] == "complete"
+    csv_response = client.get(route + ".csv")
+    assert csv_response.status_code == 200
+    csv_row = list(csv.DictReader(StringIO(csv_response.text)))[0]
+    assert csv_row["unit_price_ht"] == "12.500"
+    assert csv_row["line_total_ht"] == "12500.000"
+    changed = client.put(route, json={"rows": [{"index": 0, "unit_price_ht": "13.000"}]})
+    assert changed.json()["rows"][0]["computed"]["line_total_ht"]["value"] == "13000.000"
+    invalid = client.put(route, json={"rows": [{"index": 0, "unit_price_ht": "bad"}]})
+    assert invalid.status_code == 200 and invalid.json()["status"] == "needs_review"
+    cleared = client.put(route, json={"rows": [{"index": 0, "unit_price_ht": ""}]})
+    assert cleared.json()["totals"]["total_ht"]["value"] is None
+    assert cleared.json()["status"] == "not_started"
 
 
 def test_v2_ministry_marks_unrecognized_boq_unavailable_without_fake_data(tmp_path):
@@ -397,3 +467,32 @@ def test_corrupt_document_returns_sanitized_processing_error():
     assert error["technical_detail"]
     assert "tender-document-intelligence-" not in response.text
     assert "traceback" not in response.text.lower()
+
+
+def test_review_persists_without_mutating_machine_facts_and_delete_is_guarded(tmp_path, monkeypatch):
+    from app.api import workflow_routes
+    from app.api.document_store import LocalDocumentStore
+    store = LocalDocumentStore(tmp_path / "records")
+    monkeypatch.setattr(workflow_routes, "document_store", store)
+    source = REFERENCE_PDF.read_bytes()
+    response = client.post("/api/v2/cdc/analyze", files={"file": (REFERENCE_PDF.name, source, "application/pdf")})
+    assert response.status_code == 200, response.text
+    document_id = response.json()["document"]["document_url"].rsplit("/", 1)[-1]
+    original = store.get_analysis(document_id)["response"]
+    facts = client.get(f"/api/v2/cdc/{document_id}/review").json()["facts"]
+    assert facts and any(fact["key"].startswith("financial:") for fact in facts)
+    fact = facts[0]
+    url = f"/api/v2/cdc/{document_id}/review/{fact['key']}"
+    assert client.put(url, json={"status": "corrected", "corrected_value": ""}).status_code == 422
+    saved = client.put(url, json={"status": "corrected", "corrected_value": "Valeur vérifiée"})
+    assert saved.status_code == 200, saved.text
+    assert saved.json()["machine_value"] == fact["machine_value"]
+    assert saved.json()["corrected_value"] == "Valeur vérifiée"
+    monkeypatch.setattr(workflow_routes, "document_store", LocalDocumentStore(tmp_path / "records"))
+    reloaded = client.get(f"/api/v2/cdc/{document_id}/review").json()["facts"]
+    assert reloaded[0]["status"] == "corrected"
+    assert store.get_analysis(document_id)["response"] == original
+    assert client.delete("/api/v2/cdc/../../").status_code in {404, 405}
+    assert client.delete(f"/api/v2/cdc/{document_id}").json()["deleted"] is True
+    assert client.get(f"/api/v2/cdc/{document_id}").status_code == 404
+    assert not (tmp_path / "records" / document_id).exists()

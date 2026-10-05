@@ -56,19 +56,39 @@ _SMALL_FR = {"un": 1, "une": 1, "deux": 2, "trois": 3, "quatre": 4,
              "soixante": 60, "cent": 100}
 
 
+def _fold_with_offsets(text: str) -> tuple[str, list[int]]:
+    """Normalize for matching while retaining each folded character's source offset."""
+    digits = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
+    output: list[str] = []
+    offsets: list[int] = []
+    for index, original in enumerate(text):
+        normalized = unicodedata.normalize("NFKD", unicodedata.normalize("NFKC", original).translate(digits))
+        chars = []
+        for char in normalized:
+            if unicodedata.combining(char) and not (
+                    "ARABIC" in unicodedata.name(char, "") and "HAMZA" in unicodedata.name(char, "")):
+                continue
+            chars.append(char)
+        for char in unicodedata.normalize("NFC", "".join(chars)).casefold():
+            if char.isspace():
+                if output and output[-1] != " ":
+                    output.append(" ")
+                    offsets.append(index)
+            else:
+                output.append(char)
+                offsets.append(index)
+    if output and output[-1] == " ":
+        output.pop()
+        offsets.pop()
+    return "".join(output), offsets
+
+
 def _fold(text: str) -> str:
-    text = unicodedata.normalize("NFKC", text).translate(str.maketrans(
-        "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789"))
-    chars=[]
-    for ch in unicodedata.normalize("NFKD", text):
-        if unicodedata.combining(ch):
-            # Latin accents are folded; Arabic hamza is lexical and must stay.
-            if "ARABIC" in unicodedata.name(ch, "") and "HAMZA" in unicodedata.name(ch, ""):
-                chars.append(ch)
-            continue
-        chars.append(ch)
-    text = unicodedata.normalize("NFC", "".join(chars))
-    return re.sub(r"\s+", " ", text).strip().casefold()
+    return _fold_with_offsets(text)[0]
+
+
+def _raw_span(text: str, offsets: list[int], start: int, end: int) -> str:
+    return text[offsets[start]:offsets[end - 1] + 1] if start < end else ""
 
 
 def _decimal(token: str) -> Decimal | None:
@@ -122,7 +142,7 @@ def _number(token: str) -> Decimal | None:
 
 
 def _money(text: str) -> list[Fact]:
-    folded = _fold(text)
+    folded, offsets = _fold_with_offsets(text)
     cur = r"(?:t\s*n\s*d|dt|d\.\s*t\.?|dinars?(?:\s+tunisiens?)?|dinar tunisien|دينار(?:\s+تونسي)?|د\.?ت\.?)"
     out = []
     pattern = re.compile(rf"(?P<num>\d[\d\s.,\u00a0\u202f]*\d|\d+)\s*(?P<cur>{cur})|(?P<cur2>{cur})\s*(?P<num2>\d[\d\s.,\u00a0\u202f]*\d|\d+)", re.I)
@@ -131,7 +151,7 @@ def _money(text: str) -> list[Fact]:
         amount = _decimal(token)
         if amount is None:
             continue
-        raw = text[match.start():match.end()]
+        raw = _raw_span(text, offsets, match.start(), match.end())
         start = max(0, match.start() - 90)
         near = folded[start:min(len(folded),match.end()+30)]
         tax = "TTC" if re.search(r"\bttc\b|toutes taxes comprises", near) else "HT" if re.search(r"\bht\b|hors taxes", near) else None
@@ -143,7 +163,7 @@ def _money(text: str) -> list[Fact]:
 
 
 def _percentages(text: str) -> list[Fact]:
-    folded = _fold(text)
+    folded, offsets = _fold_with_offsets(text)
     out: list[Fact] = []
     pattern = re.compile(r"(?P<num>\d+(?:[.,]\d+)?)\s*(?P<unit>%|‰|pour\s+mille|pour\s+cent|percent|per\s+mille)", re.I)
     for m in pattern.finditer(folded):
@@ -163,17 +183,17 @@ def _percentages(text: str) -> list[Fact]:
                     "vat_rate" if re.search(r"\btva\b|ضريبة القيمة المضافة",before+" "+after) else "percentage")
         if category in ("retention", "payment_component"):
             basis = "PAYMENT_AMOUNT"
-        raw = text[m.start():m.end()]
+        raw = _raw_span(text, offsets, m.start(), m.end())
         out.append(Fact(category, raw, {"value": value, "unit": unit,
                     "period": period, "basis": basis}))
     # Written French percent with paired digits, e.g. deux pour cent (2%).
     written = re.compile(r"(?P<words>(?:vingt|trente|quarante|cinquante|soixante|\w+)(?:[- ](?:et[- ])?\w+)?)\s+pour\s+cent\s*\(\s*(?P<num>\d+(?:[.,]\d+)?)\s*%\s*\)", re.I)
     for m in written.finditer(folded):
-        if any(f.raw == text[m.start():m.end()] for f in out):
+        if any(f.raw == _raw_span(text, offsets, m.start(), m.end()) for f in out):
             continue
         v = _decimal(m.group("num"))
         if v is not None:
-            out.append(Fact("percentage", text[m.start():m.end()], {"value": v, "unit": "PERCENT", "period": None, "basis": None}))
+            out.append(Fact("percentage", _raw_span(text, offsets, m.start(), m.end()), {"value": v, "unit": "PERCENT", "period": None, "basis": None}))
     # Formula multipliers in delay clauses are ratios, not percentages.
     formula = re.compile(r"(?:penalit|retard|خطية|غرام)[^\n.;]{0,180}?(?:x|×|\*)\s*(?P<n>\d+(?:[.,]\d+)?)", re.I)
     for m in formula.finditer(folded):
@@ -182,12 +202,12 @@ def _percentages(text: str) -> list[Fact]:
         clause=folded[m.start():m.end()]
         period="DAY" if re.search(r"jour|يوم",clause) else "HOUR" if re.search(r"heure|ساعة",clause) else None
         if not any(f.category=="penalty_rate" and f.normalized and f.normalized.get("value")==value for f in out):
-            out.append(Fact("penalty_rate",text[m.start():m.end()],{"value":value,"unit":"DECIMAL_RATE","period":period,"basis":"CONTRACT_AMOUNT"}))
+            out.append(Fact("penalty_rate",_raw_span(text, offsets, m.start(), m.end()),{"value":value,"unit":"DECIMAL_RATE","period":period,"basis":"CONTRACT_AMOUNT"}))
     return out
 
 
 def _dates(text: str) -> list[Fact]:
-    folded = _fold(text)
+    folded, offsets = _fold_with_offsets(text)
     out: list[Fact] = []
     iso = re.compile(r"\b(?P<y>20\d{2})[-/](?P<m>\d{1,2})[-/](?P<d>\d{1,2})\b")
     named = re.compile(r"(?P<d>\d{1,2})\s+(?P<month>[\w\u0600-\u06ff]+)\s+(?P<y>20\d{2})", re.I)
@@ -225,23 +245,23 @@ def _dates(text: str) -> list[Fact]:
                   "clarification_deadline" if re.search(r"clarification|eclaircissement|question|استفسار",deadline_context) else
                   "submission_deadline" if re.search(r"date limite|reception des offres|آخر أجل|قبول العروض|الساعة", deadline_context) else "date")
             out.append(Fact(kind,
-                            text[m.start():m.end() + (tm.end() if tm else 0)], norm))
+                            _raw_span(text, offsets, m.start(), min(len(offsets), m.end() + (tm.end() if tm else 0))), norm))
     # Numeric day/month dates are accepted only if the ordering is unambiguous.
     numeric = re.compile(r"\b(?P<a>\d{1,2})[./](?P<b>\d{1,2})[./](?P<y>20\d{2})\b")
     for m in numeric.finditer(folded):
         a,b,y = int(m.group("a")),int(m.group("b")),int(m.group("y"))
         if a <= 12 and b <= 12:
-            out.append(Fact("date", text[m.start():m.end()], None, "ambiguous"))
+            out.append(Fact("date", _raw_span(text, offsets, m.start(), m.end()), None, "ambiguous"))
             continue
         d,mo=(a,b) if a>12 else (b,a)
         try: value=date(y,mo,d).isoformat()
         except ValueError: continue
-        out.append(Fact("date",text[m.start():m.end()],{"date":value}))
+        out.append(Fact("date",_raw_span(text, offsets, m.start(), m.end()),{"date":value}))
     return out
 
 
 def _durations(text: str) -> list[Fact]:
-    folded = _fold(text)
+    folded, offsets = _fold_with_offsets(text)
     units = r"jours?|j(?:ours?)?\.?|أيام|يوما|يوم|semaines?|mois|شهر|أشهر|ans?|annees?|سنة|سنوات"
     number = r"\d+(?:[.,]\d+)?|(?:un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|vingt|trente|quarante|cinquante|soixante|cent)(?:[- ](?:et[- ])?(?:un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|vingt|trente|quarante|cinquante|soixante|cent))?(?:\s*\(\s*\d+(?:[.,]\d+)?\s*\))?"
     pat = re.compile(rf"(?P<n>{number})\s*(?P<u>{units})", re.I)
@@ -261,12 +281,12 @@ def _durations(text: str) -> list[Fact]:
                   "warranty_period" if re.search(r"garantie|warranty|ضمان",before) else
                   "payment_deadline" if re.search(r"paiement|facture|payment|الدفع",before+" "+after) and re.search(r"delai|jours|أجل|يوما",before+" "+after) else
                   "execution_period" if re.search(r"execution|execut|achevement|delai|مدة|أجل",before) else "duration")
-        out.append(Fact(category,text[m.start():m.end()],{"value":val,"unit":unit}))
+        out.append(Fact(category,_raw_span(text, offsets, m.start(), m.end()),{"value":val,"unit":unit}))
     return out
 
 
 def _schedules(text: str) -> list[Fact]:
-    folded=_fold(text)
+    folded, offsets = _fold_with_offsets(text)
     terms=((r"trimestriellement|chaque trimestre|tous les trimestres|كل ثلاثة أشهر", "QUARTERLY"),
            (r"mensuellement|chaque mois|tous les mois|شهريا", "MONTHLY"),
            (r"annuellement|chaque année|tous les ans|سنويا", "ANNUAL"),
@@ -278,7 +298,7 @@ def _schedules(text: str) -> list[Fact]:
             clause=folded[max(0,m.start()-100):min(len(folded),m.end()+100)]
             if not payment: continue
             norm={"frequency":period,"timing":"IN_ARREARS" if re.search(r"terme echu|apres echeance|à terme échu",clause) else None}
-            out.append(Fact("payment_schedule",text[m.start():m.end()],norm))
+            out.append(Fact("payment_schedule",_raw_span(text, offsets, m.start(), m.end()),norm))
     return out
 
 

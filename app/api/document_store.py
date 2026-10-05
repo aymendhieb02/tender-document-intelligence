@@ -3,6 +3,7 @@ from __future__ import annotations
 import mimetypes
 import json
 import os
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
@@ -103,10 +104,54 @@ class LocalDocumentStore:
                     analysis_path.stat().st_mtime, timezone.utc).isoformat()
             except OSError:
                 continue
+            pricing = self.get_pricing(document_id, 0)
             records.append({"document_id": document_id, "filename": stored.filename,
                             "analyzed_at": timestamp, "page_count": document["page_count"],
-                            "workflow": analysis.get("workflow", "cdc"), "status": "completed"})
+                            "workflow": analysis.get("workflow", "cdc"), "status": "completed",
+                            "pricing_status": pricing.get("status", "not_started") if pricing else "not_started"})
         return sorted(records, key=lambda item: item["analyzed_at"], reverse=True)
+
+    def get_pricing(self, document_id: str, boq_index: int) -> dict | None:
+        if self.get_analysis(document_id) is None or not 0 <= boq_index < 1000:
+            return None
+        try:
+            value = json.loads((self._root / document_id / f"pricing-{boq_index}.json").read_text(encoding="utf-8"))
+            return value if isinstance(value, dict) and value.get("schema_version") == 1 else None
+        except (OSError, ValueError):
+            return None
+
+    def save_pricing(self, document_id: str, boq_index: int, value: dict) -> None:
+        if self.get_analysis(document_id) is None or not 0 <= boq_index < 1000:
+            raise FileNotFoundError("Cannot persist pricing without its saved tender analysis")
+        self._write_json(self._root / document_id / f"pricing-{boq_index}.json", value)
+
+    def get_review(self, document_id: str) -> dict:
+        if self.get_analysis(document_id) is None:
+            return {}
+        try:
+            value = json.loads((self._root / document_id / "review.json").read_text(encoding="utf-8"))
+            return value if isinstance(value, dict) and value.get("schema_version") == 1 else {}
+        except (OSError, ValueError):
+            return {}
+
+    def save_review(self, document_id: str, value: dict) -> None:
+        if self.get_analysis(document_id) is None:
+            raise FileNotFoundError("Cannot persist review without analysis")
+        self._write_json(self._root / document_id / "review.json", value)
+
+    def delete_analysis(self, document_id: str) -> bool:
+        """Delete one strictly identified record, without following links outside storage."""
+        if self.get_analysis(document_id) is None:
+            return False
+        root = self._root.resolve()
+        directory = root / document_id
+        if directory.parent != root or directory.is_symlink():
+            return False
+        for child in directory.iterdir():
+            if child.is_symlink() or child.is_dir():
+                return False
+        shutil.rmtree(directory)
+        return True
 
     def get_analysis(self, document_id: str) -> dict | None:
         if self.get(document_id) is None:

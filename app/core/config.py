@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     app_name: str = "Invoice OCR ERP"
     output_dir: Path = Path("outputs")
     max_upload_size_mb: int = 25
+    cors_origins: str = ""
     low_confidence_threshold: float = 0.60
     ocr_languages: str = "fr,en"
     ocr_languages_list: list[str] = ["fr", "en", "ar"]

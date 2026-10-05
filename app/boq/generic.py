@@ -18,7 +18,7 @@ HEADERS = {
     "designation": ("designation", "description", "libelle", "nature des travaux"),
     "unit": ("unite", "u"),
     "quantity": ("quantite", "qte"),
-    "unit_price_ht": ("prix unitaire ht", "prix unitaire", "pu ht", "p u ht", "pu"),
+    "unit_price_ht": ("prix unitaire ht", "prix unitaire", "pu ht", "p u ht", "p u", "pu"),
     "total_ht": ("prix total ht", "montant ht", "total ht", "prix total", "montant"),
 }
 NUMERIC = {"quantity", "unit_price_ht", "total_ht"}
@@ -76,17 +76,27 @@ def detect_generic_boq(page):
     if not _heading_present(page):
         return None
     candidates = []
-    for line in _lines(page):
-        columns = _header_columns(line)
-        if "designation" in columns and len(columns) >= 3 and any(field in columns for field in NUMERIC):
-            candidates.append((len(columns), _line_y(line), columns))
+    lines = _lines(page)
+    for index, line in enumerate(lines):
+        for span in (1, 2):
+            if span == 2 and (index + 1 >= len(lines) or _line_y(lines[index + 1]) - _line_y(line) > 40):
+                continue
+            header_lines = lines[index:index + span]
+            elements = sorted((element for part in header_lines for element in part),
+                              key=lambda element: (_bbox(element).x1, (_bbox(element).y1 + _bbox(element).y2) / 2))
+            columns = _header_columns(elements)
+            if "designation" in columns and len(columns) >= 3 and any(field in columns for field in NUMERIC):
+                header_text = normalize_header(" ".join(str(element_value(item, "text", "")) for item in elements))
+                candidates.append((len(columns), -span, _line_y(header_lines[-1]), columns, header_text))
     if not candidates:
         return None
-    _, header_y, columns = max(candidates, key=lambda item: (item[0], -item[1]))
+    _, _, header_y, columns, header_text = max(candidates, key=lambda item: (item[0], -item[2], item[1]))
+    price_basis = ("ht" if re.search(r"\b(ht|htva|hors taxes?)\b", header_text) else
+                   "ttc" if re.search(r"\bttc\b", header_text) else "unknown")
     ordered = sorted(columns.items(), key=lambda item: item[1])
     if len({round(x, 1) for _, x in ordered}) != len(ordered):
         return None
-    return header_y, ordered
+    return header_y, ordered, price_basis
 
 
 def extract_generic_boq(page, *, document_id: str | None = None) -> BOQDocument:
@@ -97,11 +107,13 @@ def extract_generic_boq(page, *, document_id: str | None = None) -> BOQDocument:
                          diagnostics=[] if detected else ["generic_header_not_detected"])
     if detected is None:
         return result
-    header_y, ordered = detected
+    header_y, ordered, price_basis = detected
     result.column_mapping = {field: field for field, _ in ordered}
     result.detection = {"method": "heading_and_positioned_header", "header_page": page.page_number,
-                        "column_centres": {field: round(x, 2) for field, x in ordered}}
+                        "column_centres": {field: round(x, 2) for field, x in ordered},
+                        "price_basis": price_basis}
     mids = [(ordered[index][1] + ordered[index + 1][1]) / 2 for index in range(len(ordered) - 1)]
+    previous_y = None
     for line in _lines(page):
         y = _line_y(line)
         if y <= header_y + max(5, page.height * .007):
@@ -109,12 +121,24 @@ def extract_generic_boq(page, *, document_id: str | None = None) -> BOQDocument:
         text = normalize_header(" ".join(str(element_value(item, "text", "")) for item in line))
         if text.startswith(("total", "sous total", "tva", "montant total")):
             continue
+        repeated = _header_columns(line)
+        if "designation" in repeated and len(repeated) >= 3:
+            continue
         cells = defaultdict(list)
         for element in line:
             box = _bbox(element)
             centre = (box.x1 + box.x2) / 2
             index = next((index for index, boundary in enumerate(mids) if centre < boundary), len(mids))
             cells[ordered[index][0]].append(element)
+        if set(cells) == {"designation"} and result.rows and previous_y is not None and (
+                y - previous_y <= max(35, page.height * .03)):
+            continuation = _text_value(page, cells["designation"])
+            previous = result.rows[-1].designation
+            previous.raw_value = " ".join(filter(None, (previous.raw_value, continuation.raw_value)))
+            previous.normalized_value = previous.raw_value
+            previous.evidence.extend(continuation.evidence)
+            previous_y = y
+            continue
         # Require a readable item label and another observed cell. This suppresses
         # narrative lines below a table and avoids manufacturing blank rows.
         if not cells.get("designation") or len([field for field in cells if cells[field]]) < 2:
@@ -126,6 +150,7 @@ def extract_generic_boq(page, *, document_id: str | None = None) -> BOQDocument:
             if cells.get(field):
                 setattr(row, field, _text_value(page, cells[field], numeric=field in NUMERIC))
         result.rows.append(row)
+        previous_y = y
     if result.rows:
         evidence = [_evidence(page, line) for line in _lines(page) if abs(_line_y(line) - header_y) <= 1]
         result.source_evidence = evidence

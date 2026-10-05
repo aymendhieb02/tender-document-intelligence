@@ -1,10 +1,11 @@
-import { analyzeTenderDocument, exportBoqCsv } from "../api.js?v=persisted-results-3";
+import { analyzeTenderDocument, exportBoqCsv, loadTenderReview, saveTenderReview } from "../api.js?v=review-1";
 import { DocumentViewer } from "../components/document-viewer.js?v=platform-refactor-qa4";
 import { createEvidenceController } from "../components/evidence-highlight.js?v=platform-refactor-5";
 import { originBadge, statusBadge } from "../components/status-badge.js?v=platform-refactor-5";
 import { setActiveAnalysis } from "../state.js?v=platform-refactor-5";
-import { renderBoqWorkspace } from "./boq-workspace.js?v=focused-sprint-1";
+import { renderBoqWorkspace } from "./boq-workspace.js?v=pricing-1";
 import { askTender } from "../api.js?v=persisted-results-3";
+import { renderPricingWorkspace } from "./pricing-workspace.js?v=pricing-1";
 
 const primaryViews = [["Vue d’ensemble", 0], ["Exigences", 2], ["Finances & Délais", 7], ["Bordereau", 4], ["Sources", 5], ["Ask Tender", 8]];
 const technicalViews = [["Structure", 1], ["Annexes", 3], ["Diagnostics", 6]];
@@ -17,7 +18,10 @@ export function renderCdcWorkspace(outlet, payload, file, workflow) {
   const documentIdLabel = documentResult.document_id ? documentResult.document_id.slice(0, 12) : "—";
   const refs = [];
   let askEvidenceItems = [];
-  const tenderTitle = summaryIdentity(payload, "title") || cdc.title || file?.name || "—";
+  let pricingController = null;
+  const extractedTitle = summaryIdentity(payload, "title");
+  const tenderTitle = (extractedTitle && extractedTitle !== "—" ? extractedTitle : null) ||
+    cdc.title || payload.document?.filename || file?.name || "Document analysé";
   const boqDiagnostics = payload.boq_document?.diagnostics || payload.modules?.boq?.diagnostics || [];
   const noHandoff = boqDiagnostics.includes("cdc_did_not_detect_boq_handoff");
   const optionalBoqNotice = male && !payload.boq_document?.detected
@@ -40,10 +44,15 @@ export function renderCdcWorkspace(outlet, payload, file, workflow) {
     const open = moreViewsMenu.classList.toggle("hidden") === false;
     moreViewsButton.setAttribute("aria-expanded", String(open));
   });
-  outlet.querySelectorAll("[data-analysis-view]").forEach(button => button.addEventListener("click", () => {
+  outlet.querySelectorAll("[data-analysis-view]").forEach(button => button.addEventListener("click", async () => {
     const index = Number(button.dataset.analysisView);
+    if (pricingController) {
+      if (!await pricingController.flush()) return;
+      pricingController = null;
+    }
     activateAnalysisView(outlet, index);
     renderAnalysisView(view, index, cdc, payload, documentResult, file, workflow, registerEvidence, selectReference);
+    if (index === 7) decorateFinancialReview(view, payload.document_store_id);
   }));
   renderAnalysisView(view, 0, cdc, payload, documentResult, file, workflow, registerEvidence, selectReference);
   outlet.classList.add("has-analysis");
@@ -56,6 +65,15 @@ export function renderCdcWorkspace(outlet, payload, file, workflow) {
     renderAnalysisView(view, 5, cdc, payload, documentResult, file, workflow, registerEvidence, selectReference, ref.evidence);
   }
   outlet.querySelector("#analysisView").addEventListener("click", async event => {
+    const pricingButton = event.target.closest("[data-boq-pricing]");
+    if (pricingButton) {
+      pricingButton.disabled = true;
+      pricingController = await renderPricingWorkspace(view, payload.document_store_id, 0, {
+        onBack: () => { pricingController = null; renderAnalysisView(view, 4, cdc, payload, documentResult, file, workflow, registerEvidence, selectReference); },
+        onSource: page => viewer.goToPage(page),
+      });
+      return;
+    }
     const exportButton = event.target.closest("[data-boq-export]");
     if (exportButton) {
       const status = outlet.querySelector("[data-boq-export-status]");
@@ -185,7 +203,17 @@ function renderOverview(cdc, result, payload, workflow) {
   const summary = payload.modules?.summary?.data;
   const identity = summary?.identity || {};
   const fact = key => identity[key]?.value ?? identity[key]?.raw_text ?? "—";
-  return `<div class="view-heading"><div><p class="eyebrow">SYNTHÈSE</p><h2>Vue d’ensemble</h2><p>Résumé du dossier et état du traitement.</p></div></div>${summary ? `<section class="diagnostic-summary"><h3>Identité du marché</h3><dl class="metadata-list"><div><dt>Objet</dt><dd>${escapeHtml(fact("title") || fact("object"))}</dd></div><div><dt>Référence</dt><dd>${escapeHtml(fact("reference"))}</dd></div><div><dt>Autorité contractante</dt><dd>${escapeHtml(fact("contracting_organization"))}</dd></div></dl></section>` : ""}<div class="overview-grid"><article class="overview-stat"><span>Pages physiques</span><strong>${pages.length || "—"}</strong></article><article class="overview-stat"><span>Sections</span><strong>${countNodes(cdc.sections)}</strong></article><article class="overview-stat"><span>Exigences</span><strong>${arrayCount(requirementItems)}</strong></article><article class="overview-stat"><span>Obligatoires</span><strong>${Array.isArray(requirementItems) ? requirementItems.filter(item => item.mandatory_status === "MANDATORY").length : "—"}</strong></article><article class="overview-stat"><span>À vérifier</span><strong>${summary?.requirements?.review_required ?? "—"}</strong></article><article class="overview-stat"><span>Faits financiers</span><strong>${arrayCount(financialItems)}</strong></article><article class="overview-stat"><span>Annexes</span><strong>${arrayCount(cdc.annexes)}</strong></article><article class="overview-stat"><span>Lignes BOQ</span><strong>${payload.boq_document?.detected ? payload.boq_document.rows?.length ?? "—" : "—"}</strong></article></div>${workflow === "male" ? `<div class="notice ${payload.boq_document?.detected ? "notice-positive" : "notice-warning"}"><strong>${payload.boq_document?.detected ? "Bordereau spécialisé reconnu" : "Bordereau spécialisé indisponible"}</strong><span>${payload.boq_document?.detected ? `${payload.boq_document.rows?.length || 0} lignes structurelles détectées.` : "L’analyse générale du cahier des charges reste disponible."}</span></div>` : ""}<section class="diagnostic-summary"><div class="subsection-heading"><h3>Traitement</h3>${statusBadge("detected")}</div><dl class="metadata-list"><div><dt>Document ID</dt><dd>${escapeHtml(result.document_id || "—")}</dd></div><div><dt>Mode</dt><dd>${escapeHtml(result.mode || "—")}</dd></div><div><dt>Source</dt><dd>${escapeHtml(result.source_type || "—")}</dd></div><div><dt>Temps total</dt><dd>${formatMs(result.diagnostics?.processing_ms)}</dd></div><div><dt>Avertissements</dt><dd>${warnings.length + cdcDiagnostics.length}</dd></div></dl></section>`;
+  return `<div class="view-heading"><div><p class="eyebrow">SYNTHÈSE</p><h2>Vue d’ensemble</h2><p>Résumé du dossier et état du traitement.</p></div></div>${renderQualitySignals(payload.quality_signals)}${summary ? `<section class="diagnostic-summary"><h3>Identité du marché</h3><dl class="metadata-list"><div><dt>Objet</dt><dd>${escapeHtml(fact("title") || fact("object"))}</dd></div><div><dt>Référence</dt><dd>${escapeHtml(fact("reference"))}</dd></div><div><dt>Autorité contractante</dt><dd>${escapeHtml(fact("contracting_organization"))}</dd></div></dl></section>` : ""}<div class="overview-grid"><article class="overview-stat"><span>Pages physiques</span><strong>${pages.length || "—"}</strong></article><article class="overview-stat"><span>Sections</span><strong>${countNodes(cdc.sections)}</strong></article><article class="overview-stat"><span>Exigences</span><strong>${arrayCount(requirementItems)}</strong></article><article class="overview-stat"><span>Obligatoires</span><strong>${Array.isArray(requirementItems) ? requirementItems.filter(item => item.mandatory_status === "MANDATORY").length : "—"}</strong></article><article class="overview-stat"><span>À vérifier</span><strong>${summary?.requirements?.review_required ?? "—"}</strong></article><article class="overview-stat"><span>Faits financiers</span><strong>${arrayCount(financialItems)}</strong></article><article class="overview-stat"><span>Annexes</span><strong>${arrayCount(cdc.annexes)}</strong></article><article class="overview-stat"><span>Lignes BOQ</span><strong>${payload.boq_document?.detected ? payload.boq_document.rows?.length ?? "—" : "—"}</strong></article></div>${workflow === "male" ? `<div class="notice ${payload.boq_document?.detected ? "notice-positive" : "notice-warning"}"><strong>${payload.boq_document?.detected ? "Bordereau spécialisé reconnu" : "Bordereau spécialisé indisponible"}</strong><span>${payload.boq_document?.detected ? `${payload.boq_document.rows?.length || 0} lignes structurelles détectées.` : "L’analyse générale du cahier des charges reste disponible."}</span></div>` : ""}<section class="diagnostic-summary"><div class="subsection-heading"><h3>Traitement</h3>${statusBadge("detected")}</div><dl class="metadata-list"><div><dt>Document ID</dt><dd>${escapeHtml(result.document_id || "—")}</dd></div><div><dt>Mode</dt><dd>${escapeHtml(result.mode || "—")}</dd></div><div><dt>Source</dt><dd>${escapeHtml(result.source_type || "—")}</dd></div><div><dt>Temps total</dt><dd>${formatMs(result.diagnostics?.processing_ms)}</dd></div><div><dt>Avertissements</dt><dd>${warnings.length + cdcDiagnostics.length}</dd></div></dl></section>`;
+}
+
+function renderQualitySignals(signals) {
+  if (!Array.isArray(signals) || !signals.length) return "";
+  const labels = { native_pages: "Pages en texte natif", ocr_pages: "Pages lues par OCR",
+    ocr_low_confidence_pages: "Pages OCR avec éléments incertains", boq_empty_template: "Bordereau vide",
+    boq_detected: "Bordereau détecté", boq_unavailable: "Bordereau non disponible",
+    ask_evidence_available: "Références consultables" };
+  return `<div class="quality-signals">${signals.filter(item => item.count || item.code === "boq_unavailable").map(item =>
+    `<span>${labels[item.code] || escapeHtml(item.code)} : ${Number(item.count) || 0}</span>`).join("")}</div>`;
 }
 
 function renderFinancial(payload, registerEvidence) {
@@ -195,8 +223,39 @@ function renderFinancial(payload, registerEvidence) {
   if (!facts.length) return emptyBlock("Aucun fait financier détecté", "Aucun fait financier ou délai n’a été retourné.");
   return `<div class="view-heading"><div><p class="eyebrow">FAITS EXTRAITS · ${escapeHtml(module.availability)}</p><h2>Finances & échéances</h2><p>Valeurs brutes et normalisées avec leur état de revue.</p></div></div><div class="requirement-list">${facts.map((item, index) => {
     const ev = item.evidence?.[0]; const ref = ev ? payloadEvidenceRef(ev, registerEvidence, item.category) : -1;
-    return `<article class="requirement-card"><div class="requirement-card-heading"><div><span class="requirement-type">${escapeHtml(item.category || "FAIT")}</span><h3>${escapeHtml(item.raw ?? "—")}</h3></div>${statusBadge(item.status || "needs_review")}</div><dl class="requirement-meta"><div><dt>Valeur source</dt><dd>${escapeHtml(item.raw ?? "—")}</dd></div><div><dt>Valeur normalisée</dt><dd>${escapeHtml(display(item.normalized))}</dd></div><div><dt>Revue</dt><dd>${escapeHtml(item.status || "—")}${item.conflict_group ? ` · Conflit ${escapeHtml(item.conflict_group)}` : ""}</dd></div><div><dt>Page</dt><dd>${ev?.page_number ?? ev?.page ?? "—"}</dd></div></dl>${ref >= 0 ? `<button class="button button-secondary" data-ref-select="${ref}">Voir la preuve</button>` : ""}</article>`;
+    return `<article class="requirement-card" data-review-key="financial:${escapeHtml(item.id)}"><div class="requirement-card-heading"><div><span class="requirement-type">${escapeHtml(item.category || "FAIT")}</span><h3>${escapeHtml(item.raw ?? "—")}</h3></div>${statusBadge(item.status || "needs_review")}</div><dl class="requirement-meta"><div><dt>Valeur source</dt><dd>${escapeHtml(item.raw ?? "—")}</dd></div><div><dt>Valeur normalisée</dt><dd>${escapeHtml(display(item.normalized))}</dd></div><div><dt>Revue machine</dt><dd>${escapeHtml(item.status || "—")}${item.conflict_group ? ` · Conflit ${escapeHtml(item.conflict_group)}` : ""}</dd></div><div><dt>Page</dt><dd>${ev?.page_number ?? ev?.page ?? "—"}</dd></div></dl>${ref >= 0 ? `<button class="button button-secondary" data-ref-select="${ref}">Voir la preuve</button>` : ""}<div class="fact-review-slot"></div></article>`;
   }).join("")}</div>`;
+}
+async function decorateFinancialReview(root, documentId) {
+  if (!documentId) return;
+  let facts;
+  try { facts = (await loadTenderReview(documentId)).facts; }
+  catch { return; }
+  if (!root.isConnected) return;
+  const byKey = new Map(facts.map(fact => [fact.key, fact]));
+  root.querySelectorAll("[data-review-key]").forEach(card => {
+    const fact = byKey.get(card.dataset.reviewKey);
+    if (!fact) return;
+    const slot = card.querySelector(".fact-review-slot");
+    slot.innerHTML = `<div class="fact-review"><label>Revue humaine <select aria-label="État de revue humaine"><option value="unreviewed">Non vérifié</option><option value="approved">Approuvé</option><option value="corrected">Corrigé</option></select></label><label>Valeur corrigée <input type="text" maxlength="1000" aria-label="Valeur corrigée" placeholder="À renseigner si corrigé" value="${escapeHtml(fact.corrected_value || "")}"></label><button type="button" class="button button-secondary">Enregistrer la revue</button><small aria-live="polite">${fact.updated_at ? "Revue enregistrée" : "Aucune revue enregistrée"}</small></div>`;
+    const select = slot.querySelector("select");
+    const input = slot.querySelector("input");
+    const button = slot.querySelector("button");
+    const status = slot.querySelector("small");
+    select.value = fact.status;
+    input.disabled = select.value !== "corrected";
+    select.addEventListener("change", () => { input.disabled = select.value !== "corrected"; status.textContent = "Modifications non enregistrées"; });
+    input.addEventListener("input", () => { status.textContent = "Modifications non enregistrées"; });
+    button.addEventListener("click", async () => {
+      button.disabled = true; status.textContent = "Enregistrement…";
+      try {
+        await saveTenderReview(documentId, fact.key, { status: select.value,
+          corrected_value: select.value === "corrected" ? input.value : null });
+        status.textContent = "Revue enregistrée";
+      } catch (error) { status.textContent = error.message; }
+      finally { button.disabled = false; }
+    });
+  });
 }
 function payloadEvidenceRef(evidence, registerEvidence, title) { return registerEvidence({ page: evidence.page_number ?? evidence.page, element_id: evidence.element_id, raw_text: evidence.raw_text, source_element_ids: [evidence.element_id], coordinate_space: evidence.coordinate_space }, title); }
 function renderAskTender() { return `<div class="view-heading"><div><p class="eyebrow">QUESTIONS AU DOSSIER</p><h2>Ask Tender</h2><p>Les réponses doivent être accompagnées de preuves du document.</p></div></div><form data-ask-tender class="ask-form"><label for="tenderQuestion">Votre question</label><textarea id="tenderQuestion" name="question" rows="3" placeholder="Posez une question sur cet appel d’offres…" required></textarea><button class="button button-primary" type="submit">Poser la question</button><div data-ask-result aria-live="polite"></div></form><p class="muted-note">La recherche locale reste disponible hors ligne. La génération de réponses par modèle local est facultative; les passages cités restent consultables sans elle.</p>`; }

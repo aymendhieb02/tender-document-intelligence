@@ -82,3 +82,35 @@ def test_french_procurement_paraphrases_retrieve_expected_evidence_in_top_three(
     result = service.answer_question(document, questions[0][0])
     assert result.status == "generation_unavailable"
     assert result.evidence and result.evidence[0].reference.page_number == 3
+
+
+def test_expanded_procurement_concepts_rank_observed_passages_without_fabricating_facts():
+    passages = [
+        (1, "Le bureau d'ordre à Tunis est le lieu de dépôt des offres.", "Où déposer l'offre ?"),
+        (2, "La garantie définitive sera fournie après attribution.", "Quelle est la caution définitive ?"),
+        (3, "La validité des offres est de 90 jours.", "Quelle durée de validité pour l'offre ?"),
+        (4, "Les modalités de paiement sont définies à l'article 12.", "Quelles conditions de paiement ?"),
+        (5, "Des pénalités de retard s'appliquent après le délai.", "Quelles pénalités de retard ?"),
+        (6, "Les critères d'évaluation incluent le prix et la technique.", "Quels critères de sélection ?"),
+        (7, "Le devis estimatif figure dans l'annexe.", "Où est le bordereau des prix ?"),
+    ]
+    document = TenderDocument(document_id="synthetic-concepts", articles=[
+        Article(id=f"a-{page}", number=str(page), text=text, page_start=page, page_end=page,
+                source_evidence=[Evidence(document_id="synthetic-concepts", page=page,
+                                          element_id=f"e-{page}", raw_text=text)])
+        for page, text, _ in passages])
+    ranks = []
+    for expected_page, _, question in passages:
+        pages = [item.reference.page_number for item in service.retrieve(document, question, limit=7)]
+        ranks.append(pages.index(expected_page) + 1 if expected_page in pages else None)
+    assert sum(rank == 1 for rank in ranks) >= 5
+    assert all(rank is not None and rank <= 3 for rank in ranks)
+
+
+def test_retrieval_deduplicates_same_evidence_passage():
+    evidence = Evidence(document_id="doc", page=1, element_id="same", raw_text="Validité des offres: 90 jours")
+    article = Article(id="a", number="1", text="Validité des offres: 90 jours",
+                      page_start=1, page_end=1, source_evidence=[evidence])
+    document = TenderDocument(document_id="doc", articles=[article, article])
+    found = service.retrieve(document, "validité des offres", limit=6)
+    assert len(found) == 1

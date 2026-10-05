@@ -84,6 +84,10 @@ export async function loadTenderAnalysis(documentId) {
   const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}`);
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(payload.error?.message || "Cette analyse n’est plus disponible.");
+  if (!payload.document?.filename) {
+    try { payload.document.filename = (await listTenderAnalyses()).find(item => item.document_id === documentId)?.filename || null; }
+    catch { /* Older saved results remain available even if the library index fails. */ }
+  }
   const firstBoq = payload.modules?.boq?.data?.[0]?.result || payload.modules?.boq?.data?.[0];
   return {
     ...payload,
@@ -109,6 +113,26 @@ export async function listTenderAnalyses() {
   return response.json();
 }
 
+export async function deleteTenderAnalysis(documentId) {
+  const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}`, { method: "DELETE" });
+  if (!response.ok) throw new Error("La suppression du dossier a échoué.");
+}
+
+export async function loadTenderReview(documentId) {
+  const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/review`);
+  if (!response.ok) throw new Error("La revue des faits est indisponible.");
+  return response.json();
+}
+
+export async function saveTenderReview(documentId, factKey, update) {
+  const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/review/${encodeURIComponent(factKey)}`, {
+    method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(update),
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.error?.message || "La revue n’a pas été enregistrée.");
+  return body;
+}
+
 export async function exportBoqCsv(documentId) {
   if (!documentId) throw new Error("Identifiant du dossier manquant.");
   const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/boq.csv`);
@@ -125,4 +149,30 @@ export async function exportBoqCsv(documentId) {
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+export async function loadBoqPricing(documentId, boqIndex = 0) {
+  const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/boq/${boqIndex}/pricing`);
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.error?.message || "Le chiffrage est indisponible.");
+  return body;
+}
+
+export async function saveBoqPricing(documentId, boqIndex, inputs) {
+  const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/boq/${boqIndex}/pricing`, {
+    method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(inputs),
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.error?.message || "Le chiffrage n’a pas été enregistré.");
+  return body;
+}
+
+export async function exportBoqPricingCsv(documentId, boqIndex = 0) {
+  const response = await fetch(`/api/v2/cdc/${encodeURIComponent(documentId)}/boq/${boqIndex}/pricing.csv`);
+  if (!response.ok) throw new Error("L’export du chiffrage a échoué.");
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = url; link.download = "boq-pricing.csv";
+  document.body.append(link); link.click(); link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

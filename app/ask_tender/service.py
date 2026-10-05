@@ -61,6 +61,20 @@ CONCEPT_ALIASES = {
     "required_documents": ("pieces a fournir", "documents demandes", "documents a fournir",
                            "documents sont demandes", "pieces demandees", "dossier de soumission",
                            "required documents"),
+    "submission_location": ("lieu de depot", "adresse de depot", "bureau d ordre", "ou deposer", "submission location"),
+    "submission_method": ("mode de depot", "modalites de remise", "soumission electronique", "comment soumettre", "submission method"),
+    "final_guarantee": ("caution definitive", "garantie definitive", "cautionnement definitif", "final guarantee"),
+    "offer_validity": ("validite des offres", "duree de validite", "offre valable", "offer validity"),
+    "technical_requirements": ("exigences techniques", "specifications techniques", "conditions techniques", "technical requirements"),
+    "administrative_requirements": ("pieces administratives", "conditions administratives", "dossier administratif", "administrative requirements"),
+    "eligibility": ("conditions de participation", "criteres d eligibilite", "qui peut participer", "eligibility"),
+    "payment_terms": ("modalites de paiement", "conditions de paiement", "delai de paiement", "payment terms"),
+    "penalties": ("penalites de retard", "penalite", "sanctions", "penalties"),
+    "lots": ("lots", "lotissement", "allotissement"),
+    "boq": ("bordereau des prix", "devis estimatif", "detail quantitatif", "bpu", "dqe"),
+    "annexes": ("annexes", "annexe", "pieces jointes"),
+    "evaluation_criteria": ("criteres d evaluation", "criteres de selection", "notation des offres", "evaluation criteria"),
+    "contact_information": ("personne a contacter", "renseignements complementaires", "contact", "telephone", "courriel"),
 }
 
 
@@ -146,14 +160,16 @@ def retrieve(document: TenderDocument, question: str, *, limit: int = 6) -> list
         concept_overlap = len(query_concepts & _concepts(candidate))
         # Aliases rank observed passages; they never supply an answer or evidence.
         lexical_score = overlap + phrase + 4 * concept_overlap
-        score = lexical_score + (2 if lexical_score and kind in {"article", "requirement", "financial_fact"} else 0)
+        score = lexical_score + (3 if lexical_score and kind == "financial_fact" else
+                                 2 if lexical_score and kind in {"article", "requirement"} else 0)
         if lexical_score:
             ranked.append((score, -index, AskEvidence(kind=kind, label=label, text=text[:1800], reference=ref, status=status)))
     results: list[AskEvidence] = []
-    seen: set[tuple[str, str, str, int | None]] = set()
+    seen: set[tuple[str, int | None, str]] = set()
     for _, _, item in sorted(ranked, reverse=True):
         page = item.reference.page_number if item.reference else None
-        key = (item.kind, item.label, item.text, page)
+        key = (item.reference.document_id if item.reference else "", page,
+               item.reference.element_id if item.reference else _fold(item.text))
         if key in seen:
             continue
         seen.add(key)

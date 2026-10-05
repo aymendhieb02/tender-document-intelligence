@@ -2,7 +2,7 @@ import { mountShell } from "./components/shell.js?v=focused-sprint-1";
 import { renderDashboard } from "./pages/dashboard.js?v=focused-sprint-1";
 import { renderCdcUpload } from "./pages/cdc-upload.js?v=mvp-fix-01";
 import { renderInvoicePage } from "./pages/invoice.js?v=platform-refactor-5";
-import { renderLibrary } from "./pages/library.js?v=library-1";
+import { renderLibrary } from "./pages/library.js?v=library-2";
 
 const path = window.location.pathname.replace(/\/$/, "") || "/";
 if (path.startsWith("/cdc/male")) document.title = "Ministère des Affaires Locales · Tender Intelligence";
@@ -25,7 +25,7 @@ if (invoiceContent || path === "/invoice" || path.startsWith("/invoice/result/")
 }
 
 async function renderCdcRoute(outlet, route) {
-  const { renderCdcWorkspace } = await import("./pages/cdc-workspace.js?v=focused-sprint-1");
+  const { renderCdcWorkspace } = await import("./pages/cdc-workspace.js?v=pricing-1");
   if (route.includes("/result/")) {
     const { loadTenderAnalysis } = await import("./api.js?v=persisted-results-3");
     const documentId = decodeURIComponent(route.split("/result/").at(-1) || "");
